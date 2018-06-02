@@ -22,7 +22,7 @@ $(function(){
   });
 
   $('#card1').click( function() {
-      $('.card1').load("card");
+      $('.graph').load("card");
   });
 
 });
