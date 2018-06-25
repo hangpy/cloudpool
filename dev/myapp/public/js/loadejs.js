@@ -23,5 +23,8 @@ $(function(){
   $('#card1').click( function() {
       $('.graph').load("card");
   });
+  $('#google').click( function() {
+      $('.graph').load("google/");
+  });
 
 });
