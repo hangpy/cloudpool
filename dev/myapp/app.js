@@ -10,8 +10,10 @@ var passport = require('./app_modules/config/passport')(app);
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var authRouter = require('./app_modules/cpauth/cp_auth')(passport);
-var google = require('./app_modules/cpgoogle/google_router');
+var google = require('./routes/google_router');
+// var box = require('./app_modules/cpgoogle/google_router');
 app.use('/google/', google);
+// app.use('/box/', box);
 
 
 

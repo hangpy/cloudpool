@@ -26,5 +26,8 @@ $(function(){
   $('#google').click( function() {
       $('.graph').load("google/");
   });
+  $('#box').click( function() {
+      $('.graph').load("box/");
+  });
 
 });
