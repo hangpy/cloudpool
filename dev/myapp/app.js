@@ -4,11 +4,16 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var sassMiddleware = require('node-sass-middleware');
+var app = express();
+var passport = require('./app_modules/config/passport')(app);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var authRouter = require('./app_modules/cpauth/cp_auth')(passport);
+var google = require('./app_modules/cpgoogle/google_router');
+app.use('/google/', google);
 
-var app = express();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -28,6 +33,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/auth/', authRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

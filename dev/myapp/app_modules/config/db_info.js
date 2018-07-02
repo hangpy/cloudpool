@@ -8,15 +8,17 @@
 *
 * @return {object}
 */
+const path = require('path');
+require('dotenv').config({path: path.join(__dirname + '/../../.env')});
 
 module.exports = (function(){
   const LOCAL_POOL = {
-    host: '',
-    port: '',
-    user: '',
-    password: '',
-    database: '',
-    connectionLimit: 1,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+    connectionLimit: 20,
     waitForConnections: false
   };
   const DEV_POOL = {
