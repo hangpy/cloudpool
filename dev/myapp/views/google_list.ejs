@@ -1,5 +1,5 @@
 <body>
-  <form id="uploadform" action='upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
+  <form id="uploadform" action='google/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
     <input type='file' name='userfile'>
     <button type="submit" >업로드</button>
 
@@ -30,34 +30,52 @@
                   if(filelist.length>0){
                      for(var i=0; i<filelist.length; i++)
                      {
-                        var oneItem = filelist[i];
-                        var size = formatBytes(oneItem.size,3);
-                        if(oneItem.mimeType=="application/vnd.google-apps.folder"){
-                          %>
-                          <tr>
-                             <td><input type="checkbox" name="name" value="<%=oneItem.id%>" ></td>
-                              <td><%=i%></td>
-                              <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                              <td><a href="http://localhost:3000/<%=oneItem.id%>"><%=oneItem.name%></a></td>
-                              <td><%=oneItem.mimeType%></td>
-                              <td><%=oneItem.modifiedTime%></td>
-                              <td><%=size%></td>
-                          </tr>
-                          <%
+                          if(i==0){
+                            var oneItem = filelist[i];
+                            var size = formatBytes(oneItem.size,3);
+                            %>
+                            <tr>
+                              <td><input type="checkbox" name="name" value="<%=oneItem.id%>" ></td>
+                                <td>/</td>
+                                <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
+                                <td><a href="http://localhost:3000/google/<%=oneItem%>">..</a></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <%
+                       }
+                       else{
+                            var oneItem = filelist[i];
+                            var size = formatBytes(oneItem.size,3);
+                            if(oneItem.mimeType=="application/vnd.google-apps.folder"){
+                              %>
+                              <tr>
+                                <td><input type="checkbox" name="name" value="<%=oneItem.id%>" ></td>
+                                  <td><%=i%></td>
+                                  <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
+                                  <td><a href="http://localhost:3000/google/<%=oneItem.id%>"><%=oneItem.name%></a></td>
+                                  <td><%=oneItem.mimeType%></td>
+                                  <td><%=oneItem.modifiedTime%></td>
+                                  <td><%=size%></td>
+                              </tr>
+                              <%
 
-                        }
-                        else{
-                          %>
-                        <tr>
-                           <td><input type="checkbox" name="name" value="<%=oneItem.id%>" ></td>
-                            <td><%=i%></td>
-                            <td><%=oneItem.name%></td>
-                            <td><%=oneItem.mimeType%></td>
-                            <td><%=oneItem.modifiedTime%></td>
-                            <td><%=size%></td>
-                        </tr>
-                          <%
-                      }
+                            }
+                            else{
+                              %>
+                            <tr>
+                              <td><input type="checkbox" name="name" value="<%=oneItem.id%>" ></td>
+                                <td><%=i%></td>
+                                <td><%=oneItem.name%></td>
+                                <td><%=oneItem.mimeType%></td>
+                                <td><%=oneItem.modifiedTime%></td>
+                                <td><%=size%></td>
+                            </tr>
+                              <%
+                          }
+                       }
+
                     }
                   }
                 %>
@@ -67,10 +85,10 @@
 <script>
   function Submit(index){
     if(index==1){
-      document.action_google.action='download';
+      document.action_google.action='google/download';
     }
     if(index==2){
-      document.action_google.action='delete';
+      document.action_google.action='google/delete';
     }
     document.action_google.submit();
   };

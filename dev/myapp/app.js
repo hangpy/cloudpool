@@ -11,9 +11,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var authRouter = require('./app_modules/cpauth/cp_auth')(passport);
 var google = require('./routes/google_router');
-// var box = require('./app_modules/cpgoogle/google_router');
-app.use('/google/', google);
-// app.use('/box/', box);
+var box = require('./routes/box_router');
 
 
 
@@ -36,6 +34,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/auth/', authRouter);
+app.use('/google/', google);
+app.use('/box/', box);
 
 
 // catch 404 and forward to error handler
