@@ -1,59 +1,55 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    box list
+<body>
+  <form id="uploadform" action='box/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
+    <input type='file' name='userfile'>
+    <button type="submit" >업로드</button>
 
-  </head>
-  <body>
-    <form id="uploadform" action='box/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
-      <input type='file' name='userfile'>
-      <button type="submit" >업로드</button>
+  </form>
 
-    </form>
+  <form name='action_box' method='post'>
+      <button type="button" onClick='Submit("download")' >다운로드</button>
+      <button type="button" onClick='Submit("delete")' >삭제</button>
+      <table border="1" id="table_box">
+              <tr>
+                  <td> </td>
+                  <td>번   호</td>
+                  <td>파일이름</td>
+                  <td>파일형식</td>
+                  <td>올린날짜</td>
+                  <td>파일용량</td>
+              </tr>
 
-    <form name='action_box' method='post'>
-        <button type="button" onClick='Submit("download")' >다운로드</button>
-        <button type="button" onClick='Submit("delete")' >삭제</button>
-        <table border="1">
-                <tr>
-                    <td> </td>
-                    <td>번   호</td>
-                    <td>파일이름</td>
-                    <td>파일형식</td>
-                    <td>올린날짜</td>
-                    <td>파일용량</td>
-                </tr>
-                  <%
-                  <!--byte to kb,mb,gb  -->
-                  function formatBytes(bytes,decimals) {
-                     if(bytes == 0) return '0 Bytes';
-                     var k = 1024,
-                         dm = decimals || 2,
-                         sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-                         i = Math.floor(Math.log(bytes) / Math.log(k));
-                     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-                  }
-                    if(filelist.length>0){
-                       for(var i=0; i<filelist.length; i++)
-                       {
-                          var oneItem = filelist[i];
-                          var size = formatBytes(oneItem.size,3);
-                          if(oneItem.mimeType=='folder'){
-                            %>
-                            <tr>
-                               <td><input type="checkbox" name="name" value="<%=oneItem.id%>" ></td>
-                                <td><%=i%></td>
-                                <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                                <td><a href="http://localhost:3000/box/<%=oneItem.id%>"><%=oneItem.name%></a></td>
-                                <td><%=oneItem.mimeType%></td>
-                                <td><%=oneItem.modifiedTime%></td>
-                                <td><%=size%></td>
-                            </tr>
-                            <%
+                <%
+                <!--byte to kb,mb,gb  -->
+                function formatBytes(bytes,decimals) {
+                   if(bytes == 0) return '0 Bytes';
+                   var k = 1024,
+                       dm = decimals || 2,
+                       sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+                       i = Math.floor(Math.log(bytes) / Math.log(k));
+                   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+                }
+                  if(filelist.length>0){
+                     for(var i=0; i<filelist.length; i++)
+                     {
+                        var oneItem = filelist[i];
+                        var size = formatBytes(oneItem.size,3);
+                        if(oneItem.mimeType=='folder'){
+                          %>
+                          <tr>
+                             <td><input type="checkbox" name="name" value="<%=oneItem.id%>" ></td>
+                              <td><%=i%></td>
+                              <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
+                              <td data-id='<%=oneItem.id%>'>
+                                <a href="#"><%=oneItem.name%></a></td>
+                              <td><%=oneItem.mimeType%></td>
+                              <td><%=oneItem.modifiedTime%></td>
+                              <td><%=size%></td>
+                          </tr>
+                          <%
+                        }
+                        else{
+                          %>
 
-                          }
-                          else{
-                            %>
                           <tr>
                              <td><input type="checkbox" name="name" value="<%=oneItem.id%>" ></td>
                               <td><%=i%></td>
@@ -62,24 +58,23 @@
                               <td><%=oneItem.modifiedTime%></td>
                               <td><%=size%></td>
                           </tr>
-                            <%
-                        }
+                          <%
                       }
                     }
-                  %>
-        </table>
-  </form>
-  </body>
-  <script>
-    function Submit(index){
-      if(index=='download'){
-        document.action_box.action='box/download';
-      }
-      if(index=='delete'){
-        document.action_box.action='box/delete';
-      }
-      document.action_box.submit();
-    };
-  </script>
-
-</html>
+                  }
+                %>
+      </table>
+</form>
+</body>
+<script>
+  function Submit(index){
+    if(index=='download'){
+      document.action_box.action='box/download';
+    }
+    if(index=='delete'){
+      document.action_box.action='box/delete';
+    }
+    document.action_box.submit();
+  };
+</script>
+<script src="js/loadfolder.js"></script>

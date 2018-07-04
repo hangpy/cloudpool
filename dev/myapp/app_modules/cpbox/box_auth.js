@@ -7,7 +7,7 @@ module.exports = function() {
     clientID: CLIENT_ID, // required
     clientSecret: CLIENT_SECRET // required
   });
-  var USER_ACCESS_TOKEN='WNKaBcty2AYsg1ykHmYixzFrnWdJEX3k';
+  var USER_ACCESS_TOKEN='C0gvLORotJuvbIAqOLupyOVa7zUnEjl6';
   // Create a basic API client
   var client = sdk.getBasicClient(USER_ACCESS_TOKEN);
 

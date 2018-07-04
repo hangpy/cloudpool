@@ -3,9 +3,17 @@ module.exports.list = function(FolderID, callback){
   var client = require('./box_auth.js')();
   var async = require('async');
 
-  client.folders.getItems(FolderID).then(items => {
+  client.folders.get(FolderID).then(items => {
     var filelist = [];
-    async.map(items.entries, function(item, callback_list){
+    if(FolderID!='0') {
+      var before={
+        'id' : items.parent.id,
+        'name' : '..',
+        'mimeType' : 'folder'
+      };
+      filelist.push(before);
+    }
+    async.map(items.item_collection.entries, function(item, callback_list){
       client.folders.get(item.id).then(function(folder){
         var iteminfo={
           'id' : item.id,
