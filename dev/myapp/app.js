@@ -9,9 +9,18 @@ var passport = require('./app_modules/config/passport')(app);
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var dropbox = require('./routes/dropbox_router')();
 var authRouter = require('./app_modules/cpauth/cp_auth')(passport);
 var google = require('./app_modules/cpgoogle/google_router');
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/google/', google);
+
+ app.use('/dropbox/',dropbox);
+// app.get('/dropbox/', (req,res)=>{
+//     console.log("여기까지 온다");
+//
+// });
 
 
 
@@ -36,10 +45,11 @@ app.use('/users', usersRouter);
 app.use('/auth/', authRouter);
 
 
+
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+// app.use(function(req, res, next) {
+//   next(createError(404));
+// });
 
 // error handler
 app.use(function(err, req, res, next) {
