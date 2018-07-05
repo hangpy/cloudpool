@@ -1,7 +1,7 @@
 <body>
   <form id="uploadform" action='box/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
     <input type='file' name='userfile'>
-    <button type="submit" >업로드</button>
+    <button type="button" onclick='UploadSubmit()' >업로드</button>
 
   </form>
 
@@ -40,7 +40,7 @@
                               <td><%=i%></td>
                               <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
                               <td data-id='<%=oneItem.id%>'>
-                                <a href="#"><%=oneItem.name%></a></td>
+                                <a href="#" onclick ="moveFolder(this)" value='<%=oneItem.id%>'><%=oneItem.name%></a></td>
                               <td><%=oneItem.mimeType%></td>
                               <td><%=oneItem.modifiedTime%></td>
                               <td><%=size%></td>
@@ -73,8 +73,15 @@
     }
     if(index=='delete'){
       document.action_box.action='box/delete';
+      $('.graph').load("box/<%=FolderID%>");
     }
     document.action_box.submit();
   };
+  var UploadSubmit = function (){
+      uploadform.action='box/upload/<%=FolderID%>';
+      uploadform.submit();
+      $('.graph').load("box/<%=FolderID%>");
+  };
+
 </script>
 <script src="js/loadfolder.js"></script>

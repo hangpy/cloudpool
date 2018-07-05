@@ -1,4 +1,3 @@
-
 var formidable = require('formidable');
 var route = require('express').Router();
 var fs = require('fs');
@@ -18,7 +17,7 @@ route.post('/delete',function(req,res){
   else {
     box_util.delete(FileID);
   }
-  res.redirect(backURL);
+  // res.redirect(backURL);
 });
 
 route.post('/download',function(req,res){
@@ -34,7 +33,7 @@ route.post('/download',function(req,res){
   else {
     box_util.download(FileID);
   }
-  res.redirect(backURL);
+  // res.redirect(backURL);
 });
 
 route.post('/upload/:id',function(req,res){
@@ -44,7 +43,7 @@ route.post('/upload/:id',function(req,res){
 
     var FileInfo = files.userfile;
 
-          res.redirect('/');
+          // res.redirect('/');
 
     //비동기 필요
     box_util.upload(FileInfo,FolderID
