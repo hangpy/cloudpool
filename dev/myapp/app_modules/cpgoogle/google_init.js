@@ -43,8 +43,9 @@ module.exports = function(usr_session, callback){
       }
       // usr_access_token = result[0].Gaccess;
       // usr_refresh_token = result[0].Grefresh;
-      var usr_access_token='';
-      var usr_refresh_token='';
+      var usr_access_token='ya29.Gl3vBYluXMfF81haU9p7rm7-7mwdnHd76O3dpjr7_ihV-eTmf7oiyX3eSbwgjS5ZI75CVGddEDsqA5SNrxpZ6gH4ORyKZEPfA_fL6Yn-xaZx6Lv-dqdhkpjdtg0kTbE';
+      var usr_refresh_token='1/L3aOfOsrMKBvLmh5x4ra-_FHIaV3GeSJ9pqZmU6SaHI';
+
       oauth2Client.credentials = {
         access_token: usr_access_token,
         refresh_token: usr_refresh_token
