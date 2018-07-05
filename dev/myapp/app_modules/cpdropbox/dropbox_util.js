@@ -88,12 +88,14 @@ const UTIL = (function(){
 
   var uploadfile = function(FileInfo, FolderDir){
     initDropbox(usr_session, function(dbx){
+      //여기서 앞단으로 progress bar 계산을 위한 정보를 보낸다 - 현재는 xhr 생각
+
       fs.readFile(FileInfo.path, function (err, contents) {
           if (err) {
             console.log('Error: ', err);
           }
           var UploadPath = FolderDir+'/'+FileInfo.name;
-
+          //150MB 미만만 가능
           dbx.filesUpload({ path: UploadPath, contents: contents })
             .then(function (response) {
               console.log(response);
@@ -104,12 +106,54 @@ const UTIL = (function(){
         });
     });
 
+    // // File is bigger than 150 Mb - use filesUploadSession* API
+    //     const maxBlob = 8 * 1000 * 1000; // 8Mb - Dropbox JavaScript API suggested max file / chunk size
+    //     var workItems = [];
+    //
+    //     var offset = 0;
+    //     while (offset < file.size) {
+    //       var chunkSize = Math.min(maxBlob, file.size - offset);
+    //       workItems.push(file.slice(offset, offset + chunkSize));
+    //       offset += chunkSize;
+    //     }
+    //
+    //     const task = workItems.reduce((acc, blob, idx, items) => {
+    //       if (idx == 0) {
+    //         // Starting multipart upload of file
+    //         return acc.then(function() {
+    //           return dbx.filesUploadSessionStart({ close: false, contents: blob})
+    //                     .then(response => response.session_id)
+    //         });
+    //       } else if (idx < items.length-1) {
+    //         // Append part to the upload session
+    //         return acc.then(function(sessionId) {
+    //          var cursor = { session_id: sessionId, offset: idx * maxBlob };
+    //          return dbx.filesUploadSessionAppendV2({ cursor: cursor, close: false, contents: blob }).then(() => sessionId);
+    //         });
+    //       } else {
+    //         // Last chunk of data, close session
+    //         return acc.then(function(sessionId) {
+    //           var cursor = { session_id: sessionId, offset: file.size - blob.size };
+    //           var commit = { path: '/' + file.name, mode: 'add', autorename: true, mute: false };
+    //           return dbx.filesUploadSessionFinish({ cursor: cursor, commit: commit, contents: blob });
+    //         });
+    //       }
+    //     }, Promise.resolve());
+    //
+    //     task.then(function(result) {
+    //       var results = document.getElementById('results');
+    //       results.appendChild(document.createTextNode('File uploaded!'));
+    //     }).catch(function(error) {
+    //       console.error(error);
+    //     });
+    //
   };
 
   var listfile = function(FolderDir, callback){
     var filelist=[];
     initDropbox(usr_session, function(dbx){
       console.log("list");
+      console.log("FolderDir : " + FolderDir);
       dbx.filesListFolder({path :FolderDir}) //list 원하는 경로
       .then(function(response) {
         async.map(response.entries,
