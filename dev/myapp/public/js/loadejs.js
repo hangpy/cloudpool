@@ -24,4 +24,8 @@ $(function(){
       $('.graph').load("card");
   });
 
+  $('#google').click( function() {
+    $('.graph').load("google/");
+});
+
 });

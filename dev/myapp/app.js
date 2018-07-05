@@ -7,13 +7,10 @@ var sassMiddleware = require('node-sass-middleware');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var authRouter = require('./app_modules/cpauth/cp_auth')(passport);
+// var authRouter = require('./app_modules/cpauth/cp_auth')(passport);
 var google = require('./routes/google_router');
-app.use('/google/', google);
-
-
 var app = express();
-
+app.use('/google/', google);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
