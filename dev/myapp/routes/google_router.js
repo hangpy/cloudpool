@@ -25,8 +25,6 @@ router.post('/upload/:id',function(req,res){
   
     //비동기 필요
     google_util.upload(FileInfo,FolderID);
-
-    res.redirect('/google/'+FolderID);
   });
 });
 
