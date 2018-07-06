@@ -16,6 +16,9 @@
 <form name='action_google' method='post'>
   <button type="button" onClick='Submit(1)' >다운로드</button>
   <button type="button" onClick='Submit(2)' >삭제</button>
+  <td><input type="text" name="filename" placeholder="newname"></td>
+  <button type="submit" onClick='Submit(3)' >변경</button>
+
   <table border="1" id="table_google">
           <tr>
               <td> </td>
@@ -103,8 +106,16 @@ if(index===2){
   action_google.action='google/delete/<%=FolderID%>';
   $('.graph').load("google/<%=FolderID%>");
 }
+
+if(index===3){
+  action_google.action='google/update/<%=FolderID%>';
+  // $('.graph').load("google/<%=FolderID%>");
+}
+
 action_google.submit();
 };
+
+
 function UploadSubmit(){
   uploadform.action='google/upload/<%=FolderID%>';
   uploadform.submit();
