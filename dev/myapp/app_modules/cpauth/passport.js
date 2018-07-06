@@ -15,7 +15,7 @@ module.exports = function(app){
      done(null, user.user_ID);
    });
 
-//인증후, 사용자 정보를 세션에서 읽어서 request.user에 저장
+   //인증후, 사용자 정보를 세션에서 읽어서 request.user에 저장
    passport.deserializeUser(function(id, done) {
      console.log('deserializeUser', id);
      var sql = 'SELECT * FROM user_info WHERE user_ID=?';

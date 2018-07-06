@@ -40,23 +40,24 @@
                         <div class="login-content card">
                             <div class="login-form">
                                 <h4>Register</h4>
-                                <form  name='joinAction' action ="/auth/register" method ="post">
-                                  <div class="form-group row">
+                                <form  name="joinACtion" id="joinAction" action ="auth/register" method ="post">
+                                  <!--<div class="form-group row">
                                       <label class="col-lg-4 col-form-label" for="val-username">ID <span class="text-danger">*</span></label>
                                       <div class="col-lg-6">
                                           <input type="text" class="form-control"  ID= "cp_ID"name="cp_ID" placeholder="Enter your ID..">
                                       </div>
                                   </div>
+                                  -->
                                   <div class="form-group row">
                                       <label class="col-lg-4 col-form-label" for="val-username">Username <span class="text-danger">*</span></label>
                                       <div class="col-lg-6">
-                                          <input type="text" class="form-control"  ID= "cp_username"name="cp_username" placeholder="Enter your Username..">
+                                          <input type="text" class="form-control"  ID= "cp_username"name="cp_username" placeholder="Ex) 홍길동">
                                       </div>
                                   </div>
                                   <div class="form-group row">
                                       <label class="col-lg-4 col-form-label" for="val-email">Email <span class="text-danger">*</span></label>
                                       <div class="col-lg-6">
-                                          <input type="text" class="form-control"  ID= "cp_email"name="cp_email" placeholder="Your valid email..">
+                                          <input type="email" class="form-control"  ID= "cp_email" name="cp_email" placeholder="Ex) user@email.com">
                                       </div>
                                   </div>
                                   <div class="form-group row">
@@ -103,38 +104,39 @@
     <script src="js/lib/sticky-kit-master/dist/sticky-kit.min.js"></script>
     <!--Custom JavaScript -->
     <script src="js/scripts.js"></script>
-    <!-- chekc password -->
-<script type="text/javascript" src="js/jquery-1.10.2.js"></script>
-<script>
+    <!-- check password -->
+    <!--<script src="js/jquery-1.10.2.js"></script>-->
+    <script>
 
-function addUser() {
-            // 빈칸 체크
-            // 비밀번호 길이 영어숫자 확인
-            var id = $('#cp_ID').val();
-            var pw = $('#cp_password').val();
-            var repw = $('#cp_password_check').val();
-            var name = $('#cp_username').val();
-            var mail = $('#cp_email').val();
-            var pwchk = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{4,12}$/; //비번 체크
-            if(id == ''||  pw == '' || repw == '' || name == '' || mail == '') {
-                alert("모든 칸을 채워주세요");
-                // return false;
-            } else {
-                if(pwchk.test(pw) == false) {
-                    alert("비밀번호는 4~12자리 영어와 숫자, 특수문자가 모두 포함되어야 합니다");
-                    pw.focus();
+    function addUser() {
+                // 빈칸 체크
+                // 비밀번호 길이 영어숫자 확인
+                // var id = $('#cp_ID').val();
+                var pw = $('#cp_password').val();
+                var repw = $('#cp_password_check').val();
+                var name = $('#cp_username').val();
+                var mail = $('#cp_email').val();
+                var pwchk = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{4,12}$/; //비번 체크
+                if(pw == '' || repw == '' || name == '' || mail == '') {
+                    alert("모든 칸을 채워주세요");
                     // return false;
                 } else {
-                    if(pw != repw) {
-                        alert ("비밀번호는 똑같아야 합니다 ");
+                    if(pwchk.test(pw) == false) {
+                        alert("비밀번호는 4~12자리 영어와 숫자, 특수문자가 모두 포함되어야 합니다");
+                        pw.focus();
+                        // return false;
                     } else {
-                        $('#joinAction').submit();
+                        if(pw != repw) {
+                            alert ("비밀번호는 똑같아야 합니다 ");
+                        } else {
+                          alert('success');
+                          $('#joinAction').submit();
+                        }
                     }
                 }
-            }
-          }
+              }
 
-</script>
+    </script>
 
 </body>
 

@@ -9,17 +9,20 @@
     "async": "^2.6.1",
     "body-parser": "^1.18.3",
     "box-node-sdk": "^1.16.1",
+    "connect-redis": "^3.3.3",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "dotenv": "^6.0.0",
     "dropbox": "^4.0.3",
     "ejs": "~2.5.7",
     "express": "~4.16.0",
+    "express-session": "^1.15.6",
     "formidable": "^1.2.1",
     "google-auth-library": "^1.6.1",
     "googleapis": "^32.0.0",
     "http-errors": "~1.6.2",
     "isomorphic-fetch": "^2.2.1",
+    "knex": "^0.15.0",
     "mime": "^2.3.1",
     "morgan": "~1.9.0",
     "mysql": "^2.15.0",
@@ -28,6 +31,7 @@
     "passport-google-drive": "0.0.6",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
-    "pbkdf2-password": "^1.2.1"
+    "pbkdf2-password": "^1.2.1",
+    "redis": "^2.8.0"
   }
 }
