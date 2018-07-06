@@ -42,7 +42,7 @@ module.exports = function(){
       }else{
           size = req.file.size;
       }
-
+      
       console.log("Split size : "+ size);
 
       var zipFile = java.newInstanceSync("net.lingala.zip4j.core.ZipFile",__dirname+"/uploads/dis/"+req.file.filename+".zip");
