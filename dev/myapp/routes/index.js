@@ -4,10 +4,14 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+  // 로그인 되어있으면 index로 (대쉬보드)
   res.render('index', { title: 'Express' });
+
+  // 로그인 되어있지 않으면 intro로
 });
 
 router.get('/intro', function(req, res, next){
+  // 로그인 되어있으면 index로 (대쉬보드)
   res.render('intro', {title: 'Intro'});
 })
 
@@ -19,7 +23,14 @@ router.get('/login', function(req, res, next) {
 
 /* GET register page. */
 router.get('/register', function(req, res, next) {
+  // 로그인 되어있으면 index로
   res.render('page-register', { title: 'register' });
+});
+
+/* GET logout page. */
+router.get('/logout', function(req, res, next) {
+  req.logout();
+  res.redirect('/intro');
 });
 
 

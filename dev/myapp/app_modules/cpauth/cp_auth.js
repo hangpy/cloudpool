@@ -5,16 +5,21 @@ module.exports = function(passport) {
   var route = require('express').Router();
   var knex = require('../db/knex.js');
 
-  route.post(
-    '/login',
-    passport.authenticate(
-      'local', {
-        successRedirect: '/',
-        failureRedirect: '/login_error',
-        failureFlash: false
-      }
-    )
-  );
+
+  var isAuthenticated = function (req, res, next) {
+    if (req.isAuthenticated())
+      return next();
+    res.redirect('/login');
+  };
+
+  route.post('/login', passport.authenticate(
+    'local-login', {
+      successRedirect: '/',
+      failureRedirect: '/login',
+      successFlash: true,
+      failureFlash: true
+    }
+  ));
 
 
   route.post('/register', function(req, res) {
@@ -27,11 +32,11 @@ module.exports = function(passport) {
         email: req.body.cp_email,
         salt: salt,
         password: hash
-      }).then(function(){
-        // db 유저 정보 삽입 성공시
+      }).then(function() {
+        // db 유저 정보 삽입 성공시 로그인 창으로 이동
         res.redirect('/');
-      }).catch(function(err){
-        // db 유저 정보 삽입 실패시
+      }).catch(function(err) {
+        // db 유저 정보 삽입 실패시 등록 실패 메시지
         console.log(err);
         res.status(500);
       });
