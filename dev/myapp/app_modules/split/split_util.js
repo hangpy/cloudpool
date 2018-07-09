@@ -22,10 +22,10 @@ const UTIL = (function() {
 
   var storage = multer.diskStorage({
     destination: function(req, file, cb) {
-      cb(null, 'uploads/org/') // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
+      cb(null, '../app_modules/split/uploads/org/') // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
     },
     filename: function(req, file, cb) {
-      cb(null, Date.now() + file.originalname) // cb 콜백함수를 통해 전송된 파일 이름 설정
+      cb(null, file.originalname) // cb 콜백함수를 통해 전송된 파일 이름 설정
     }
   });
 
@@ -33,7 +33,7 @@ const UTIL = (function() {
     storage: storage
   }).single('userfile');
 
-  var parameters = (function() {
+  var parameters = function() {
     var result = java.newInstanceSync("net.lingala.zip4j.model.ZipParameters");
     result.setCompressionMethod(8, function(err, res) {
       if (err) {
@@ -47,23 +47,27 @@ const UTIL = (function() {
     });
 
     return result;
-  })();
+  };
 
   var sizeSplit = function(size) {
+    var result;
+    console.log('file size : '+ size);
     if (size > 65536 * 3) {
       result = parseInt(size / 3);
+      return result;
     } else {
       if (size > 65536 * 2) {
         result = parseInt(size / 2);
+        return result;
       } else {
         result = size;
+        return result;
       }
-      return result;
     }
   };
 
   var filesToAdd = java.newInstanceSync("java.util.ArrayList");
-
+  
   var orgFile = function(dirname, path) {
     return java.newInstanceSync("java.io.File", dirname + "/" + path);
   };
@@ -74,17 +78,13 @@ const UTIL = (function() {
 
 
   return {
-    splitUtil: {
-      storage: storage,
-      upload: upload,
-      sizeSplit: sizeSplit,
-      files: {
-        parameters: parameters,
-        filesToAdd: filesToAdd,
-        orgFile: orgFile,
-        zipFile: zipFile
-      }
-    }
+    storage: storage,
+    upload: upload,
+    sizeSplit: sizeSplit,
+    parameters: parameters,
+    filesToAdd: filesToAdd,
+    orgFile: orgFile,
+    zipFile: zipFile
   }
 })();
 

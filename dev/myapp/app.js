@@ -12,7 +12,7 @@ var usersRouter = require('./routes/users');
 var dropbox = require('./routes/dropbox_router')();
 var authRouter = require('./app_modules/cpauth/cp_auth')(passport);
 var google = require('./app_modules/cpgoogle/google_router');
-var splitRouter = require('./routes/split_router');
+var splitRouter = require('./routes/split_router')();
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/google/', google);
@@ -44,7 +44,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/auth/', authRouter);
-app.use('/split',splitRouter)
+app.use('/split/',splitRouter)
 
 
 // catch 404 and forward to error handler

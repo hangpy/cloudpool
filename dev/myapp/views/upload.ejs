@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+
+    <form id="uploadform" action='split/upload' method='post' enctype="multipart/form-data">
+
+      <input type='file' name='userfile'>
+      <button type="submit" >토큰받기</button>
+
+    </form>
+    <div class="progress">
+        <div class="bar"></div >
+        <div class="percent">0%</div >
+    </div>
+
+    <div id="status"></div>
+  </body>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+</html>
+<script>
+$(function() {
+
+        var bar = $('.bar');
+        var percent = $('.percent');
+        var status = $('#status');
+
+        $('#uploadform').ajaxForm({
+            beforeSend: function() {
+                status.empty();
+                var percentVal = '0%';
+                bar.width(percentVal);
+                percent.html(percentVal);
+            },
+            uploadProgress: function(event, position, total, percentComplete) {
+                var percentVal = percentComplete + '%';
+                bar.width(percentVal);
+                percent.html(percentVal);
+            },
+            complete: function(xhr) {
+                status.html(xhr.responseText);
+            }
+        });
+    });
+//   $(document).ready(function() {
+//
+//      $('#uploadForm').submit(function() {
+//         $("#status").empty().text("File is uploading...");
+//         $(this).ajaxSubmit({
+//
+//             error: function(xhr) {
+//         status('Error: ' + xhr.status);
+//             },
+//
+//             success: function(response) {
+//         $("#status").empty().text(response);
+//                 console.log(response);
+//             }
+//     });
+//         //Very important line, it disable the page refresh.
+//     return false;
+//     });
+// });
+</script>
