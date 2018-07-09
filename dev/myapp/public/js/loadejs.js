@@ -28,6 +28,13 @@ $(function(){
   });
   $('#box').click( function() {
       $('.graph').load("box/");
+  $('#dropbox').click( function() {
+      $('.graph').load("dropbox/");
+     //  for (int i = 0; i < 3; i++)
+     // {
+     //    alert( $("#Folder_"+i).attr('value') );
+     //    console.log($("#Folder_"+i).attr('value'));
+     // }
   });
 
 });

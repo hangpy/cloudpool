@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>Intro</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+</head>
+
+<body>
+  <div class="ground">
+    <div class="title">
+      <h1>클라우드 풀에 오신걸 환영합니다~♥</h1><br>
+      <h3>모든 드라이브를 한자리에서 관리해보세요!</h3>
+    </div>
+
+    <br>
+
+
+
+    <div class="link-container">
+        <!-- 세션값 있을 시, register, login은 보이지 않아야 함  -->
+      <% if(!isUser) { %>
+        <div class="button-link"><button type="button" class="btn btn-outline-primary"><a href="/login">로그인</a></button></div>
+        <div class="button-link"><button type="button" class="btn btn-outline-primary"><a href="/register">회원가입</a></button></div>
+      <% } else { %>
+        <!-- 세션값 없을 시, logout은 보이지 않아야 함 -->
+        <div class="button-link"><button type="button" class="btn btn-outline-primary"><a href="/logout">로그아웃</a></button></div>
+      <% } %>
+    </div>
+  </div>
+
+
+
+
+
+  <style>
+
+    h1 {
+      font-family: 궁서
+    }
+
+    .title {
+      display: flex;
+      align-items : center;
+      flex-direction: column;
+    }
+
+    .ground {
+      margin: 100px 20px 50px 20px;
+    }
+
+    .link-container {
+      margin-top: 150px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .button-link {
+      margin: 20px;
+      font-size: 20px;
+    }
+
+    .content {
+      margin: 15px;
+    }
+  </style>
+
+
+
+</body>
+
+</html>

@@ -12,15 +12,18 @@
     <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
     <title>CloudPool</title>
     <!-- Bootstrap Core CSS -->
+    <link href="css/lib/dropzone/dropzone.css" rel="stylesheet">
     <link href="css/lib/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
 
+    <!-- Custom CSS -->
+    <link href="css/helper.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
     <link href="css/lib/calendar2/semantic.ui.min.css" rel="stylesheet">
     <link href="css/lib/calendar2/pignose.calendar.min.css" rel="stylesheet">
     <link href="css/lib/owl.carousel.min.css" rel="stylesheet" />
     <link href="css/lib/owl.theme.default.min.css" rel="stylesheet" />
-    <link href="css/helper.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:** -->
@@ -227,11 +230,12 @@
                             <a class="nav-link dropdown-toggle text-muted  " href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="images/users/5.jpg" alt="user" class="profile-pic" /></a>
                             <div class="dropdown-menu dropdown-menu-right animated zoomIn">
                                 <ul class="dropdown-user">
+                                    <li><a href="#"><i class="ti-user"></i>환영합니다 <%= user.userName %>님</a></li>
                                     <li><a href="#"><i class="ti-user"></i> Profile</a></li>
                                     <li><a href="#"><i class="ti-wallet"></i> Balance</a></li>
                                     <li><a href="#"><i class="ti-email"></i> Inbox</a></li>
                                     <li><a href="#"><i class="ti-settings"></i> Setting</a></li>
-                                    <li><a href="#"><i class="fa fa-power-off"></i> Logout</a></li>
+                                    <li><a href="/logout"><i class="fa fa-power-off"></i> Logout</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -255,6 +259,7 @@
                                 <li><a href="#" id="card1">Card </a></li>
                                 <li><a href="#" id="google">Google </a></li>
                                 <li><a href="#" id="box">Box </a></li>
+                                <li><a href="#" id="dropbox">Dropbox </a></li>
                                 <li><a href="index1.html">Analytics </a></li>
                             </ul>
                         </li>
@@ -326,6 +331,10 @@
             <footer class="footer"> © 2018 All rights reserved. Template designed by <a href="https://colorlib.com">Colorlib</a></footer>
             <!-- End footer -->
         </div>
+          <div id="toast"><div id="img">파일 관리</div><div id="desc">업로드 중입니다.
+            <div class="progress">
+              <div class="progress-bar" role="progressbar"></div>
+            </div></div></div>
         <!-- End Page wrapper  -->
     </div>
     <!-- End Wrapper -->
@@ -364,6 +373,7 @@
 
     <script src="js/scripts.js"></script>
     <script src="js/loadejs.js"></script>
+
 
 </body>
 

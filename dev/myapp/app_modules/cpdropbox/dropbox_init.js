@@ -24,7 +24,7 @@ module.exports = function(usr_session, callback){
         throw err;
       } else {
         // var usr_access_token = result[0].Daccess;
-        var usr_access_token = 'asdf1234asdf1234';
+        var usr_access_token = 'kFb_ENWtmyUAAAAAAAABXmkgkMo381IwrSZdCoj2voMWz0dRlWPda7Caj0ivnG7X';
         var dbx = new Dropbox({ accessToken: usr_access_token });
 
         // dropbox api's util functions will be executed in this callback function

@@ -2,20 +2,71 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var router = express.Router();
 
+
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', function(req, res, next){
+  if(!req.isAuthenticated())
+    res.redirect('/intro');
+  else
+    return next();
+}, function(req, res, next) {
+  console.log("세션세션세션: " + req.user);
+  res.render('index', {
+    title: 'Express',
+    user: req.user
+  });
 });
+
+/* GET intro page. */
+router.get('/intro', function(req, res, next) {
+  if(req.isAuthenticated())
+    // res.redirect('/');
+    return next();
+  else {
+    return next();
+  }
+}, function(req, res, next) {
+  res.render('intro', {
+    title: 'Intro',
+    isUser: req.isAuthenticated()
+  });
+})
 
 
 /* GET login page. */
-router.get('/login', function(req, res, next) {
-  res.render('page-login', { title: 'login' });
+router.get('/login', function(req, res, next){
+  if(req.isAuthenticated())
+    res.redirect('/');
+  else
+    return next();
+}, function(req, res, next) {
+  res.render('page-login', {
+    title: 'login'
+  });
 });
 
 /* GET register page. */
-router.get('/register', function(req, res, next) {
-  res.render('page-register', { title: 'register' });
+router.get('/register', function(req, res, next){
+  if(req.isAuthenticated())
+    res.redirect('/');
+  else
+    return next();
+}, function(req, res, next) {
+  // 로그인 되어있으면 index로
+  res.render('page-register', {
+    title: 'register'
+  });
+});
+
+/* GET logout page. */
+router.get('/logout', function(req, res, next){
+  if(!req.isAuthenticated())
+    res.redirect('/login');
+  else
+    return next();
+}, function(req, res, next) {
+  req.logout();
+  res.redirect('/intro');
 });
 
 
