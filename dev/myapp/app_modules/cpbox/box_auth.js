@@ -1,13 +1,17 @@
 module.exports = function() {
   var BoxSDK = require('box-node-sdk');
+  const client_info = require('../config/client_info');
+  const box_client = client_info.BOX;
 
-  var CLIENT_ID = 'f36zje5931w2wgjcfbxfowewyxgk9gah';
-  var CLIENT_SECRET =  'Su0gZfykeccyzzRiKrtgRvqstzqk0p5Q';
+  const CLIENT_ID = box_client.getClientId(),
+        CLIENT_SECRET = box_client.getClientSecret(),
+        REDIRECT_URL = box_client.getRedirectUrl();
+
   var sdk = new BoxSDK({
     clientID: CLIENT_ID, // required
     clientSecret: CLIENT_SECRET // required
   });
-  var USER_ACCESS_TOKEN='5zhtjr08wr5lRYrMTeASwij9cMvf1g3A';
+  var USER_ACCESS_TOKEN='qEyumwQlZMK9GvQGQlK3EIs917mqnT7y';
   // Create a basic API client
   var client = sdk.getBasicClient(USER_ACCESS_TOKEN);
 

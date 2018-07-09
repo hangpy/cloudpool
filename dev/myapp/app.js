@@ -10,7 +10,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var box = require('./routes/box_router');
 var dropbox = require('./routes/dropbox_router')();
-var google = require('./app_modules/cpgoogle/google_router');
+var google = require('./routes/google_router');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 
@@ -23,17 +23,7 @@ require('./app_modules/cpauth/passport')(passport);
 // deliver set passport to router for authentication
 var authRouter = require('./app_modules/cpauth/cp_auth')(passport);
 
-
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use('/google/', google);
-
- app.use('/dropbox/',dropbox);
-// app.get('/dropbox/', (req,res)=>{
-//     console.log("여기까지 온다");
-//
-// });
-
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
