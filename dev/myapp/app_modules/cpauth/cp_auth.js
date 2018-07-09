@@ -1,4 +1,5 @@
 module.exports = function(passport) {
+  // need passport object as parameter was set in passport.js
   const dbutil = require('../db/db_util');
   var bkfd2Password = require("pbkdf2-password");
   var hasher = bkfd2Password();
@@ -6,11 +7,6 @@ module.exports = function(passport) {
   var knex = require('../db/knex.js');
 
 
-  var isAuthenticated = function (req, res, next) {
-    if (req.isAuthenticated())
-      return next();
-    res.redirect('/login');
-  };
 
   route.post('/login', passport.authenticate(
     'local-login', {
@@ -33,8 +29,8 @@ module.exports = function(passport) {
         salt: salt,
         password: hash
       }).then(function() {
-        // db 유저 정보 삽입 성공시 로그인 창으로 이동
-        res.redirect('/');
+        // db 유저 정보 삽입 성공시 intro 창으로 이동
+        res.redirect('/intro');
       }).catch(function(err) {
         // db 유저 정보 삽입 실패시 등록 실패 메시지
         console.log(err);
@@ -63,13 +59,15 @@ module.exports = function(passport) {
   });
 
 
-  route.get('/logout', function(req, res) {
-    req.logout();
-    //구글 logout 해야된다.
-    req.session.save(function() {
-      res.redirect('/welcome');
-    });
-  });
+  // route.get('/logout', function(req, res) {
+  //   req.logout();
+  //   //구글 logout 해야된다.
+  //   req.session.save(function() {
+  //     res.redirect('/welcome');
+  //   });
+  // });
+
+
   return route;
 
 }

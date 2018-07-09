@@ -12,11 +12,15 @@ var usersRouter = require('./routes/users');
 var dropbox = require('./routes/dropbox_router')();
 var google = require('./app_modules/cpgoogle/google_router');
 var bodyParser = require('body-parser');
-
 var session = require('express-session');
-var passport = require('passport');
 
+
+// required parts to initialize passport and passport session.
+// make passport object
+var passport = require('passport');
+// set the passport object
 require('./app_modules/cpauth/passport')(passport);
+// deliver set passport to router for authentication
 var authRouter = require('./app_modules/cpauth/cp_auth')(passport);
 
 
