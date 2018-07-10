@@ -4,13 +4,12 @@ var router = express.Router();
 
 
 /* GET home page. */
-router.get('/', function(req, res, next){
-  if(!req.isAuthenticated())
+router.get('/', function(req, res, next) {
+  if (!req.isAuthenticated())
     res.redirect('/intro');
   else
     return next();
 }, function(req, res, next) {
-  console.log("세션세션세션: " + req.user);
   res.render('index', {
     title: 'Express',
     user: req.user
@@ -19,7 +18,7 @@ router.get('/', function(req, res, next){
 
 /* GET intro page. */
 router.get('/intro', function(req, res, next) {
-  if(req.isAuthenticated())
+  if (req.isAuthenticated())
     // res.redirect('/');
     return next();
   else {
@@ -34,8 +33,8 @@ router.get('/intro', function(req, res, next) {
 
 
 /* GET login page. */
-router.get('/login', function(req, res, next){
-  if(req.isAuthenticated())
+router.get('/login', function(req, res, next) {
+  if (req.isAuthenticated())
     res.redirect('/');
   else
     return next();
@@ -46,13 +45,12 @@ router.get('/login', function(req, res, next){
 });
 
 /* GET register page. */
-router.get('/register', function(req, res, next){
-  if(req.isAuthenticated())
+router.get('/register', function(req, res, next) {
+  if (req.isAuthenticated())
     res.redirect('/');
   else
     return next();
 }, function(req, res, next) {
-  // 로그인 되어있으면 index로
   res.render('page-register', {
     title: 'register'
   });
@@ -61,14 +59,15 @@ router.get('/register', function(req, res, next){
 
 
 
-// /* GET register page. */
-router.get('/graph', function(req, res, next) {
-  res.render('graph_test');
-});
-
-router.get('/card', function(req, res, next) {
-  res.render('card_test');
-});
+/* GET dynamic pages */
+router.get('/page-setting', function(req, res, next) {
+  if (!req.isAuthenticated())
+    res.redirect('/login');
+  else
+    return next();
+}, function(req, res, next) {
+  res.render('page-setting');
+})
 
 // router.get('/google', function(req, res, next) {
 //   res.render('google_list');
