@@ -58,17 +58,6 @@ router.get('/register', function(req, res, next){
   });
 });
 
-/* GET logout page. */
-router.get('/logout', function(req, res, next){
-  if(!req.isAuthenticated())
-    res.redirect('/login');
-  else
-    return next();
-}, function(req, res, next) {
-  req.logout();
-  res.redirect('/intro');
-});
-
 
 
 
