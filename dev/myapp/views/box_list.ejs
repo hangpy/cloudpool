@@ -65,6 +65,24 @@
                 %>
       </table>
 </form>
+<form action='box/rename/file' method='post' enctype="multipart/form-data">
+  <button type="submit" >파일 이름바꾸기</button>
+</form>
+<form action='box/rename/folder' method='post' enctype="multipart/form-data">
+  <button type="submit" >폴더 이름바꾸기</button>
+</form>
+<form action='box/move/file' method='post' enctype="multipart/form-data">
+  <button type="submit" >파일 이동</button>
+</form>
+<form action='box/move/folder' method='post' enctype="multipart/form-data">
+  <button type="submit" >폴더 이동</button>
+</form>
+<form action='box/thumbnail' method='post' enctype="multipart/form-data">
+  <button type="submit" >썸네일</button>
+</form>
+<form action='box/search' method='post' enctype="multipart/form-data">
+  <button type="submit" >검색</button>
+</form>
 </body>
 <script>
   function Submit(index){
@@ -73,14 +91,14 @@
     }
     if(index=='delete'){
       document.action_box.action='box/delete';
-      $('.graph').load("box/<%=FolderID%>");
+      // $('.graph').load("box/<%=FolderID%>");
     }
     document.action_box.submit();
   };
   var UploadSubmit = function (){
       uploadform.action='box/upload/<%=FolderID%>';
       uploadform.submit();
-      $('.graph').load("box/<%=FolderID%>");
+      // $('.graph').load("box/<%=FolderID%>");
   };
 
 </script>
