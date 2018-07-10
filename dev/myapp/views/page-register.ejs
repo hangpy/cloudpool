@@ -41,13 +41,6 @@
               <div class="login-form">
                 <h4>회원가입</h4>
                 <form name="joinACtion" id="joinAction" action="auth/register" method="post">
-                  <!--<div class="form-group row">
-                                      <label class="col-lg-4 col-form-label" for="val-username">ID <span class="text-danger">*</span></label>
-                                      <div class="col-lg-6">
-                                          <input type="text" class="form-control"  ID= "cp_ID"name="cp_ID" placeholder="Enter your ID..">
-                                      </div>
-                                  </div>
-                                  -->
                   <div class="form-group row">
                     <label class="col-lg-4 col-form-label" for="val-username">이름 <span class="text-danger">*</span></label>
                     <div class="col-lg-6">
@@ -55,10 +48,11 @@
                     </div>
                   </div>
                   <div class="form-group row">
-                    <label class="col-lg-4 col-form-label" for="val-email">계정 <span class="text-danger">*</span></label>
+                    <label class="col-lg-4 col-form-label" for="val-email">이메일 <span class="text-danger">*</span></label>
                     <div class="col-lg-6">
                       <input type="email" class="form-control" id="cp_email" name="cp_email" placeholder="예시) user@email.com">
-                      <p id="email_dup_check" style="font-size: 8px">중복 체크 부분</p>
+                      <span style="font-size: 11px">이메일 중복 체크: </span>
+                      <span id="email_dup_check" style="font-size: 11px"></span>
                     </div>
                   </div>
                   <div class="form-group row">
@@ -75,8 +69,8 @@
                   </div>
                   <div class="checkbox">
                     <label>
-                      										<input type="checkbox"> 약관 동의
-                      									</label>
+  										<input type="checkbox"> 약관 동의
+  									</label>
                   </div>
                   <button type="button" onClick="addUser();" class="btn btn-primary btn-flat m-b-30 m-t-30">등록 하기</button>
                   <div class="register-link m-t-15 text-center">
@@ -108,49 +102,56 @@
   <!-- check password -->
   <!--<script src="js/jquery-1.10.2.js"></script>-->
   <script>
+
+
     function addUser() {
       // 빈칸 체크
       // 비밀번호 길이 영어숫자 확인
-      // var id = $('#cp_ID').val();
       var pw = $('#cp_password').val();
       var repw = $('#cp_password_check').val();
       var name = $('#cp_username').val();
-      var mail = $('#cp_email').val();
-      var pwchk = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{4,12}$/; //비번 체크
-      if (pw == '' || repw == '' || name == '' || mail == '') {
-        alert("모든 칸을 채워주세요");
-        // return false;
+      var email = $('#cp_email').val();
+      var dup_check = $('#email_dup_check').val();
+      var pwchk = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{4,12}$/; // password check
+      var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i; // email check
+      if (pw == '' || repw == '' || name == '' || email == '') {
+        alert("모든 칸을 채워주세요.");
       } else {
         if (pwchk.test(pw) == false) {
-          alert("비밀번호는 4~12자리 영어와 숫자, 특수문자가 모두 포함되어야 합니다");
+          alert("비밀번호는 4~12자리 영어와 숫자, 특수문자가 모두 포함되어야 합니다.");
           pw.focus();
-          // return false;
         } else {
           if (pw != repw) {
-            alert("비밀번호는 똑같아야 합니다 ");
+            alert("비밀번호는 똑같아야 합니다.");
           } else {
-            alert('success');
-            $('#joinAction').submit();
+            if (email == '' || !re.test(email)) {
+              alert("이메일을 확인하세요.");
+            } else {
+              $('#joinAction').submit();
+            }
           }
         }
       }
     }
 
-    $(function(){
-      $('#cp_email').keyup(function(){
-        if($('#cp_email').val().length >= 4){
-          $.get('/auth/check_email?email='+ $('#cp_email').val(), function(result){
-            if(result.result == 1) {
-              $('#email_dup_check').html("해당 이메일은 이미 존재합니다.");
-            } else {
-              $('#email_dup_check').html("사용 가능합니다.");
-            }
-          });
+    $(function() {
+      $('#cp_email').keyup(function() {
+        if ($('#cp_email').val().length >= 4) {
+          var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i; // email check
+          if (!re.test($('#cp_email').val())) {
+            $('#email_dup_check').html("이메일 형식을 확인하세요.").css('color', 'red');
+          } else {
+            $.get('/auth/check_email?email=' + $('#cp_email').val(), function(result) {
+              if (result.result == 1) {
+                $('#email_dup_check').html("해당 이메일은 이미 존재합니다.").css('color', 'red');
+              } else {
+                $('#email_dup_check').html("사용 가능합니다.").css('color', 'blue');
+              }
+            });
+          }
         }
       });
     });
-
-
   </script>
 
 </body>
