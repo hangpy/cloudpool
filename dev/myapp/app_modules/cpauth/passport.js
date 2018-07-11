@@ -5,7 +5,6 @@ var LocalStrategy = require('passport-local').Strategy;
 var knex = require('../db/knex.js');
 var hasher = bkfd2Password();
 
-
 module.exports = function(passport) {
 
   //인증후 사용자 정보를 세션에 저장

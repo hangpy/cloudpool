@@ -124,7 +124,7 @@
           if (pw != repw) {
             alert("비밀번호는 똑같아야 합니다.");
           } else {
-            if (email == '' || !re.test(email)) {
+            if (email === '' || !re.test(email)) {
               alert("이메일을 확인하세요.");
             } else {
               $('#joinAction').submit();
