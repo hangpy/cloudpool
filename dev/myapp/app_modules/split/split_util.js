@@ -8,11 +8,13 @@
  *
  */
 
-
    var multer = require('multer');
    var java = require('java');
    var path = require('path');
-
+   var dbxUtil=require('../cpdropbox/dropbox_util.js');
+   var googleUtil=require('../cpgoogle/google_util.js');
+   var boxUtil=require('../cpbox/box_util.js');
+   const min = 65536;
    java.classpath.push(path.resolve(__dirname,'zip4j-1.3.2.jar'));
    console.log(__dirname);
    java.classpath.push("./");
@@ -28,10 +30,6 @@ const UTIL = (function() {
       cb(null, file.originalname) // cb 콜백함수를 통해 전송된 파일 이름 설정
     }
   });
-
-  var upload = multer({
-    storage: storage
-  }).single('userfile');
 
   var parameters = function() {
     var result = java.newInstanceSync("net.lingala.zip4j.model.ZipParameters");
@@ -52,11 +50,11 @@ const UTIL = (function() {
   var sizeSplit = function(size) {
     var result;
     console.log('file size : '+ size);
-    if (size > 65536 * 3) {
+    if (size > min * 3) {
       result = parseInt(size / 3);
       return result;
     } else {
-      if (size > 65536 * 2) {
+      if (size > min * 2) {
         result = parseInt(size / 2);
         return result;
       } else {
@@ -66,8 +64,9 @@ const UTIL = (function() {
     }
   };
 
+
   var filesToAdd = java.newInstanceSync("java.util.ArrayList");
-  
+
   var orgFile = function(dirname, path) {
     return java.newInstanceSync("java.io.File", dirname + "/" + path);
   };
@@ -76,6 +75,16 @@ const UTIL = (function() {
     return java.newInstanceSync("net.lingala.zip4j.core.ZipFile", dirname + "/uploads/dis/" + filename + ".zip");
   };
 
+  var refreshSpace = function(){
+    dbxUil.checkSpace();
+  }
+
+  var upload = function(FileInfo){
+    console.log(FileInfo.getSync(0));
+    googleUtil.uploadSplit(FileInfo.getSync(0) , 'root');
+    dbxUtil.dbx.uploadSplit(FileInfo.getSync(1) , '');
+    boxUtil.uploadSplit(FileInfo.getSync(2) , '0');
+  }
 
   return {
     storage: storage,
