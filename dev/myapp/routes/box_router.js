@@ -21,6 +21,49 @@ var sdk = new BoxSDK({
   clientSecret: CLIENT_SECRET
 });
 
+router.get('/folder', (req, res) => {
+  box_init(req.user, function(client){
+    var folderID = 0;
+    box_util.listFile(client, folderID, function(filelist) {
+      console.log("return - 2");
+      res.render('box_list', {
+        FolderID: folderID,
+        filelist: filelist
+      });
+    });
+  });
+});
+
+router.get('/folder/:id', (req, res) => {
+  box_init(req.user, function(client){
+    // var folderID = '\''+req.params.id+'\'';
+    var folderID = req.params.id;
+    box_util.listFile(client, folderID, function(filelist) {
+      console.log("return - 3");
+      res.render('box_list', {
+        FolderID: folderID,
+        filelist: filelist
+      });
+    });
+  });
+});
+
+router.post('/upload/:id', function(req, res) {
+  box_init(req.user, function(client){
+    var FolderID = req.params.id;
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+
+      var FileInfo = files.userfile;
+
+      res.redirect('/' + FolderID);
+
+      //비동기 필요
+      box_util.uploadFile(client, FileInfo, FolderID);
+    });
+  });
+});
+
 router.post('/download', function(req, res) {
   box_init(req.user, function(clinet){
     var backURL = req.header('Referer') || '/';
@@ -55,7 +98,6 @@ router.post('/delete', function(req, res) {
   });
 });
 
-
 router.post('/rename/file', function(req, res) {
   box_init(req.user, function(client){
     var FileID = '302277766633';
@@ -64,23 +106,6 @@ router.post('/rename/file', function(req, res) {
     res.redirect('/');
   });
 });
-
-router.post('/upload/:id', function(req, res) {
-  box_init(req.user, function(client){
-    var FolderID = req.params.id;
-    var form = new formidable.IncomingForm();
-    form.parse(req, function(err, fields, files) {
-
-      var FileInfo = files.userfile;
-
-      res.redirect('/' + FolderID);
-
-      //비동기 필요
-      box_util.uploadFile(client, FileInfo, FolderID);
-    });
-  });
-});
-
 
 router.post('/rename/folder', function(req, res) {
   box_init(req.user, function(client){
@@ -117,7 +142,6 @@ router.post('/thumbnail', function(req, res) {
   });
 });
 
-
 router.post('/search', function(req, res) {
   box_init(req.user, function(client){
     var searchText = 'test';
@@ -126,35 +150,6 @@ router.post('/search', function(req, res) {
     });
   });
 });
-
-router.get('/folder', (req, res) => {
-  box_init(req.user, function(client){
-    var folderID = 0;
-    box_util.listFile(client, folderID, function(filelist) {
-      console.log("return - 2");
-      res.render('box_list', {
-        FolderID: folderID,
-        filelist: filelist
-      });
-    });
-  });
-});
-
-
-router.get('/folder/:id', (req, res) => {
-  box_init(req.user, function(client){
-    // var folderID = '\''+req.params.id+'\'';
-    var folderID = req.params.id;
-    box_util.listFile(client, folderID, function(filelist) {
-      console.log("return - 3");
-      res.render('box_list', {
-        FolderID: folderID,
-        filelist: filelist
-      });
-    });
-  });
-});
-
 
 
 /* get box authentication and insert into database */

@@ -2,7 +2,6 @@ module.exports = (function(){
   var async = require('async');
   var fs = require('fs');
 
-
   var listFile = function(client, FolderID, callback){
     client.folders.get(FolderID).then(items => {
       var filelist = [];
@@ -54,8 +53,6 @@ module.exports = (function(){
     });
   }
 
-
-
   var uploadFile = function(client, FileInfo, FolderID){
     var stream = fs.createReadStream(FileInfo.path);
     client.files.uploadFile(FolderID, FileInfo.name, stream, function(err ,newfile){
@@ -66,8 +63,6 @@ module.exports = (function(){
       }
     });
   }
-
-
 
   var downloadFile = function(client, fileId){
     client.files.getReadStream(fileId).then(stream => {
@@ -80,15 +75,11 @@ module.exports = (function(){
     })
   }
 
-
-
   var deleteFile = function(client, fileId){
     client.files.delete(fileId).then(() => {
       console.log('deletion succeeded');
     })
   }
-
-
 
   var renameFile = function(client, fileId, newname){
     client.files.update(fileId, {name : newname})
@@ -97,16 +88,12 @@ module.exports = (function(){
   	});
   }
 
-
-
   var renameFolder = function(client, folderId, newname){
     client.folders.update(folderId, {name : newname})
   	.then(updatedFolder  => {
   		console.log('renaming folder completed');
   	});
   }
-
-
 
   var moveFile = function(client, fileId, parentId){
     client.files.update(fileId, {parent : {id : parentId}})
@@ -115,16 +102,12 @@ module.exports = (function(){
   	});
   }
 
-
-
   var moveFolder = function(client, folderId, parentId){
     client.folders.update(folderId, {parent : {id : parentId}})
   	.then(updatedFolder => {
   		console.log('moving folder completed');
   	});
   }
-
-
 
   var thumbnail = function(client, fileId){
     client.files.getThumbnail(fileId)
@@ -143,8 +126,6 @@ module.exports = (function(){
   		}
   	});
   }
-
-
 
   var search = function(client, searchText, callback){
     client.search.query(
