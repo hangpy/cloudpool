@@ -59,16 +59,6 @@ router.get('/register', function(req, res, next) {
 
 
 
-/* GET dynamic pages */
-router.get('/page-setting-drive', function(req, res, next) {
-  if (!req.isAuthenticated())
-    res.redirect('/login');
-  else
-    return next();
-}, function(req, res, next) {
-  res.render('page-setting-drive');
-})
-
 // router.get('/google', function(req, res, next) {
 //   res.render('google_list');
 // });

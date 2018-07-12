@@ -38,7 +38,7 @@ $(function(){
      // }
   });
   $('.setting-drive').click( function() {
-      $('.graph').load("page-setting-drive");
+      $('.graph').load("setting/page-setting-drive");
   });
 
 });

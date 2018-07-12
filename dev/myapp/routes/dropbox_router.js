@@ -6,7 +6,7 @@ module.exports = function(){
   var formidable = require('formidable');
   var bodyParser = require('body-parser');
   //list - root
-  route.get('/', (req,res)=>{
+  route.get('/folder/', (req,res)=>{
       var folderID = '';
     dbxutil.dbx.list(folderID, function(filelist){
       res.render('dropbox_list',{
@@ -18,7 +18,7 @@ module.exports = function(){
 
   //list - folder
 
-  route.get('/:id', (req,res)=>{
+  route.get('/folder/:id', (req,res)=>{
 
     if(req.params.id.includes('%25')){
       var name = req.params.id.replace("%25","%");
@@ -90,10 +90,6 @@ module.exports = function(){
 
 
 
-
-
-
-
   //upload - root
 
   route.post('/upload/',function(req,res){
@@ -126,6 +122,8 @@ module.exports = function(){
 
     });
   });
+
+
   return route;
 }
 // module.exports = route;
