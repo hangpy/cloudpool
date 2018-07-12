@@ -27,7 +27,7 @@ $(function(){
       $('.graph').load("google/");
   });
   $('#box').click( function() {
-      $('.graph').load("box/");
+      $('.graph').load("box/folder/");
   });
   $('#dropbox').click( function() {
       $('.graph').load("dropbox/");

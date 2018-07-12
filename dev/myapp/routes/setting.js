@@ -13,6 +13,10 @@ const google_reqToken_url = require('../app_modules/cpgoogle/google_auth')();
 
 /* GET dynamic pages */
 router.get('/page-setting-drive', function(req, res, next) {
+
+  const request = require('request');
+  console.log("session: " + request.user);
+
   if (!req.isAuthenticated())
     res.redirect('/login');
   else
