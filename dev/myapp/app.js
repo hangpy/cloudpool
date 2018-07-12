@@ -54,9 +54,9 @@ app.use(passport.session());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
-app.use('/google/', google);
-app.use('/box/', box);
-app.use('/dropbox/', dropbox);
+app.use('/google', google);
+app.use('/box', box);
+app.use('/dropbox', dropbox);
 app.use('/setting', setting);
 
 
