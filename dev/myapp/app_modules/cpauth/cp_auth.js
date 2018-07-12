@@ -11,12 +11,11 @@ module.exports = function(passport) {
   route.post('/login', passport.authenticate(
     'local-login', {
       successRedirect: '/',
-      failureRedirect: '/login',
+      failureRedirect: '/login', // message 필요
       successFlash: true,
       failureFlash: true
     }
   ));
-
 
   route.post('/register', function(req, res) {
     console.log('before hasher');
@@ -56,6 +55,44 @@ module.exports = function(passport) {
 
 
     });
+  });
+
+
+  // logout and remove session
+  route.get('/logout', function(req, res, next) {
+    if (!req.isAuthenticated())
+      res.redirect('/login');
+    else
+      return next();
+  }, function(req, res, next) {
+    req.logout();
+    res.redirect('/intro');
+  });
+
+  route.get('/check_email', function(req, res, next) {
+    if (req.isAuthenticated())
+      res.redirect('/');
+    else
+      return next();
+  }, function(req, res, next) {
+    var email = req.param('email');
+    console.log("got " + email);
+    knex.select('email').from("USER_INFO_TB").where('email', email)
+      .then(function(rows) {
+        if(rows.length == 0){
+          console.log(rows[0]);
+          res.send({
+            result: 0
+          });
+        } else {
+          res.send({
+            result: 1
+          });
+        }
+      })
+      .catch(function(err) {
+        console.log(err);
+      })
   });
 
 

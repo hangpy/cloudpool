@@ -37,5 +37,8 @@ $(function(){
      //    console.log($("#Folder_"+i).attr('value'));
      // }
   });
+  $('.setting-drive').click( function() {
+      $('.graph').load("setting/page-setting-drive");
+  });
 
 });
