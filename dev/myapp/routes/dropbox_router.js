@@ -136,6 +136,7 @@ module.exports = function(){
 
 
   // 이항복으로부터 추가 지우지 말것
+  /* 이미 인증 되어있는데 또 요구시 메시지 */
   /* insert user access token into database */
   // router to accept what dropbox responsed against user's request for authentication
   route.get('/callback', function(req, res) {
@@ -168,7 +169,6 @@ module.exports = function(){
 
       // insert token into database
       knex('DROPBOX_CONNECT_TB').insert({
-        // todo: session에서 userID 추출
         userID: req.user.userID,
         accessToken_d: USER_ACCESS_TOKEN,
       }).then(function() {

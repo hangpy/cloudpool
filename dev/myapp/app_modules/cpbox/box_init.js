@@ -16,6 +16,7 @@ const http = require('https');
 const mysql = require('mysql');
 const dbutil = require('../db/db_util');
 const client_info = require('../config/client_info');
+const knex = require('../db/knex');
 
 module.exports = function(usr_session, callback){
 
@@ -28,6 +29,8 @@ module.exports = function(usr_session, callback){
     clientID: CLIENT_ID,
     clientSecret: CLIENT_SECRET
   });
+
+  knex.selec
 
 
   // 로그인 사용자 정보에 따른 토큰 구별

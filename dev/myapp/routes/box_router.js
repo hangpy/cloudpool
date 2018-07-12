@@ -1,10 +1,26 @@
 var formidable = require('formidable');
-var route = require('express').Router();
+var router = require('express').Router();
 var fs = require('fs');
 var box_util=require('../app_modules/cpbox/box_util.js');
 var async = require('async');
 
-route.post('/delete',function(req,res){
+/* modules required to get athentication from box */
+const BoxSDK = require('box-node-sdk');
+const box_client = require('../app_modules/config/client_info').BOX;
+const url = require('url');
+const app = require('express')();
+const box_auth = require('../app_modules/cpbox/box_auth')();
+const knex = require('../app_modules/db/knex');
+
+const CLIENT_ID = box_client.getClientId();
+const CLIENT_SECRET = box_client.getClientSecret();
+
+var sdk = new BoxSDK({
+  clientID: CLIENT_ID,
+  clientSecret: CLIENT_SECRET
+});
+
+router.post('/delete',function(req,res){
   var backURL = req.header('Referer') || '/';
   console.log(req.body);
   var FileID = req.body.name;
@@ -20,7 +36,7 @@ route.post('/delete',function(req,res){
   // res.redirect(backURL);
 });
 
-route.post('/download',function(req,res){
+router.post('/download',function(req,res){
   var backURL = req.header('Referer') || '/';
   console.log(req.body);
   var FileID = req.body.name;
@@ -36,7 +52,7 @@ route.post('/download',function(req,res){
   // res.redirect(backURL);
 });
 
-route.post('/upload/:id',function(req,res){
+router.post('/upload/:id',function(req,res){
   var FolderID = req.params.id;
   var form = new formidable.IncomingForm();
   form.parse(req, function(err, fields, files) {
@@ -55,7 +71,7 @@ route.post('/upload/:id',function(req,res){
   });
 });
 
-route.get('/', (req,res)=>{
+router.get('/folder', (req,res)=>{
   // ID='\'root\'';
   ID='0';
 
@@ -69,7 +85,8 @@ route.get('/', (req,res)=>{
 
 });
 
-route.get('/:id', (req,res)=>{
+
+router.get('/folder/:id', (req,res)=>{
   // var folderID = '\''+req.params.id+'\'';
   var folderID = req.params.id;
 
@@ -83,4 +100,70 @@ route.get('/:id', (req,res)=>{
   })
 });
 
-module.exports = route;
+
+
+// 이항복이 추가한부분 지우지 말것!
+/* get box authentication and insert into database */
+// router when general user use function enrolling authentication about dropbox
+router.get('/token', function(req, res) {
+
+  var csrfToken = box_auth.generateCSRFToken();
+  console.log('access /box/token');
+  res.cookie('csrf', csrfToken);
+
+  // https://account.box.com/api/oauth2/authorize
+  // ?response_type=code
+  // &client_id=<MY_CLIENT_ID>
+  // &redirect_uri=<MY_REDIRECT_URL>
+  // &state=<MY_SECURITY_TOKEN>
+
+  res.redirect(url.format({
+    protocol: 'https',
+    hostname: 'account.box.com',
+    pathname: 'api/oauth2/authorize',
+    query: {
+      client_id: CLIENT_ID, //App key of dropbox api
+      response_type: 'code',
+      state: csrfToken,
+      // redirect_uri must be matched with one of enrolled redirect url in dropbox
+      redirect_uri: box_auth.generateRedirectURI(req)
+    }
+  }));
+
+
+});
+
+router.get('/callback', function(req, res){
+  if (req.query.error) {
+    return res.send('ERROR ' + req.query.error + ': ' + req.query.error_description);
+  }
+  if (req.query.state !== req.cookies.csrf) {
+    return res.status(401).send(
+      'CSRF token mismatch, possible cross-site request forgery attempt.'
+    );
+  }
+  // query code will can be catched when user authorize box by login
+  var code = req.query.code;
+  sdk.getTokensAuthorizationCodeGrant(code, null, function(error, tokens){
+    if(error){
+      console.error(error);
+    } else {
+      const USER_ACCESS_TOKEN = tokens.accessToken;
+      const USER_REFRESH_TOKEN = tokens.refreshToken;
+
+      // insert token into database
+      knex('BOX_CONNECT_TB').insert({
+        userID: req.user.userID,
+        accessToken_b: USER_ACCESS_TOKEN,
+        refreshToken_b: USER_REFRESH_TOKEN
+      }).then(function() {
+        res.redirect("/");
+      }).catch(function(err) {
+        console.log(err);
+        res.status(500);
+      });
+    }
+  });
+});
+
+module.exports = router;

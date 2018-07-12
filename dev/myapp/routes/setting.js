@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
+const knex = require('../app_modules/db/knex');
 
 
 /* url for requiring user access token */
@@ -17,10 +18,17 @@ router.get('/page-setting-drive', function(req, res, next) {
   else
     return next();
 }, function(req, res, next) {
-  res.render('page-setting-drive',{
-    google_url: google_reqToken_url
-    // ,dropbox_url: dropbox_reqToken_url,
-    // box_url: box_reqToken_url
+  /* Before render page, check drive state of each user from database */
+  knex.select().from('DRIVE_STATE_TB').where('userID', req.user.userID)
+  .then(function(rows){
+    res.render('page-setting-drive',{
+      google_url: google_reqToken_url,
+      drive_state: rows[0]
+      // box_url: box_reqToken_url
+    });
+  })
+  .catch(function(){
+
   });
 });
 
