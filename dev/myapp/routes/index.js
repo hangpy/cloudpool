@@ -1,7 +1,7 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var router = express.Router();
-
+const express = require('express');
+const bodyParser = require('body-parser');
+const router = express.Router();
+const knex = require('../app_modules/db/knex');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -10,9 +10,17 @@ router.get('/', function(req, res, next) {
   else
     return next();
 }, function(req, res, next) {
-  res.render('index', {
-    title: 'Express',
-    user: req.user
+  knex.select().from('DRIVE_STATE_TB').where('userID', req.user.userID)
+  .then(function(rows){
+    console.log('Render from /');
+    res.render('index', {
+      title: 'Express',
+      user: req.user,
+      drive_state: rows[0]
+    });
+  })
+  .catch(function(err){
+    console.log(err);
   });
 });
 

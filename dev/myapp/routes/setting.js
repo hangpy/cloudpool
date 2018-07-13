@@ -25,14 +25,15 @@ router.get('/page-setting-drive', function(req, res, next) {
   /* Before render page, check drive state of each user from database */
   knex.select().from('DRIVE_STATE_TB').where('userID', req.user.userID)
   .then(function(rows){
+    console.log('Render from /page-setting-drive');
     res.render('page-setting-drive',{
       google_url: google_reqToken_url,
       drive_state: rows[0]
       // box_url: box_reqToken_url
     });
   })
-  .catch(function(){
-
+  .catch(function(err){
+    console.log(err);
   });
 });
 

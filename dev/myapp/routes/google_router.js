@@ -3,11 +3,13 @@ var bodyParser = require('body-parser');
 var router = express.Router();
 var formidable = require('formidable');
 var fs = require('fs');
-var google_util=require('../app_modules/cpgoogle/google_util.js');//수정
+var google_util = require('../app_modules/cpgoogle/google_util.js'); //수정
 
 /* modules for getting user access token 지우지마!*/
 const knex = require('../app_modules/db/knex');
-const { google } = require('googleapis');
+const {
+  google
+} = require('googleapis');
 const OAuth2 = google.auth.OAuth2;
 const google_client = require('../app_modules/config/client_info').GOOGLE;
 const oauth2Client = new OAuth2(
@@ -19,20 +21,22 @@ const oauth2Client = new OAuth2(
 
 
 
-router.use(bodyParser.urlencoded({ extended: false }));
+router.use(bodyParser.urlencoded({
+  extended: false
+}));
 
 // 동시삭제, 동시다운로드 불가 다운로드 및 삭제 방식 변경 필요
 
-router.post('/download',function(req,res){
+router.post('/download', function(req, res) {
   var backURL = req.header('Referer') || '/';
   var FileID = req.body.name;
-  console.log('fileid : ',FileID);
+  console.log('fileid : ', FileID);
   google_util.download(FileID);
   res.redirect(backURL);
 });
 
 
-router.post('/upload/:id',function(req,res){
+router.post('/upload/:id', function(req, res) {
   var FolderID = req.params.id;
   var form = new formidable.IncomingForm();
   form.parse(req, function(err, fields, files) {
@@ -41,13 +45,13 @@ router.post('/upload/:id',function(req,res){
     //시각적으로 비동기 필요
 
     //비동기 필요
-    google_util.upload(FileInfo,FolderID);
+    google_util.upload(FileInfo, FolderID);
 
-    res.redirect('/google/'+FolderID);
+    res.redirect('/google/' + FolderID);
   });
 });
 
-router.post('/delete',function(req,res){
+router.post('/delete', function(req, res) {
   var backURL = req.header('Referer') || '/';
   var FileID = req.body.name;
   google_util.delete(FileID);
@@ -55,15 +59,15 @@ router.post('/delete',function(req,res){
 });
 
 
-router.get('/folder/', (req,res)=>{
+router.get('/folder/', (req, res) => {
 
-  ID='\'root\'';
+  ID = '\'root\'';
 
   google_util.list(ID, function(filelist) { //callback 함수를 통해 정보를 받아온다.
     console.log("return - 2");
-    res.render('google_list',{
-      FolderID : ID,
-      filelist:filelist
+    res.render('google_list', {
+      FolderID: ID,
+      filelist: filelist
     });
   });
 
@@ -71,24 +75,24 @@ router.get('/folder/', (req,res)=>{
 
 
 // 테스트, 지울거
-router.get('/test/', function(req, res, next){
+router.get('/test/', function(req, res, next) {
   res.redirect('/intro');
 })
 
-router.get('/folder/:id', (req,res)=>{
+router.get('/folder/:id', (req, res) => {
 
   var folderID;
   console.log(req.params);
-  if(req.params.id=='\'root\'') folderID=req.params.id;
-  else{
-    folderID = '\''+req.params.id+'\'';
+  if (req.params.id == '\'root\'') folderID = req.params.id;
+  else {
+    folderID = '\'' + req.params.id + '\'';
   }
-  google_util.list(folderID, function(filelist){
+  google_util.list(folderID, function(filelist) {
     console.log("return - 3");
     console.log(filelist);
-    res.render('google_list',{
-        FolderID : req.params.id,
-        filelist:filelist
+    res.render('google_list', {
+      FolderID: req.params.id,
+      filelist: filelist
     });
   })
 });
@@ -122,6 +126,55 @@ router.get('/callback', function(req, res) {
       res.status(500);
     });
   });
+});
+
+
+router.get('/refresh', function(req, res) {
+
+  knex.select('accessToken_g', 'refreshToken_g')
+  .from('GOOGLE_CONNECT_TB')
+  .where('userID', req.user.userID)
+  .then(function(rows){
+    oauth2Client.credentials = {
+      access_token: rows[0].accessToken_g,
+      refresh_token: rows[0].refreshToken_g
+    };
+    oauth2Client.refreshAccessToken(function(err, tokens){
+      if(err){
+        console.log(err);
+        res.send({
+          msg: "Access token refresh is failed",
+          state: 0,
+          err: err
+        });
+      } else {
+        var new_accessToken_g = tokens.access_token;
+        knex('GOOGLE_CONNECT_TB').where('userID', req.user.userID)
+        .update({
+          accessToken_g: new_accessToken_g
+        })
+        .then(function(){
+          res.send({
+            msg: "Access token is refreshed successfully",
+            state: 1
+          });
+        })
+        .catch(function(err){
+          console.log(err);
+          res.send({
+            msg: "Failed refresh token, check database",
+            state: 0,
+            err: err
+          });
+        });
+      }
+    })
+  })
+  .catch(function(err){
+    console.log(err);
+    res.redirect('/');
+  });
+
 });
 
 module.exports = router;
