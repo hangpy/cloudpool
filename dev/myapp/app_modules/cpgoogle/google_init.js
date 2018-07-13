@@ -13,6 +13,7 @@ const {google} = require('googleapis');
 const client_info = require('../config/client_info');
 const mysql = require('mysql');
 const dbutil = require('../db/db_util');
+const knex = require('../db/knex');
 
 module.exports = function(usr_session, callback){
 
@@ -30,28 +31,18 @@ module.exports = function(usr_session, callback){
     REDIRECT_URL
   );
 
-  /**
-  * @todo usr_info 사용
-  */
-
-  dbutil.pool.executeQuery(function(con){
-    // 로그인 사용자 정보에 따라 토큰 구별
-    con.query('select * from user_token', function(err, result, fields){
-      if(err){
-        con.release();
-        throw err;
-      }
-      // usr_access_token = result[0].Gaccess;
-      // usr_refresh_token = result[0].Grefresh;
-      var usr_access_token='ya29.Gl30BVOuAlBwHT5tqE7-CBOhznf-PWJtx5rl98GdC2H0qt1iWK676sj3tiwiQpzu0qAWIlK77WPZBn5_k8gD_TsWk9gnio3FYhy7Loyd2URB1Mzh4BlNU3g93PadxQw';
-      var usr_refresh_token='1/L3aOfOsrMKBvLmh5x4ra-_FHIaV3GeSJ9pqZmU6SaHI';
-
-      oauth2Client.credentials = {
-        access_token: usr_access_token,
-        refresh_token: usr_refresh_token
-      };
-      callback(oauth2Client);
-      con.release();
-    });
+  knex.select('accessToken_g', 'refreshToken_g').from('GOOGLE_CONNECT_TB').where('userID', user_session.userID)
+  .then(function(rows){
+    const USER_ACCESS_TOKEN = rows[0].accessToken_g;
+    const USER_REFRESH_TOKEN = rows[0].refreshToken_g;
+    oauth2Client.credentials = {
+      access_token: USER_ACCESS_TOKEN,
+      refresh_token: USER_REFRESH_TOKEN
+    };
+    var client = oauth2Client;
+    callback(client);
+  })
+  .catch(function(err){
+    console.log(err);
   });
 };
