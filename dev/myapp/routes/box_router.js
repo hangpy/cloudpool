@@ -208,4 +208,51 @@ router.get('/callback', function(req, res) {
   });
 });
 
+router.get('/refresh', function(req, res) {
+
+  knex.select('refreshToken_b')
+  .from('BOX_CONNECT_TB')
+  .where('userID', req.user.userID)
+  .then(function(rows){
+    const USER_REFRESH_TOKEN = rows[0].refreshToken_b;
+    sdk.getTokensRefreshGrant(USER_REFRESH_TOKEN, function(err, tokenInfo) {
+      if(err){
+        console.log(err);
+        res.send({
+          msg: "Access token refresh is failed",
+          state: 0,
+          err: err
+        });
+      } else {
+        var new_accessToken_b = tokenInfo.accessToken;
+        var new_refreshToken_b = tokenInfo.refreshToken;
+        knex('BOX_CONNECT_TB').where('userID', req.user.userID)
+        .update({
+          accessToken_b: new_accessToken_b,
+          refreshToken_b: new_refreshToken_b
+        })
+        .then(function(){
+          res.send({
+            msg: "Access token is refreshed successfully",
+            state: 1
+          });
+        })
+        .catch(function(err){
+          console.log(err);
+          res.send({
+            msg: "Failed refresh token, check database",
+            state: 0,
+            err: err
+          });
+        });
+      }
+    })
+  })
+  .catch(function(err){
+    console.log(err);
+    res.redirect('/');
+  });
+
+});
+
 module.exports = router;

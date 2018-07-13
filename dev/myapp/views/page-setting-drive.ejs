@@ -108,5 +108,19 @@
 
     });
   })
+  $('#box_refresh_btn').click(function(){
+    $.ajax({
+      type: "GET",
+      url: "/box/refresh",
+      success: function(data){
+        if(data.state)
+          alert(data.msg);
+        else
+          alert("?");
+      }
+    }).done(function() {
+
+    });
+  })
 
 </script>
