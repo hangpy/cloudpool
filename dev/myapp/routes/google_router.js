@@ -26,25 +26,33 @@ router.post('/copy/:id',function(req,res){
 
 });
 
-router.post('/searchtype/:id',function(req,res){
-  var Filetype;
-  google_util.updatefile(Filetype);
+router.post('/searchtype',function(req,res){
+  console.log(req.body.type);
+  var Filetype=req.body.type;
 
+  google_util.searchtype(Filetype, function(filelist) { //callback 함수를 통해 정보를 받아온다.
+    console.log("return - 4");
+    res.render('google_list',{
+      FolderID : 'root',
+      filelist : filelist
+    });
+    // $( "#objectID" ).load( "test.php", { "choices[]": [ "Jon", "Susan" ] } );
+    // $('.graph').load("../../views/google_list.ejs");
+  });
 });
 
 router.post('/searchname/:id',function(req,res){
   var Filename;
-
   google_util.updatefile(Filename);
 
 });
 
 router.post('/updatefile/:id',function(req,res){
-  var Newname;
-  var fileId;
-
+  var Newname = req.body.filename;
+  var fileId = req.body.name;
+  
+  console.log(req.params, req.body);
   google_util.updatefile(Newname,fileId);
-
 });
 
 router.post('/updatedir/:id',function(req,res){
@@ -75,7 +83,7 @@ router.post('/upload/:id',function(req,res){
 
 router.post('/delete',function(req,res){
   var backURL = req.header('Referer') || '/';
-  var FileID = req.body.name;
+  var FileID = req.body.id;
   google_util.delete(FileID);
   res.redirect(backURL);
 });

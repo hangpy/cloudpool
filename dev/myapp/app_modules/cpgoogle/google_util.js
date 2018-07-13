@@ -251,7 +251,8 @@ module.exports.updatefile = function(Newname,fileId){
       }
     });
   });
-  //res.redirect('google/'root);
+  console.log("name completely changed!");
+  // res.redirect('google/rootroot);
 }
   
 module.exports.updatefile = function(Newname,fileId){
@@ -345,7 +346,7 @@ module.exports.searchname = function(Filename){
 }
 
 
-module.exports.searchtype = function(Filetype){
+module.exports.searchtype = function(Filetype,callback){
   var usr_session = null;
 
     initGoogle(usr_session, function(oauth2Client){
@@ -360,14 +361,100 @@ module.exports.searchtype = function(Filetype){
         fields: "nextPageToken, files(id,name,mimeType,createdTime,modifiedTime,size,parents)"
       }, function(err, response) {
         if (err) {
-          console.log('The API returned an error 1: ' + err);
+          console.log('The API returned an error (search): ' + err);
           return;
         }
         else{
-          console.log(response.data.files);
-        }
-      });
+          // console.log(response.data.files);
+          // var filelist = [];
 
+          // if(folder!='root'){
+          //   console.log('GET ID : ',folder);
+          //   service.files.get({
+          //     fileId: folder,
+          //     // fileId: '1gd2kkvnSjz95WUM9KWePmhDc_BrAdlqq',
+          //     auth: oauth2Client,
+          //     fields:'parents'
+          //   }, (err, metadata) => {
+          //     if (err) {
+          //       console.log('The API returned an error!!!!!!!!!!!!!!!!!!!!: ' + err);
+          //       console.log('222222!!!!!!!!!!!!!!!!!!!!: ');
+          //       return;
+          //     }
+          //     else{
+          //       var _filelist = response.data.files;
+          //       console.log('metadata: ',metadata.data.parents);
+          //       filelist.push(metadata.data.parents);
+    
+          //       async.map(_filelist,
+          //         function(file, callback_list){
+          //           //각각 디렉토리의 파일리스트 읽어오기
+          //           if(file!=undefined){
+          //           var fileinfo={
+          //             "id" : file.id,
+          //             "name" : file.name,
+          //             "mimeType" : file.mimeType,
+          //             "modifiedTime" : file.modifiedTime,
+          //             "size" : file.size,
+          //             "parents" : file.parents
+          //           };
+    
+          //           console.log(":",fileinfo)
+          //           filelist.push(fileinfo);
+          //           callback_list(null,"finish")
+          //         }
+          //           else callback_list(null,"finish");
+          //         },
+          //         function(err,result){
+          //             if(err) console.log(err);
+          //             //list 받아오기 완료
+          //             else {
+          //               console.log('Finish the File list');
+          //               // console.log(filelist);
+          //               callback(filelist);
+          //               console.log(filelist);
+          //             }
+          //         }
+          //       );
+          //     }
+          //   });
+          // }
+            var filelist = [];
+            var _filelist = response.data.files;
+            // console.log('metadata2: ',folder);
+            // filelist.push(folder);
+            async.map(_filelist,
+              function(file, callback_list){
+                //각각 디렉토리의 파일리스트 읽어오기
+                if(file!=undefined){
+                var fileinfo={
+                  "id" : file.id,
+                  "name" : file.name,
+                  "mimeType" : file.mimeType,
+                  "modifiedTime" : file.modifiedTime,
+                  "size" : file.size,
+                  "parents" : file.parents
+                };
+                
+                console.log(":",fileinfo)
+                filelist.push(fileinfo);
+                callback_list(null,"finish")
+              }
+                else callback_list(null,"finish");
+              },
+              function(err,result){
+                  if(err) console.log(err);
+                  //list 받아오기 완료
+                  else {
+                    console.log('Finish the File list');
+                    // console.log(filelist);
+                    callback(filelist);
+                    console.log(filelist);
+                  }
+              }
+            );
+          }
+      });
       //res.redirect('google/'root);
   });
 }
