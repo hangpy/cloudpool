@@ -25,7 +25,7 @@
     <option value="application/vnd.google-apps.document">document-docx</option>
     <option value="image/jpeg">image</option>
   </select>
-  <button  type="submit" onClick='Submit(4)' >골라보기</button>
+  <button type="submit" onClick='Submit(4)' >골라보기</button>
 
   <table border="1" id="table_google">
           <tr>
@@ -120,15 +120,7 @@ if(index===3){
 }
 
 if(index===4){
-  
-  // action_google.action='google/searchtype';
-  // action_google.method="post";
-  // action_google.submit();
-  // action_google.submit();
-  // action_google.action='#';
-  // action_google.action='google/searchtype'
-  $('.graph').load("google/searchtype",{post});
-
+  action_google.action='google/searchtype';
 }
 
 action_google.submit();

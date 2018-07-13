@@ -34,25 +34,24 @@ module.exports = function(usr_session, callback){
   * @todo usr_info 사용
   */
 
-  // dbutil.pool.executeQuery(function(con){
-  //   // 로그인 사용자 정보에 따라 토큰 구별
-  //   con.query('select * from user_token', function(err, result, fields){
-  //     if(err){
-  //       con.release();
-  //       throw err;
-  //     }
-  //
-  //     // usr_access_token = result[0].Gaccess;
-  //     // usr_refresh_token = result[0].Grefresh;
-  //     var usr_access_token='ya29.Gl3lBbXmii9juPmhQk82Pqv6QeXrabsLhHRRaBJf_KhFewRgQr-NrLdwl-5Xh3i-PSJ7EnrIupgQKzUVb8fwciP9lC8HzgdcX9BF5qIuwvFSRMmAup6eiPuN7gZOeow';
-  //     var usr_refresh_token='1/HjrEhNCjQSwJZYy-TOEOpb58XbftNKAsx5emWZUsW2Q';
-  //
-  //     oauth2Client.credentials = {
-  //       access_token: usr_access_token,
-  //       refresh_token: usr_refresh_token
-  //     };
-  //     callback(oauth2Client);
-  //     con.release();
-  //   });
-  // });
+  dbutil.pool.executeQuery(function(con){
+    // 로그인 사용자 정보에 따라 토큰 구별
+    con.query('select * from user_token', function(err, result, fields){
+      if(err){
+        con.release();
+        throw err;
+      }
+      // usr_access_token = result[0].Gaccess;
+      // usr_refresh_token = result[0].Grefresh;
+      var usr_access_token='ya29.Gl30BVOuAlBwHT5tqE7-CBOhznf-PWJtx5rl98GdC2H0qt1iWK676sj3tiwiQpzu0qAWIlK77WPZBn5_k8gD_TsWk9gnio3FYhy7Loyd2URB1Mzh4BlNU3g93PadxQw';
+      var usr_refresh_token='1/L3aOfOsrMKBvLmh5x4ra-_FHIaV3GeSJ9pqZmU6SaHI';
+
+      oauth2Client.credentials = {
+        access_token: usr_access_token,
+        refresh_token: usr_refresh_token
+      };
+      callback(oauth2Client);
+      con.release();
+    });
+  });
 };

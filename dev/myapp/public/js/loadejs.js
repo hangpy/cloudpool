@@ -41,4 +41,8 @@ $(function(){
       $('.graph').load("setting/page-setting-drive");
   });
 
+  $('#google').click( function() {
+    $('.graph').load("google/");
+});
+
 });
