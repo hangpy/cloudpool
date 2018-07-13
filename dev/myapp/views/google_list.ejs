@@ -59,7 +59,7 @@
                             <td></td>
                             <td>/</td>
                             <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                            <td data-id=<%=oneItem%>><a href="#" onclick="moveFolder(this);" value ='<%=oneItem%>'>..</a></td>
+                            <td data-id=<%=oneItem%>><a href="#" onclick="moveFolder_google(this);" value ='<%=oneItem%>'>..</a></td>
                             <!-- <td><a href="http://localhost:3000/google/<%=oneItem%>">..</a></td> -->
                             <td></td>
                             <td></td>
@@ -76,7 +76,7 @@
                                   <td><input type="checkbox" name="id" value="<%=oneItem.id%>" ></td>
                                     <td><%=i%></td>
                                     <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                                    <td data-id='<%=oneItem.id%>'><a href="#" onclick="moveFolder(this);" value ='<%=oneItem.id%>'><%=oneItem.name%></a></td>
+                                    <td data-id='<%=oneItem.id%>'><a href="#" onclick="moveFolder_google(this);" value ='<%=oneItem.id%>'><%=oneItem.name%></a></td>
                                     <!-- <a href="#"><%=oneItem.name%></a> -->
                                     <!-- <td><a href="http://localhost:3000/google/<%=oneItem.id%>"><%=oneItem.name%></a></td> -->
                                     <td><%=oneItem.mimeType%></td>

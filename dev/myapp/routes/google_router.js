@@ -43,7 +43,7 @@ router.get('/folder/:id', (req, res) => {
   google_init(req.user, function(client) {
     var folderID;
     if (req.params.id == '\'root\'') folderID = req.params.id;
-    else {folderID = '\'' + req.params.id + '\'';}
+    else {folderID = req.params.id ;}
     var orderkey = 'folder'; // check
 
     google_util.list(folderID,orderkey,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
