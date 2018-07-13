@@ -23,9 +23,7 @@ $(function(){
   $('#card1').click( function() {
       $('.graph').load("card");
   });
-  $('#google').click( function() {
-      $('.graph').load("google/");
-  });
+
   $('#box').click( function() {
       $('.graph').load("box/folder/");
   });
@@ -42,7 +40,7 @@ $(function(){
   });
 
   $('#google').click( function() {
-    $('.graph').load("google/");
+    $('.graph').load("google/folder/");
 });
 
 });

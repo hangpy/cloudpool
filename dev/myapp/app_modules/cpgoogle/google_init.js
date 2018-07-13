@@ -15,7 +15,9 @@ const mysql = require('mysql');
 const dbutil = require('../db/db_util');
 const knex = require('../db/knex');
 
-module.exports = function(usr_session, callback){
+module.exports = function(user_session, callback){
+
+  console.log("--------------1---------------");
 
   // Select google client info part out of several drives
   const google_client = client_info.GOOGLE;
@@ -31,6 +33,8 @@ module.exports = function(usr_session, callback){
     REDIRECT_URL
   );
 
+  console.log("--------------2---------------");
+
   knex.select('accessToken_g', 'refreshToken_g').from('GOOGLE_CONNECT_TB').where('userID', user_session.userID)
   .then(function(rows){
     const USER_ACCESS_TOKEN = rows[0].accessToken_g;
@@ -40,9 +44,11 @@ module.exports = function(usr_session, callback){
       refresh_token: USER_REFRESH_TOKEN
     };
     var client = oauth2Client;
+    console.log("select before callback")
     callback(client);
   })
   .catch(function(err){
+    console.log('--------select error----------')
     console.log(err);
   });
 };

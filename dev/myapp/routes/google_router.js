@@ -27,8 +27,8 @@ router.use(bodyParser.urlencoded({
 
 router.get('/folder/', (req, res) => {
   google_init(req.user, function(client) {
-    var folderID = '\'root\'';
-    var orderkey = 'folder'; // check 
+    var folderID = 'root';
+    var orderkey = 'folder'; // check
     google_util.list(folderID,orderkey,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
       console.log("return - 2");
       res.render('google_list', {
@@ -44,7 +44,7 @@ router.get('/folder/:id', (req, res) => {
     var folderID;
     if (req.params.id == '\'root\'') folderID = req.params.id;
     else {folderID = '\'' + req.params.id + '\'';}
-    var orderkey = 'folder'; // check 
+    var orderkey = 'folder'; // check
 
     google_util.list(folderID,orderkey,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
       console.log("return - 3");
@@ -108,7 +108,7 @@ router.post('/changedir/:id',function(req,res){
 
 
 router.post('/makedir/:id',function(req,res){
-  google_init(req.user, function(client) {  
+  google_init(req.user, function(client) {
     var foldername;
     var FolderID;
     google_util.makeDir(foldername,FolderID,client);
@@ -116,21 +116,21 @@ router.post('/makedir/:id',function(req,res){
 });
 
 router.post('/getthumbnail/:id',function(req,res){
-  google_init(req.user, function(client) {  
+  google_init(req.user, function(client) {
     var fileId;
     google_util.getThumbnailLink(fileId,client);
   });
 });
 
 router.post('/copy/:id',function(req,res){
-  google_init(req.user, function(client) {  
+  google_init(req.user, function(client) {
     var fileId;
     google_util.copyFile(fileId,client);
   });
 });
 
 router.post('/searchtype',function(req,res){
-  google_init(req.user, function(client) {  
+  google_init(req.user, function(client) {
     var Filetype=req.body.type;
     google_util.searchType(Filetype,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
       console.log("return - 4");
@@ -145,7 +145,7 @@ router.post('/searchtype',function(req,res){
 });
 
 router.post('/searchname/:id',function(req,res){
-  google_init(req.user, function(client) {  
+  google_init(req.user, function(client) {
     var Filename;
     google_util.searchName(Filename,client);
   });

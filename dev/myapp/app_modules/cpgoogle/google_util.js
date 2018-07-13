@@ -197,7 +197,7 @@ var downloadFile = function(res, fileId,oauth2Client) {
           }
         });
       }
- 
+
   }
 
   var deleteFile = function(fileId,oauth2Client) {
