@@ -4,12 +4,14 @@ var router = express.Router();
 var formidable = require('formidable');
 var fs = require('fs');
 var google_util = require('../app_modules/cpgoogle/google_util.js'); //수정
+var google_init = require('../app_modules/cpgoogle/google_init');
 
 /* modules for getting user access token 지우지마!*/
 const knex = require('../app_modules/db/knex');
 const {
   google
 } = require('googleapis');
+
 const OAuth2 = google.auth.OAuth2;
 const google_client = require('../app_modules/config/client_info').GOOGLE;
 const oauth2Client = new OAuth2(
@@ -18,136 +20,136 @@ const oauth2Client = new OAuth2(
   google_client.getRedirectUrl()
 );
 
-
-
-
 router.use(bodyParser.urlencoded({
   extended: false
 }));
 
-// 동시삭제, 동시다운로드 불가 다운로드 및 삭제 방식 변경 필요
 
-router.post('/download', function(req, res) {
-  var backURL = req.header('Referer') || '/';
-  var FileID = req.body.name;
-  console.log('fileid : ', FileID);
-  google_util.downloadFile(FileID);
-  res.redirect(backURL);
+router.get('/folder/', (req, res) => {
+  google_init(req.user, function(client) {
+    var folderID = 'root';
+    var orderkey = 'folder'; // check
+    google_util.list(folderID,orderkey,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
+      console.log("return - 2");
+      res.render('google_list', {
+        FolderID: folderID,
+        filelist: filelist
+      });
+    });
+  });
+});
+
+router.get('/folder/:id', (req, res) => {
+  google_init(req.user, function(client) {
+    var folderID;
+    if (req.params.id == '\'root\'') folderID = req.params.id;
+    else {folderID = '\'' + req.params.id + '\'';}
+    var orderkey = 'folder'; // check
+
+    google_util.list(folderID,orderkey,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
+      console.log("return - 3");
+      res.render('google_list', {
+        FolderID: folderID,
+        filelist: filelist
+      });
+    });
+  });
 });
 
 router.post('/upload/:id',function(req,res){
-  var FolderID = req.params.id;
-  var form = new formidable.IncomingForm();
-  form.parse(req, function(err, fields, files) {
-
-    var FileInfo = files.userfile;
-    //시각적으로 비동기 필요
-
-    //비동기 필요
-    google_util.uploadFile(FileInfo, FolderID);
-
-    res.redirect('/google/' + FolderID);
+  google_init(req.user, function(client) {
+    var folderID = req.params.id;
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+      var FileInfo = files.userfile;
+      google_util.uploadFile(FileInfo, folderID,client);
+      res.redirect('/google/' + folderID);
+    });
   });
 });
 
 // 동시삭제, 동시다운로드 불가 다운로드 및 삭제 방식 변경 필요
-router.post('/makedir/:id',function(req,res){
-  var foldername;
-  var FolderID;
-  google_util.makeDir(foldername,FolderID);
 
+router.post('/download', function(req, res) {
+  google_init(req.user, function(client) {
+    var backURL = req.header('Referer') || '/';
+    var fileId = req.body.name;
+    google_util.downloadFile(res,fileId,client);
+    res.redirect(backURL);
+  });
+});
+
+router.post('/delete', function(req, res) {
+
+  google_init(req.user, function(client) {
+    var backURL = req.header('Referer') || '/';
+    var fileId = req.body.name;
+    google_util.deleteFile(fileId,client);
+    res.redirect(backURL);
+  });
+});
+
+router.post('/rename:id',function(req,res){
+  google_init(req.user, function(client) {
+    var Newname = req.body.filename;
+    var fileId = req.body.name;
+    console.log(req.params, req.body);
+    google_util.updateFile(Newname,fileId,client);
+  });
+});
+
+router.post('/changedir/:id',function(req,res){
+  google_init(req.user, function(client) {
+    var fileId ;
+    var folderId ;
+    google_util.updateDir(fileId,folderId,client);
+  });
+});
+
+
+router.post('/makedir/:id',function(req,res){
+  google_init(req.user, function(client) {
+    var foldername;
+    var FolderID;
+    google_util.makeDir(foldername,FolderID,client);
+  });
 });
 
 router.post('/getthumbnail/:id',function(req,res){
-
-  var fileId;
-  google_util.getThumbnailLink(fileId);
+  google_init(req.user, function(client) {
+    var fileId;
+    google_util.getThumbnailLink(fileId,client);
+  });
 });
 
 router.post('/copy/:id',function(req,res){
-  var FileID;
-  google_util.copy(FileID);
-
+  google_init(req.user, function(client) {
+    var fileId;
+    google_util.copyFile(fileId,client);
+  });
 });
 
 router.post('/searchtype',function(req,res){
-  console.log(req.body.type);
-  var Filetype=req.body.type;
-
-  google_util.searchType(Filetype, function(filelist) { //callback 함수를 통해 정보를 받아온다.
-    console.log("return - 4");
-    res.render('google_list',{
-      FolderID : 'root',
-      filelist : filelist
+  google_init(req.user, function(client) {
+    var Filetype=req.body.type;
+    google_util.searchType(Filetype,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
+      console.log("return - 4");
+      res.render('google_list',{
+        FolderID : 'root',
+        filelist : filelist
+      });
+      // $( "#objectID" ).load( "test.php", { "choices[]": [ "Jon", "Susan" ] } );
+      // $('.graph').load("../../views/google_list.ejs");
     });
-    // $( "#objectID" ).load( "test.php", { "choices[]": [ "Jon", "Susan" ] } );
-    // $('.graph').load("../../views/google_list.ejs");
   });
 });
 
 router.post('/searchname/:id',function(req,res){
-  var Filename;
-  google_util.searchName(Filename);
-
-});
-
-router.post('/updatefile/:id',function(req,res){
-  var Newname = req.body.filename;
-  var fileId = req.body.name;
-
-  console.log(req.params, req.body);
-  google_util.updateFile(Newname,fileId);
-});
-
-router.post('/updatedir/:id',function(req,res){
-  var fileId ;
-  var folderId ;
-  google_util.updateDir(fileId,folderId);
-});
-
-
-router.post('/delete', function(req, res) {
-  var backURL = req.header('Referer') || '/';
-  var FileID = req.body.name;
-  google_util.deleteFile(FileID);
-  res.redirect(backURL);
-});
-
-
-router.get('/folder/', (req, res) => {
-
-  ID = '\'root\'';
-
-  google_util.list(ID, function(filelist) { //callback 함수를 통해 정보를 받아온다.
-    console.log("return - 2");
-    res.render('google_list', {
-      FolderID: ID,
-      filelist: filelist
-    });
+  google_init(req.user, function(client) {
+    var Filename;
+    google_util.searchName(Filename,client);
   });
-
 });
-
-
-router.get('/folder/:id', (req, res) => {
-
-  var folderID;
-  console.log(req.params);
-  if (req.params.id == '\'root\'') folderID = req.params.id;
-  else {
-    folderID = '\'' + req.params.id + '\'';
-  }
-  google_util.list(folderID, function(filelist) {
-    console.log("return - 3");
-    console.log(filelist);
-    res.render('google_list', {
-      FolderID: req.params.id,
-      filelist: filelist
-    });
-  })
-});
-
-
 
 /* insert user access token into database */
 router.get('/callback', function(req, res) {
