@@ -17,8 +17,6 @@ const knex = require('../db/knex');
 
 module.exports = function(user_session, callback){
 
-  console.log("--------------1---------------");
-
   // Select google client info part out of several drives
   const google_client = client_info.GOOGLE;
   var OAuth2 = google.auth.OAuth2;

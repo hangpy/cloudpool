@@ -111,23 +111,18 @@ if(index===1){
   action_google.action='google/download';
 }
 if(index===2){
-  action_google.action='google/delete/<%=FolderID%>';
+  action_google.action='google/delete';
   $('.graph').load("google/<%=FolderID%>");
 }
 
 if(index===3){
-  action_google.action='google/updatefile/<%=FolderID%>';
+  action_google.action='google/rename';
 }
 
 if(index===4){
 
-  // action_google.action='google/searchtype';
-  // action_google.method="post";
-  // action_google.submit();
-  // action_google.submit();
-  // action_google.action='#';
-  // action_google.action='google/searchtype'
-  $('.graph').load("google/searchtype",{post});
+  action_google.action='google/searchtype';
+  // $('.graph').load("google/searchtype",{post});
 
 }
 

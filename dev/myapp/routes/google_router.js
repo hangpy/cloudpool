@@ -89,7 +89,7 @@ router.post('/delete', function(req, res) {
   });
 });
 
-router.post('/rename:id',function(req,res){
+router.post('/rename',function(req,res){
   google_init(req.user, function(client) {
     var Newname = req.body.filename;
     var fileId = req.body.name;
