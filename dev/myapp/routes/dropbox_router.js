@@ -1,12 +1,12 @@
 module.exports = function(){
 
-  var route = require('express').Router();
+  var router = require('express').Router();
   var fs = require('fs');
   var dbxutil=require('../app_modules/cpdropbox/dropbox_util.js');
   var formidable = require('formidable');
   var bodyParser = require('body-parser');
   //list - root
-  route.get('/folder/', (req,res)=>{
+  router.get('/folder/', (req,res)=>{
       var folderID = '';
       console.log("read folder/");
       dbxutil.dbx.getlistRest(folderID, function(filelist){
@@ -20,7 +20,7 @@ module.exports = function(){
 
   //list - folder
 
-  route.get('/folder/:id', (req,res)=>{
+  router.get('/folder/:id', (req,res)=>{
       console.log("read folder/id");
     if(req.params.id.includes('%25')){
       var name = req.params.id.replace("%25","%");
@@ -38,7 +38,7 @@ module.exports = function(){
   });
 
   //search list view - root
-  route.post('/search/folder/', (req,res)=>{
+  router.post('/search/folder/', (req,res)=>{
       var folderID = '';
       console.log("read search folder/");
       var searchfilelist = JSON.parse(req.body.obj);
@@ -50,7 +50,7 @@ module.exports = function(){
 
   //search list view - folder
 
-  route.post('/search/folder/:id', (req,res)=>{
+  router.post('/search/folder/:id', (req,res)=>{
       console.log("read folder/id");
     if(req.params.id.includes('%25')){
       var name = req.params.id.replace("%25","%");
@@ -66,7 +66,7 @@ module.exports = function(){
 
 
   //select list - root
-  route.post('/select/folder/', (req,res)=>{
+  router.post('/select/folder/', (req,res)=>{
       var folderID = '';
       console.log("read search folder/");
       var searchfilelist = JSON.parse(req.body.obj);
@@ -78,7 +78,7 @@ module.exports = function(){
 
   //select list - folder
 
-  route.post('/select/folder/:id', (req,res)=>{
+  router.post('/select/folder/:id', (req,res)=>{
       console.log("read folder/id");
     if(req.params.id.includes('%25')){
       var name = req.params.id.replace("%25","%");
@@ -96,7 +96,7 @@ module.exports = function(){
 
   //rename - root
 
-  route.post('/rename/',function(req,res){
+  router.post('/rename/',function(req,res){
     var FolderID = '';
     var originName = req.body.originname;
     var type = originName.split(".")[1];
@@ -113,7 +113,7 @@ module.exports = function(){
 
   //rename -folder
 
-  route.post('/rename/:id',function(req,res){
+  router.post('/rename/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
     var originName = req.body.originname;
     var type = originName.split(".")[1];
@@ -130,7 +130,7 @@ module.exports = function(){
 
   //search - root
 
-  route.post('/search/',function(req,res){
+  router.post('/search/',function(req,res){
     var FolderID = '';
     var searchname = req.body.searchname;
     var searchFolder = req.body.searchfolder;
@@ -142,7 +142,7 @@ module.exports = function(){
 
   //search -folder
 
-  route.post('/search/:id',function(req,res){
+  router.post('/search/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
     var searchname = req.body.searchname;
     var searchFolder = req.body.searchfolder;
@@ -154,7 +154,7 @@ module.exports = function(){
 
   //select - root
 
-  route.post('/select/',function(req,res){
+  router.post('/select/',function(req,res){
     var FolderID = '';
     var selecttype = req.body.selecttype;
     dbxutil.dbx.sendselectRest(selecttype, FolderID, function(result){
@@ -164,7 +164,7 @@ module.exports = function(){
 
   //select -folder
 
-  route.post('/select/:id',function(req,res){
+  router.post('/select/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
     var selecttype = req.body.selecttype;
     dbxutil.dbx.sendselectRest(selecttype, FolderID, function(result){
@@ -174,7 +174,7 @@ module.exports = function(){
 
   //delete - root
 
-  route.post('/delete/',function(req,res){
+  router.post('/delete/',function(req,res){
     var FolderID = '';
     var FileName = req.body.name.split("*")[0];
     dbxutil.dbx.delete(FileName,FolderID);
@@ -190,7 +190,7 @@ module.exports = function(){
 
   //delete -folder
 
-  route.post('/delete/:id',function(req,res){
+  router.post('/delete/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
     var FileName = req.body.name.split("*")[0];
 
@@ -202,7 +202,7 @@ module.exports = function(){
 
   //download - root
 
-  route.post('/download/',function(req,res){
+  router.post('/download/',function(req,res){
     var FolderID = '';
     console.log(req.body);
     var FileID = req.body.name.split("*")[0];
@@ -215,7 +215,7 @@ module.exports = function(){
 
   //download - folder
 
-  route.post('/download/:id',function(req,res){
+  router.post('/download/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
     var FileID = req.body.name.split("*")[0];
 
@@ -233,7 +233,7 @@ module.exports = function(){
 
   //upload - root
 
-  route.post('/upload/',function(req,res){
+  router.post('/upload/',function(req,res){
     var FolderID = '';
     var form = new formidable.IncomingForm();
 
@@ -250,7 +250,7 @@ module.exports = function(){
   });
 
   //upload - folder
-  route.post('/upload/:id',function(req,res){
+  router.post('/upload/:id',function(req,res){
     var folderID = '/'+req.params.id.replace(/[*]/g,"/");
 
     var form = new formidable.IncomingForm();
@@ -263,6 +263,77 @@ module.exports = function(){
 
     });
   });
-  return route;
+
+  /* insert user access token into database */
+  // router to accept what dropbox responsed against user's request for authentication
+  router.get('/callback', function(req, res) {
+    if (req.query.error) {
+      return res.send('ERROR ' + req.query.error + ': ' + req.query.error_description);
+    }
+    if (req.query.state !== req.cookies.csrf) {
+      return res.status(401).send(
+        'CSRF token mismatch, possible cross-site request forgery attempt.'
+      );
+    }
+    request.post('https://api.dropbox.com/1/oauth2/token', {
+      form: {
+        code: req.query.code,
+        grant_type: 'authorization_code',
+        redirect_uri: dropbox_auth.generateRedirectURI(req)
+      },
+      auth: {
+        user: dropbox_client.getClientId(),
+        pass: dropbox_client.getClientSecret()
+      }
+    },
+    function(error, response, body) {
+      var data = JSON.parse(body);
+      if (data.error) {
+        return res.send('ERROR: ' + data.error);
+      }
+      const USER_ACCESS_TOKEN = data.access_token;
+
+
+      // insert token into database
+      knex('DROPBOX_CONNECT_TB').insert({
+        userID: req.user.userID,
+        accessToken_d: USER_ACCESS_TOKEN,
+      }).then(function() {
+        // req.session.token = data.access_token;
+        request.post('https://api.dropbox.com/1/account/info', {
+          headers: {
+            Authorization: 'Bearer ' + USER_ACCESS_TOKEN
+          }
+        });
+        // final working after all process of authentication without any errors
+        // res.send('Logged in successfully as ' + JSON.parse(body).access_token + '.');
+        res.redirect("/");
+      }).catch(function(err) {
+        console.log(err);
+        res.status(500);
+      });
+    });
+  });
+
+  // router when general user use function enrolling authentication about dropbox
+  router.get('/token', function(req, res) {
+    var csrfToken = dropbox_auth.generateCSRFToken();
+    res.cookie('csrf', csrfToken);
+    res.redirect(url.format({
+      protocol: 'https',
+      hostname: 'www.dropbox.com',
+      pathname: '1/oauth2/authorize',
+      query: {
+        client_id: dropbox_client.getClientId(), //App key of dropbox api
+        response_type: 'code',
+        state: csrfToken,
+        // redirect_uri must be matched with one of enrolled redirect url in dropbox
+        redirect_uri: dropbox_auth.generateRedirectURI(req)
+      }
+    }));
+  });
+
+
+  return router;
 }
 // module.exports = route;
