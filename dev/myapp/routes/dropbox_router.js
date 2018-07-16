@@ -5,6 +5,16 @@ module.exports = function(){
   var dbxutil=require('../app_modules/cpdropbox/dropbox_util.js');
   var formidable = require('formidable');
   var bodyParser = require('body-parser');
+
+  /* module required to get authentication from dropbox */
+  const dropbox_client = require('../app_modules/config/client_info').DROPBOX;
+  const knex = require('../app_modules/db/knex');
+  const url = require('url');
+  const request = require('request');
+  const dropbox_auth = require('../app_modules/cpdropbox/dropbox_auth')();
+
+
+
   //list - root
   route.get('/folder/', (req,res)=>{
       var folderID = '';
@@ -48,7 +58,11 @@ module.exports = function(){
       });
   });
 
+<<<<<<< HEAD
   //search list view - folder
+=======
+  route.get('/folder/:id', (req,res)=>{
+>>>>>>> 2d0cbcab4ca5733a0b866ce4e3cb111474f6660b
 
   route.post('/search/folder/:id', (req,res)=>{
       console.log("read folder/id");
@@ -227,10 +241,6 @@ module.exports = function(){
 
 
 
-
-
-
-
   //upload - root
 
   route.post('/upload/',function(req,res){
@@ -263,6 +273,81 @@ module.exports = function(){
 
     });
   });
+
+
+
+  // 이항복으로부터 추가 지우지 말것
+  /* 이미 인증 되어있는데 또 요구시 메시지 */
+  /* insert user access token into database */
+  // router to accept what dropbox responsed against user's request for authentication
+  route.get('/callback', function(req, res) {
+    if (req.query.error) {
+      return res.send('ERROR ' + req.query.error + ': ' + req.query.error_description);
+    }
+    if (req.query.state !== req.cookies.csrf) {
+      return res.status(401).send(
+        'CSRF token mismatch, possible cross-site request forgery attempt.'
+      );
+    }
+    request.post('https://api.dropbox.com/1/oauth2/token', {
+      form: {
+        code: req.query.code,
+        grant_type: 'authorization_code',
+        redirect_uri: dropbox_auth.generateRedirectURI(req)
+      },
+      auth: {
+        user: dropbox_client.getClientId(),
+        pass: dropbox_client.getClientSecret()
+      }
+    },
+    function(error, response, body) {
+      var data = JSON.parse(body);
+      if (data.error) {
+        return res.send('ERROR: ' + data.error);
+      }
+      const USER_ACCESS_TOKEN = data.access_token;
+
+
+      // insert token into database
+      knex('DROPBOX_CONNECT_TB').insert({
+        userID: req.user.userID,
+        accessToken_d: USER_ACCESS_TOKEN,
+      }).then(function() {
+        // req.session.token = data.access_token;
+        request.post('https://api.dropbox.com/1/account/info', {
+          headers: {
+            Authorization: 'Bearer ' + USER_ACCESS_TOKEN
+          }
+        });
+        // final working after all process of authentication without any errors
+        // res.send('Logged in successfully as ' + JSON.parse(body).access_token + '.');
+        res.redirect("/");
+      }).catch(function(err) {
+        console.log(err);
+        res.status(500);
+      });
+    });
+  });
+
+  // router when general user use function enrolling authentication about dropbox
+  route.get('/token', function(req, res) {
+    var csrfToken = dropbox_auth.generateCSRFToken();
+    res.cookie('csrf', csrfToken);
+    res.redirect(url.format({
+      protocol: 'https',
+      hostname: 'www.dropbox.com',
+      pathname: '1/oauth2/authorize',
+      query: {
+        client_id: dropbox_client.getClientId(), //App key of dropbox api
+        response_type: 'code',
+        state: csrfToken,
+        // redirect_uri must be matched with one of enrolled redirect url in dropbox
+        redirect_uri: dropbox_auth.generateRedirectURI(req)
+      }
+    }));
+  });
+
+
   return route;
 }
 // module.exports = route;

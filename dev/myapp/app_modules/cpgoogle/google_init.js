@@ -13,8 +13,9 @@ const {google} = require('googleapis');
 const client_info = require('../config/client_info');
 const mysql = require('mysql');
 const dbutil = require('../db/db_util');
+const knex = require('../db/knex');
 
-module.exports = function(usr_session, callback){
+module.exports = function(user_session, callback){
 
   // Select google client info part out of several drives
   const google_client = client_info.GOOGLE;
@@ -30,29 +31,22 @@ module.exports = function(usr_session, callback){
     REDIRECT_URL
   );
 
-  /**
-  * @todo usr_info 사용
-  */
+  console.log("--------------2---------------");
 
-  dbutil.pool.executeQuery(function(con){
-    // 로그인 사용자 정보에 따라 토큰 구별
-    con.query('select * from user_token', function(err, result, fields){
-      if(err){
-        con.release();
-        throw err;
-      }
-
-      // usr_access_token = result[0].Gaccess;
-      // usr_refresh_token = result[0].Grefresh;
-      var usr_access_token='ya29.Gl3lBbXmii9juPmhQk82Pqv6QeXrabsLhHRRaBJf_KhFewRgQr-NrLdwl-5Xh3i-PSJ7EnrIupgQKzUVb8fwciP9lC8HzgdcX9BF5qIuwvFSRMmAup6eiPuN7gZOeow';
-      var usr_refresh_token='1/HjrEhNCjQSwJZYy-TOEOpb58XbftNKAsx5emWZUsW2Q';
-
-      oauth2Client.credentials = {
-        access_token: usr_access_token,
-        refresh_token: usr_refresh_token
-      };
-      callback(oauth2Client);
-      con.release();
-    });
+  knex.select('accessToken_g', 'refreshToken_g').from('GOOGLE_CONNECT_TB').where('userID', user_session.userID)
+  .then(function(rows){
+    const USER_ACCESS_TOKEN = rows[0].accessToken_g;
+    const USER_REFRESH_TOKEN = rows[0].refreshToken_g;
+    oauth2Client.credentials = {
+      access_token: USER_ACCESS_TOKEN,
+      refresh_token: USER_REFRESH_TOKEN
+    };
+    var client = oauth2Client;
+    console.log("select before callback")
+    callback(client);
+  })
+  .catch(function(err){
+    console.log('--------select error----------')
+    console.log(err);
   });
 };

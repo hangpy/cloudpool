@@ -1,0 +1,126 @@
+
+<%
+  var google_state = drive_state.googleCount;
+  var dropbox_state = drive_state.dropboxCount;
+  var box_state = drive_state.boxCount
+%>
+
+
+
+<div class="card">
+  <div class="card-title"><img id="google-img" src="icons\drive-icon\google.png" alt=""></div>
+  <div class="card-body">
+    <div>
+      <p class="text-muted m-b-15 f-s-12">
+        연결상태:
+        <% if(google_state > 0) { %>
+          <span  style="color: blue">연결됨</span>
+        <% } else { %>
+          <span  style="color: red">연결안됨</span>
+        <% } %>
+      </p>
+    </div>
+    <div>
+      <% if(google_state > 0) { %>
+      <button type="button" class="btn btn-danger m-b-10 m-l-5">연결해제</button>
+      <button type="button" id="google_refresh_btn" class="btn btn-danger m-b-10 m-l-5">리프래쉬</button>
+      <% } else { %>
+      <a href="<%= google_url %>"><button type="button" class="btn btn-info m-b-10 m-l-5">연결하기</button></a>
+      <% } %>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title"><img id="dropbox_img" src="icons\drive-icon\dropbox.png" alt=""></div>
+  <div class="card-body">
+    <div>
+      <p class="text-muted m-b-15 f-s-12">
+        연결상태:
+        <% if(dropbox_state > 0) { %>
+          <span style="color: blue">연결됨</span>
+        <% } else { %>
+          <span style="color: red">연결안됨</span>
+        <% } %>
+      </p>
+    </div>
+    <div>
+      <% if(dropbox_state > 0) { %>
+      <button type="button" class="btn btn-danger m-b-10 m-l-5">연결해제</button>
+      <% } else { %>
+      <a href="/dropbox/token"><button type="button" class="btn btn-info m-b-10 m-l-5">연결하기</button></a>
+      <% } %>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title"><img id="box-img" src="icons\drive-icon\box_blue.png" alt=""></div>
+  <div class="card-body">
+    <div>
+      <p class="text-muted m-b-15 f-s-12">
+        연결상태:
+        <% if(box_state > 0) { %>
+          <span style="color: blue">연결됨</span>
+        <% } else { %>
+          <span style="color: red">연결안됨</span>
+        <% } %>
+      </p>
+    </div>
+    <div>
+      <% if(box_state > 0) { %>
+      <button type="button" class="btn btn-danger m-b-10 m-l-5">연결해제</button>
+      <button type="button" id="box_refresh_btn" class="btn btn-danger m-b-10 m-l-5">리프래쉬</button>
+      <% } else { %>
+      <a href="/box/token"><button type="button" class="btn btn-info m-b-10 m-l-5">연결하기</button></a>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<style>
+
+  #google-img{
+    width: 50px;
+    height: 50px;
+  }
+  #dropbox-img{
+    width: 50px;
+    height: 47px;
+  }
+  #box-img{
+    width: 50px;
+    height: 26px;
+  }
+</style>
+
+<script>
+
+  $('#google_refresh_btn').click(function(){
+    $.ajax({
+      type: "GET",
+      url: "/google/refresh",
+      success: function(data){
+        if(data.state)
+          alert(data.msg);
+        else
+          alert("?");
+      }
+    }).done(function() {
+
+    });
+  })
+  $('#box_refresh_btn').click(function(){
+    $.ajax({
+      type: "GET",
+      url: "/box/refresh",
+      success: function(data){
+        if(data.state)
+          alert(data.msg);
+        else
+          alert("?");
+      }
+    }).done(function() {
+
+    });
+  })
+
+</script>

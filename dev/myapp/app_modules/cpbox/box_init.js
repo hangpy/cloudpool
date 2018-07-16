@@ -16,8 +16,9 @@ const http = require('https');
 const mysql = require('mysql');
 const dbutil = require('../db/db_util');
 const client_info = require('../config/client_info');
+const knex = require('../db/knex');
 
-module.exports = function(usr_session, callback){
+module.exports = function(user_session, callback){
 
   const box_client = client_info.BOX;
 
@@ -29,20 +30,13 @@ module.exports = function(usr_session, callback){
     clientSecret: CLIENT_SECRET
   });
 
-
-  // 로그인 사용자 정보에 따른 토큰 구별
-  dbutil.pool.executeQuery(function(con){
-    con.query('select * from user_token', function(err, result, fields){
-      if(err){
-        con.release();
-        throw err;
-      } else {
-        // const USER_ACCESS_TOKEN = result[0].access_token;
-        const USER_ACCESS_TOKEN = '';
-        var client = sdk.getBasicClient(USER_ACCESS_TOKEN);
-        callback(client);
-        con.release();
-      }
-    });
+  knex.select('accessToken_b').from('BOX_CONNECT_TB').where('userID', user_session.userID)
+  .then(function(rows){
+    const USER_ACCESS_TOKEN = rows[0].accessToken_b;
+    var client = sdk.getBasicClient(USER_ACCESS_TOKEN);
+    callback(client);
+  })
+  .catch(function(err){
+    console.log(err);
   });
 }

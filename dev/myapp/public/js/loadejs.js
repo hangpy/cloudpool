@@ -23,8 +23,9 @@ $(function(){
   $('#card1').click( function() {
       $('.graph').load("card");
   });
-  $('#google').click( function() {
-      $('.graph').load("google/folder");
+
+  $('#box').click( function() {
+      $('.graph').load("box/folder/");
   });
   $('#dropbox').click( function() {
       $('.graph').load("dropbox/folder");
@@ -34,5 +35,12 @@ $(function(){
      //    console.log($("#Folder_"+i).attr('value'));
      // }
   });
+  $('.setting-drive').click( function() {
+      $('.graph').load("setting/page-setting-drive");
+  });
+
+  $('#google').click( function() {
+    $('.graph').load("google/folder/");
+});
 
 });
