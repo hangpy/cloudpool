@@ -1,10 +1,16 @@
 module.exports = function(){
-
   var router = require('express').Router();
   var fs = require('fs');
   var dbxutil=require('../app_modules/cpdropbox/dropbox_util.js');
   var formidable = require('formidable');
   var bodyParser = require('body-parser');
+
+  /* module required to get authentication from dropbox */
+  const dropbox_client = require('../app_modules/config/client_info').DROPBOX;
+  const knex = require('../app_modules/db/knex');
+  const url = require('url');
+  const request = require('request');
+  const dropbox_auth = require('../app_modules/cpdropbox/dropbox_auth')();
   //list - root
   router.get('/folder/', (req,res)=>{
       var folderID = '';
