@@ -26,35 +26,52 @@ router.use(bodyParser.urlencoded({
 
 
 router.get('/folder/', (req, res) => {
-  google_init(req.user, function(client) {
-    var folderID = 'root';
-    var orderkey = 'folder'; // check
-    google_util.list(folderID,orderkey,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
-      console.log("return - 2");
-      res.render('google_list', {
-        FolderID: folderID,
-        filelist: filelist
-      });
+  var userId='lee';
+  var folderId= '0AGCP8EhCswtnUk9PVA';
+  var orderkey; // check
+  google_util.list(userId,folderId, orderkey, function(fileList){
+
+    res.render('google_list', {
+      FolderID: folderId,
+      filelist: fileList
     });
   });
 });
 
 router.get('/folder/:id', (req, res) => {
-  google_init(req.user, function(client) {
-    var folderID;
-    if (req.params.id == '\'root\'') folderID = req.params.id;
-    else {folderID = req.params.id ;}
-    var orderkey = 'folder'; // check
-
-    google_util.list(folderID,orderkey,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
-      console.log("return - 3");
-      res.render('google_list', {
-        FolderID: folderID,
-        filelist: filelist
-      });
+  var userId='lee';
+  var folderId = req.params.id;
+  var orderkey;
+  google_util.list(userId,folderId, orderkey, function(filelist){
+    res.render('google_list', {
+      FolderID: folderId,
+      filelist: filelist
     });
   });
 });
+
+router.post('/search/',function(req,res){
+  var filelist=JSON.parse(req.body.list);
+  
+  console.log(filelist);
+  var folderId= '0AGCP8EhCswtnUk9PVA';
+  res.render('google_list',{
+    FolderID : folderId,
+    filelist : filelist
+  });
+});
+
+router.post('/searchtype/',function(req,res){
+    var userId='lee';
+    var keyType=req.body.selectType;
+    var keyWord=req.body.fileName;
+    var orderKey;
+    console.log('/searchtype/post ; ',userId, keyType);
+    google_util.searchType(userId,keyWord,keyType,orderKey, function(filelist){
+      res.json(filelist);
+    });
+});
+
 
 router.post('/upload/:id',function(req,res){
   google_init(req.user, function(client) {
@@ -126,21 +143,6 @@ router.post('/copy/:id',function(req,res){
   google_init(req.user, function(client) {
     var fileId;
     google_util.copyFile(fileId,client);
-  });
-});
-
-router.post('/searchtype',function(req,res){
-  google_init(req.user, function(client) {
-    var Filetype=req.body.type;
-    google_util.searchType(Filetype,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
-      console.log("return - 4");
-      res.render('google_list',{
-        FolderID : 'root',
-        filelist : filelist
-      });
-      // $( "#objectID" ).load( "test.php", { "choices[]": [ "Jon", "Susan" ] } );
-      // $('.graph').load("../../views/google_list.ejs");
-    });
   });
 });
 

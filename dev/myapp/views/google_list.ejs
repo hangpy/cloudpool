@@ -17,15 +17,15 @@
   <button type="button" onClick='Submit(1)' >다운로드</button>
   <button type="button" onClick='Submit(2)' >삭제</button>
   <td><input type="text" name="filename" placeholder="newname"></td>
-  <button type="submit" onClick='Submit(3)' >변경</button>
   <tr></tr>
-  <select name="type">
+  <select name="selectType">
+    <option value="...">...</option>
     <option value="application/vnd.google-apps.folder">folder</option>
     <option value="application/pdf">document-pdf</option>
     <option value="application/vnd.google-apps.document">document-docx</option>
     <option value="image/jpeg">image</option>
   </select>
-  <button  type="submit" onClick='Submit(4)' >골라보기</button>
+  <button  type="button" onClick='Select()' >골라보기</button>
 
   <table border="1" id="table_google">
           <tr>
@@ -119,16 +119,35 @@ if(index===3){
   action_google.action='google/rename';
 }
 
-if(index===4){
-
-  action_google.action='google/searchtype';
-  // $('.graph').load("google/searchtype",{post});
-
-}
-
 action_google.submit();
 };
 
+function Select(){
+    var selectType = action_google.selectType.value;
+    var fileName=action_google.filename.value;
+
+    var body= {
+      "selectType" : selectType,
+      "fileName" : fileName
+    }
+    console.log(selectType);
+
+    $.ajax({
+          type: "POST",
+          url: "google/searchtype/",
+          async: false,
+          data: body,
+          dataType: "JSON",
+          success: function(json) {
+            // var obj = JSON.stringify(json);
+            // console.log(obj);
+            $('.graph').load("google/search/",{list:json});
+          },
+          error: function(error) {
+            console.log(error);
+          }
+      });
+}
 
 function UploadSubmit(){
   uploadform.action='google/upload/<%=FolderID%>';
