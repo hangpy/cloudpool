@@ -176,6 +176,25 @@ const UTIL = (function(){
               console.log(err);
             });
         });
+
+    var uploadfile = function(dbx, FileInfo, FolderDir){
+          // initDropbox(usr_session, function(dbx){
+            //여기서 앞단으로 progress bar 계산을 위한 정보를 보낸다 - 현재는 xhr 생각
+
+            fs.readFile(FileInfo.path, function (err, contents) {
+                if (err) {
+                  console.log('Error: ', err);
+                }
+                var UploadPath = FolderDir+'/'+FileInfo.name;
+                //150MB 미만만 가능
+                dbx.filesUpload({ path: UploadPath, contents: contents })
+                  .then(function (response) {
+                    // console.log(response);
+                  })
+                  .catch(function (err) {
+                    console.log(err);
+                  });
+              });
     // });
 
     // // File is bigger than 150 Mb - use filesUploadSession* API
