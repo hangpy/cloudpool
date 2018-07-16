@@ -17,6 +17,7 @@ var initDropbox = require('./dropbox_init')
 , fs = require('fs')
 , https = require('https')
 , async = require('async')
+, request = require('request')
 , mime = require('mime');
 
 
@@ -29,6 +30,77 @@ const UTIL = (function(){
   * @param {callback}
   *
   */
+
+  var getlistRest = function(FolderDir, callback){
+    initDropbox(usr_session, function(dbx){
+      var user_id = "3";
+      var data = { "user_id" : user_id , "folderID" : FolderDir };
+      request.post({
+        url: 'http://localhost:4000/api/dropbox/check/',
+        body : data,
+        json : true
+      },
+        function(error, response, body){
+          callback(body);
+        }
+      );
+
+    });
+  }
+
+  var sendrenameRest = function(newName, filename, FolderID, callback){
+
+    initDropbox(usr_session, function(dbx){
+      var user_id = "3";
+      var data = { "user_id" : user_id ,  "file_name" : filename, "newName" : newName, "folderID" : FolderID };
+      request.post({
+        url: 'http://localhost:4000/api/dropbox/rename/',
+        body : data,
+        json : true
+      },
+        function(error, response, body){
+          callback("finish_rename_the_file");
+        }
+      );
+
+    });
+  }
+
+  var sendsearchRest = function(searchname, searchFolder, searchtype, FolderID, callback){
+    initDropbox(usr_session, function(dbx){
+      var user_id = "3";
+      // var accesstoken = dbx.accessToken;
+      var data = { "user_id" : user_id , "searchname" : searchname, "searchFolder" : searchFolder, "folderID" : FolderID, "searchtype" : searchtype};
+      request.post({
+        url: 'http://localhost:4000/api/dropbox/search/',
+        body : data,
+        json : true
+      },
+        function(error, response, body){
+          callback(body);
+        }
+      );
+
+    });
+  }
+
+  var sendselectRest = function(selecttype, FolderID, callback){
+    initDropbox(usr_session, function(dbx){
+      var user_id = "3";
+      // var accesstoken = dbx.accessToken;
+      var data = { "user_id" : user_id , "folderID" : FolderID, "selecttype" : selecttype};
+      request.post({
+        url: 'http://localhost:4000/api/dropbox/select/',
+        body : data,
+        json : true
+      },
+        function(error, response, body){
+          callback(body);
+        }
+      );
+
+    });
+  }
 
   // deletefile
   var deletefile = function(Filename, FolderDir){
@@ -161,6 +233,7 @@ const UTIL = (function(){
 
             //각각 디렉토리의 파일리스트 읽어오기
             if(file!=undefined){
+              console.log(file);
               if(file['.tag']=='folder'){
                 var extension = 'folder';
               }
@@ -204,10 +277,14 @@ const UTIL = (function(){
 
   return {
     dbx: {
+      getlistRest : getlistRest,
+      sendrenameRest : sendrenameRest,
       list: listfile,
       delete: deletefile,
       upload: uploadfile,
-      download: downloadfile
+      download: downloadfile,
+      sendsearchRest: sendsearchRest,
+      sendselectRest: sendselectRest
     }
   }
 

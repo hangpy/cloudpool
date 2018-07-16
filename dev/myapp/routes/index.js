@@ -2,9 +2,13 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var router = express.Router();
 
+
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  //로그인 시 사용자의 서버에서 지속적으로 돌리는 거 시작하는것에 시작점
+
+  res.render('index', { title: 'Express'});
 });
 
 
@@ -27,7 +31,7 @@ router.get('/graph', function(req, res, next) {
 });
 
 router.get('/card', function(req, res, next) {
-  res.render('card_test');
+  res.render('card_test',{CP_love : 'kFb_ENWtmyUAAAAAAAABXmkgkMo381IwrSZdCoj2voMWz0dRlWPda7Caj0ivnG7X'});
 });
 
 // router.get('/google', function(req, res, next) {

@@ -24,10 +24,10 @@ $(function(){
       $('.graph').load("card");
   });
   $('#google').click( function() {
-      $('.graph').load("google/");
+      $('.graph').load("google/folder");
   });
   $('#dropbox').click( function() {
-      $('.graph').load("dropbox/");
+      $('.graph').load("dropbox/folder");
      //  for (int i = 0; i < 3; i++)
      // {
      //    alert( $("#Folder_"+i).attr('value') );
