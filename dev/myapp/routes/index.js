@@ -7,11 +7,6 @@ const knex = require('../app_modules/db/knex');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-<<<<<<< HEAD
-  //로그인 시 사용자의 서버에서 지속적으로 돌리는 거 시작하는것에 시작점
-
-  res.render('index', { title: 'Express'});
-=======
   if (!req.isAuthenticated())
     res.redirect('/intro');
   else
@@ -29,7 +24,6 @@ router.get('/', function(req, res, next) {
   .catch(function(err){
     console.log(err);
   });
->>>>>>> 2d0cbcab4ca5733a0b866ce4e3cb111474f6660b
 });
 
 /* GET intro page. */
@@ -75,18 +69,6 @@ router.get('/register', function(req, res, next) {
 
 
 
-<<<<<<< HEAD
-// /* GET register page. */
-router.get('/graph', function(req, res, next) {
-  res.render('graph_test');
-});
-
-router.get('/card', function(req, res, next) {
-  res.render('card_test',{CP_love : 'kFb_ENWtmyUAAAAAAAABXmkgkMo381IwrSZdCoj2voMWz0dRlWPda7Caj0ivnG7X'});
-});
-
-=======
->>>>>>> 2d0cbcab4ca5733a0b866ce4e3cb111474f6660b
 // router.get('/google', function(req, res, next) {
 //   res.render('google_list');
 // });
