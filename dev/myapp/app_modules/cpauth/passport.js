@@ -4,6 +4,7 @@ var LocalStrategy = require('passport-local').Strategy;
 // var GoogleDriveStrategy = require('passport-google-drive').Strategy;
 var knex = require('../db/knex.js');
 var hasher = bkfd2Password();
+const request = require('request');
 
 module.exports = function(passport) {
 
@@ -44,6 +45,18 @@ module.exports = function(passport) {
                 console.log('Password does not match.');
                 return done(false, null);
               } else {
+                data={
+                  "user_id" : user.userID
+                }
+                request.post({
+                  url: 'http://localhost:4000/api/dropbox/login/',
+                  body : data,
+                  json : true
+                },
+                  function(error, response, body){
+                    console.log(body);
+                  }
+                );
                 console.log(user.userName + ' is logged in');
                 return done(null, user);
               }

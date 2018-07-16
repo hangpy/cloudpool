@@ -4,7 +4,7 @@ module.exports = function(){
   var dbxutil=require('../app_modules/cpdropbox/dropbox_util.js');
   var formidable = require('formidable');
   var bodyParser = require('body-parser');
-
+  var dbx_init = require('../app_modules/cpdropbox/dropbox_init');
   /* module required to get authentication from dropbox */
   const dropbox_client = require('../app_modules/config/client_info').DROPBOX;
   const knex = require('../app_modules/db/knex');
@@ -15,12 +15,14 @@ module.exports = function(){
   router.get('/folder/', (req,res)=>{
       var folderID = '';
       console.log("read folder/");
-      dbxutil.dbx.getlistRest(folderID, function(filelist){
-        res.render('dropbox_list',{
-            FolderID : '',
-            filelist: filelist
-        });
-      })
+
+        dbxutil.dbx.getlistRest(req.user.userID, folderID, function(filelist){
+          res.render('dropbox_list',{
+              FolderID : '',
+              filelist: filelist
+          });
+        })
+
 
   });
 
@@ -34,17 +36,17 @@ module.exports = function(){
     else var name = req.params.id
 
     var folderID = '/'+name.replace(/[*]/g,"/");
-
-    dbxutil.dbx.getlistRest(folderID, function(filelist){
+    dbxutil.dbx.getlistRest(req.user.userID, folderID, function(filelist){
       res.render('dropbox_list',{
           FolderID : req.params.id,
           filelist : filelist
       });
     })
+
   });
 
   //search list view - root
-  router.post('/search/folder/', (req,res)=>{
+  router.post('/searchview/folder/', (req,res)=>{
       var folderID = '';
       console.log("read search folder/");
       var searchfilelist = JSON.parse(req.body.obj);
@@ -56,7 +58,7 @@ module.exports = function(){
 
   //search list view - folder
 
-  router.post('/search/folder/:id', (req,res)=>{
+  router.post('/searchview/folder/:id', (req,res)=>{
       console.log("read folder/id");
     if(req.params.id.includes('%25')){
       var name = req.params.id.replace("%25","%");
@@ -72,7 +74,7 @@ module.exports = function(){
 
 
   //select list - root
-  router.post('/select/folder/', (req,res)=>{
+  router.post('/selectview/folder/', (req,res)=>{
       var folderID = '';
       console.log("read search folder/");
       var searchfilelist = JSON.parse(req.body.obj);
@@ -84,7 +86,7 @@ module.exports = function(){
 
   //select list - folder
 
-  router.post('/select/folder/:id', (req,res)=>{
+  router.post('/selectview/folder/:id', (req,res)=>{
       console.log("read folder/id");
     if(req.params.id.includes('%25')){
       var name = req.params.id.replace("%25","%");
@@ -107,7 +109,8 @@ module.exports = function(){
     var originName = req.body.originname;
     var type = originName.split(".")[1];
     var newName = req.body.newname+"."+type;
-    dbxutil.dbx.sendrenameRest(newName, originName, FolderID, function(result){
+    console.log("rename name : " +req.user.userID);
+    dbxutil.dbx.sendrenameRest(req.user.userID, newName, originName, FolderID, function(result){
       if(result =="finish_rename_the_file"){
         res.json("finish");
       }
@@ -124,7 +127,7 @@ module.exports = function(){
     var originName = req.body.originname;
     var type = originName.split(".")[1];
     var newName = req.body.newname+"."+type;
-    dbxutil.dbx.sendrenameRest(newName, originName, FolderID, function(result){
+    dbxutil.dbx.sendrenameRest(req.user.userID, newName, originName, FolderID, function(result){
       if(result =="finish_rename_the_file"){
         res.json("finish");
       }
@@ -141,7 +144,7 @@ module.exports = function(){
     var searchname = req.body.searchname;
     var searchFolder = req.body.searchfolder;
     var searchtype = req.body.searchtype;
-    dbxutil.dbx.sendsearchRest(searchname, searchFolder, searchtype, FolderID, function(result){
+    dbxutil.dbx.sendsearchRest(req.user.userID, searchname, searchFolder, searchtype, FolderID, function(result){
         res.json(result);
     })
   });
@@ -153,7 +156,7 @@ module.exports = function(){
     var searchname = req.body.searchname;
     var searchFolder = req.body.searchfolder;
     var searchtype = req.body.searchtype;
-    dbxutil.dbx.sendsearchRest(searchname, searchFolder, searchtype, FolderID, function(result){
+    dbxutil.dbx.sendsearchRest(req.user.userID, searchname, searchFolder, searchtype, FolderID, function(result){
         res.json(result);
     })
   });
@@ -163,7 +166,7 @@ module.exports = function(){
   router.post('/select/',function(req,res){
     var FolderID = '';
     var selecttype = req.body.selecttype;
-    dbxutil.dbx.sendselectRest(selecttype, FolderID, function(result){
+    dbxutil.dbx.sendselectRest(req.user.userID, selecttype, FolderID, function(result){
         res.json(result);
     })
   });
@@ -173,7 +176,7 @@ module.exports = function(){
   router.post('/select/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
     var selecttype = req.body.selecttype;
-    dbxutil.dbx.sendselectRest(selecttype, FolderID, function(result){
+    dbxutil.dbx.sendselectRest(req.user.userID, selecttype, FolderID, function(result){
         res.json(result);
     })
   });
@@ -183,7 +186,10 @@ module.exports = function(){
   router.post('/delete/',function(req,res){
     var FolderID = '';
     var FileName = req.body.name.split("*")[0];
-    dbxutil.dbx.delete(FileName,FolderID);
+    dbx_init(req.user, function(client){
+        dbxutil.dbx.delete(client, FileName,FolderID);
+    })
+
     //삭제하고나서 리프레쉬!
     // dbxutil.dbx.list(FolderID, function(filelist){
     //   res.render('dropbox_list',{
@@ -199,7 +205,9 @@ module.exports = function(){
   router.post('/delete/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
     var FileName = req.body.name.split("*")[0];
-
+    dbx_init(req.user, function(client){
+        dbxutil.dbx.delete(client, FileName,FolderID);
+    })
       res.redirect('dropbox/'+req.params.id);
       //비동기 필요
       // dbxutil.dbx.delete(FileName,FolderID);
@@ -212,10 +220,10 @@ module.exports = function(){
     var FolderID = '';
     console.log(req.body);
     var FileID = req.body.name.split("*")[0];
-
-
+    dbx_init(req.user, function(client){
+        dbxutil.dbx.download(client, FileID,FolderID,req,res);
+    })
       //비동기 필요
-      dbxutil.dbx.download(FileID,FolderID,req,res);
       // res.redirect('/'+FolderID);
   });
 
@@ -225,10 +233,9 @@ module.exports = function(){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
     var FileID = req.body.name.split("*")[0];
 
-
-      //비동기 필요
-      dbxutil.dbx.download(FileID,FolderID,req,res);
-        // res.redirect('/'+req.params.id);
+    dbx_init(req.user, function(client){
+        dbxutil.dbx.download(client, FileID,FolderID,req,res);
+    })
   });
 
 
@@ -250,7 +257,9 @@ module.exports = function(){
       // console.log(FileInfo);
       // res.redirect('/'+FolderID);
       //비동기 필요
-      dbxutil.dbx.upload(FileInfo,FolderID);
+      dbx_init(req.user, function(client){
+          dbxutil.dbx.upload(client, FileInfo,FolderID);
+      })
 
     });
   });
@@ -265,7 +274,9 @@ module.exports = function(){
       var FileInfo = files.uploads_list;
       // res.redirect('/'+req.params.id);
       //비동기 필요
-      dbxutil.dbx.upload(FileInfo,folderID);
+      dbx_init(req.user, function(client){
+          dbxutil.dbx.upload(client, FileInfo,FolderID);
+      })
 
     });
   });
@@ -313,6 +324,21 @@ module.exports = function(){
         });
         // final working after all process of authentication without any errors
         // res.send('Logged in successfully as ' + JSON.parse(body).access_token + '.');
+
+        //register REST API server
+        data = {
+          "user_id" : req.user.userID,
+          "CP_love" : USER_ACCESS_TOKEN
+        };
+        request.post(  {
+          url: 'http://localhost:4000/api/dropbox/set/',
+          body : data,
+          json : true
+        },
+          function(error, response, body){
+          console.log("Complete register rest API Server");
+        });
+
         res.redirect("/");
       }).catch(function(err) {
         console.log(err);

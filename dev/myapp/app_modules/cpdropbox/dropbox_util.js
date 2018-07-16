@@ -31,9 +31,9 @@ const UTIL = (function(){
   *
   */
 
-  var getlistRest = function(FolderDir, callback){
-    initDropbox(usr_session, function(dbx){
-      var user_id = "3";
+  var getlistRest = function(user_id, FolderDir, callback){
+    // initDropbox(usr_session, function(dbx){
+      var user_id = user_id;
       var data = { "user_id" : user_id , "folderID" : FolderDir };
       request.post({
         url: 'http://localhost:4000/api/dropbox/check/',
@@ -45,13 +45,13 @@ const UTIL = (function(){
         }
       );
 
-    });
+    // });
   }
 
-  var sendrenameRest = function(newName, filename, FolderID, callback){
+  var sendrenameRest = function(user_id, newName, filename, FolderID, callback){
 
-    initDropbox(usr_session, function(dbx){
-      var user_id = "3";
+    // initDropbox(usr_session, function(dbx){
+      var user_id = user_id;
       var data = { "user_id" : user_id ,  "file_name" : filename, "newName" : newName, "folderID" : FolderID };
       request.post({
         url: 'http://localhost:4000/api/dropbox/rename/',
@@ -63,12 +63,12 @@ const UTIL = (function(){
         }
       );
 
-    });
+    // });
   }
 
-  var sendsearchRest = function(searchname, searchFolder, searchtype, FolderID, callback){
-    initDropbox(usr_session, function(dbx){
-      var user_id = "3";
+  var sendsearchRest = function(user_id, searchname, searchFolder, searchtype, FolderID, callback){
+    // initDropbox(usr_session, function(dbx){
+      var user_id = user_id;
       // var accesstoken = dbx.accessToken;
       var data = { "user_id" : user_id , "searchname" : searchname, "searchFolder" : searchFolder, "folderID" : FolderID, "searchtype" : searchtype};
       request.post({
@@ -81,12 +81,12 @@ const UTIL = (function(){
         }
       );
 
-    });
+    // });
   }
 
-  var sendselectRest = function(selecttype, FolderID, callback){
-    initDropbox(usr_session, function(dbx){
-      var user_id = "3";
+  var sendselectRest = function(user_id, selecttype, FolderID, callback){
+    // initDropbox(usr_session, function(dbx){
+      var user_id = user_id;
       // var accesstoken = dbx.accessToken;
       var data = { "user_id" : user_id , "folderID" : FolderID, "selecttype" : selecttype};
       request.post({
@@ -99,12 +99,12 @@ const UTIL = (function(){
         }
       );
 
-    });
+    // });
   }
 
   // deletefile
-  var deletefile = function(Filename, FolderDir){
-      initDropbox(usr_session, function(dbx){
+  var deletefile = function(dbx, Filename, FolderDir){
+      // initDropbox(usr_session, function(dbx){
         if(FolderDir==""){
         var totalDir = "/"+Filename;
         }
@@ -120,12 +120,12 @@ const UTIL = (function(){
           .catch(function (err) {
             console.log(err);
           });
-      });
+      // });
 
   };
 
-  var downloadfile = function(Filename, FolderDir, req, res){
-      initDropbox(usr_session, function(dbx){
+  var downloadfile = function(dbx, Filename, FolderDir, req, res){
+      // initDropbox(usr_session, function(dbx){
         if(FolderDir==""){
         var totalDir = "/"+Filename;
         }
@@ -154,12 +154,12 @@ const UTIL = (function(){
                   // );
           });
         });
-      });
+      // });
 
     };
 
-  var uploadfile = function(FileInfo, FolderDir){
-    initDropbox(usr_session, function(dbx){
+  var uploadfile = function(dbx, FileInfo, FolderDir){
+    // initDropbox(usr_session, function(dbx){
       //여기서 앞단으로 progress bar 계산을 위한 정보를 보낸다 - 현재는 xhr 생각
 
       fs.readFile(FileInfo.path, function (err, contents) {
@@ -170,13 +170,13 @@ const UTIL = (function(){
           //150MB 미만만 가능
           dbx.filesUpload({ path: UploadPath, contents: contents })
             .then(function (response) {
-              console.log(response);
+              // console.log(response);
             })
             .catch(function (err) {
               console.log(err);
             });
         });
-    });
+    // });
 
     // // File is bigger than 150 Mb - use filesUploadSession* API
     //     const maxBlob = 8 * 1000 * 1000; // 8Mb - Dropbox JavaScript API suggested max file / chunk size
@@ -221,9 +221,9 @@ const UTIL = (function(){
     //
   };
 
-  var listfile = function(FolderDir, callback){
+  var listfile = function(dbx, FolderDir, callback){
     var filelist=[];
-    initDropbox(usr_session, function(dbx){
+    // initDropbox(usr_session, function(dbx){
       console.log("list");
       console.log("FolderDir : " + FolderDir);
       dbx.filesListFolder({path :FolderDir}) //list 원하는 경로
@@ -268,7 +268,7 @@ const UTIL = (function(){
       .catch(function(error) {
         console.error(error);
       });
-    });
+    // });
   };
 
 

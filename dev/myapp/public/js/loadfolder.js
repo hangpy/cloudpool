@@ -36,3 +36,8 @@ function moveFolder_box(obj){
   var FolderID = $(obj).attr('value');
   $('.graph').load("box/folder/"+FolderID);
 }
+
+function moveFolder_dropbox(obj){
+  var FolderID = $(obj).attr('value');
+  $('.graph').load("dropbox/"+FolderID);
+}

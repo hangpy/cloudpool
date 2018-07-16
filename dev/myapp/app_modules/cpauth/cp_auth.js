@@ -5,7 +5,7 @@ module.exports = function(passport) {
   var hasher = bkfd2Password();
   var route = require('express').Router();
   var knex = require('../db/knex.js');
-
+  const request = require('request');
 
 
   route.post('/login', passport.authenticate(
@@ -65,6 +65,21 @@ module.exports = function(passport) {
     else
       return next();
   }, function(req, res, next) {
+
+    //send logout status restapi server
+    data={
+      "user_id" : req.user.userID
+    }
+    request.post({
+      url: 'http://localhost:4000/api/dropbox/logout/',
+      body : data,
+      json : true
+    },
+      function(error, response, body){
+        console.log(body);
+      }
+    );
+
     req.logout();
     res.redirect('/intro');
   });

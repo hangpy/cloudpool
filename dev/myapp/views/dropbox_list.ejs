@@ -59,7 +59,7 @@
                      <td></td>
                       <td></td>
                       <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                      <td><a href="#" onclick ="moveFolder(this)" value="folder/">/</a></td>
+                      <td><a href="#" onclick ="moveFolder_dropbox(this)" value="folder/">/</a></td>
                       <td></td>
                       <td></td>
                       <td></td>
@@ -87,7 +87,7 @@
                    <td></td>
                     <td></td>
                     <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                    <td><a href="#" onclick ="moveFolder(this)" value='folder/<%=beforeFolder%>' ><%=beforeFolderName%></a></td>
+                    <td><a href="#" onclick ="moveFolder_dropbox(this)" value='folder/<%=beforeFolder%>' ><%=beforeFolderName%></a></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -122,7 +122,7 @@
                                 <td data-id='<%=Foldername%>'>
                                   <!-- <a href="/dropbox/<%=Foldername%>" id="Folder_<%=i%>" value="<%=Foldername%>"> -->
 
-                                  <a href="#" onclick ="moveFolder(this)" value='folder/<%=Foldername%>' ><%=oneItem.name%></a></td>
+                                  <a href="#" onclick ="moveFolder_dropbox(this)" value='folder/<%=Foldername%>' ><%=oneItem.name%></a></td>
                                 <td><%=oneItem.mimeType%></td>
                                 <td><%=oneItem.modifiedTime%></td>
                                 <td><%=size%></td>
@@ -141,7 +141,7 @@
                                 <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
                                 <td data-id='<%=FolderID%>*<%=Foldername%>'>
                                   <!-- <a href="/dropbox/<%=FolderID%>*<%=Foldername%>"  id="Folder_<%=i%>" value="<%=FolderID%>*<%=Foldername%>"> -->
-                                  <a href="#" onclick ="moveFolder(this)" value='folder/<%=FolderID%>*<%=Foldername%>'><%=oneItem.name%></a></td>
+                                  <a href="#" onclick ="moveFolder_dropbox(this)" value='folder/<%=FolderID%>*<%=Foldername%>'><%=oneItem.name%></a></td>
                                 <td><%=oneItem.mimeType%></td>
                                 <td><%=oneItem.modifiedTime%></td>
                                 <td><%=size%></td>
@@ -258,7 +258,7 @@
              var obj = JSON.stringify(json);
              console.log(obj);
 
-             $('.graph').load("dropbox/search/folder/<%=FolderID%>",{obj:obj});
+             $('.graph').load("dropbox/selectview/folder/<%=FolderID%>",{obj:obj});
            },
            error: function(error) {
               console.log(error);
@@ -285,7 +285,7 @@
              var obj = JSON.stringify(json);
              console.log(obj);
 
-             $('.graph').load("dropbox/search/folder/<%=FolderID%>",{obj:obj});
+             $('.graph').load("dropbox/searchview/folder/<%=FolderID%>",{obj:obj});
            },
            error: function(error) {
               console.log(error);
