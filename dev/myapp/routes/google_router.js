@@ -62,7 +62,7 @@ router.post('/upload/:id',function(req,res){
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
       var FileInfo = files.userfile;
-      google_util.uploadFile(FileInfo, folderID,client);
+      google_util.uploadSplit(FileInfo, folderID, client);
       res.redirect('/google/' + folderID);
     });
   });

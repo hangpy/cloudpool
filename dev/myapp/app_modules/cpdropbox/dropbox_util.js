@@ -158,6 +158,41 @@ const UTIL = (function(){
 
     };
 
+    var downloadfileSplit = function(dbx, Filename, FolderDir, req, res, callback){
+        // initDropbox(usr_session, function(dbx){
+          if(FolderDir==""){
+          var totalDir = "/"+Filename;
+          }
+          else{
+            var totalDir = FolderDir+"/"+Filename;
+          }
+          var dropdownpath;
+          var fullname = Filename.split(".");
+          var mimetype = mime.getType(fullname[fullname.length-1]);
+          // var mimetype = mime.lookup(totalDir);
+          //zo3 같이 분할 파일은 null값
+          var URL = dbx.filesGetTemporaryLink({path: totalDir});
+          console.log(mimetype);
+          console.log(Filename);
+          var newFileName = encodeURIComponent(Filename);
+          res.setHeader('Content-disposition', 'attachment; filename*=UTF-8\'\''+newFileName); //origFileNm으로 로컬PC에 파일 저장
+          res.setHeader('Content-type', mimetype);
+          URL.then(function(result){
+            dropdownpath=__dirname+'/downloads/dis/'+savefilename;
+            callback(dropdownpath);
+            var output = fs.createWriteStream(dropdownpath);
+            var request = https.get(result.link, function(file) {
+              // console.log(URL);
+              console.log(output);
+              file.pipe(output).on('finish', () => {
+                totalpath=totalpath+",M,"+dropdownpath;
+              });
+          });
+        // });
+
+      });
+}
+
   var uploadfile = function(dbx, FileInfo, FolderDir){
     // initDropbox(usr_session, function(dbx){
       //여기서 앞단으로 progress bar 계산을 위한 정보를 보낸다 - 현재는 xhr 생각
@@ -176,16 +211,18 @@ const UTIL = (function(){
               console.log(err);
             });
         });
+}
 
-    var uploadfile = function(dbx, FileInfo, FolderDir){
+    var uploadfileSplit = function(dbx, FilePath, FolderDir){
           // initDropbox(usr_session, function(dbx){
             //여기서 앞단으로 progress bar 계산을 위한 정보를 보낸다 - 현재는 xhr 생각
 
-            fs.readFile(FileInfo.path, function (err, contents) {
+            fs.readFile(FilePath, function (err, contents) {
                 if (err) {
                   console.log('Error: ', err);
                 }
-                var UploadPath = FolderDir+'/'+FileInfo.name;
+                var splitedname = FilePath.split("\\");
+                var UploadPath = FolderDir+'/'+splitedname[(splitedname.length)-1];
                 //150MB 미만만 가능
                 dbx.filesUpload({ path: UploadPath, contents: contents })
                   .then(function (response) {
@@ -195,6 +232,7 @@ const UTIL = (function(){
                     console.log(err);
                   });
               });
+            }
     // });
 
     // // File is bigger than 150 Mb - use filesUploadSession* API
@@ -238,7 +276,7 @@ const UTIL = (function(){
     //       console.error(error);
     //     });
     //
-  };
+
 
   var listfile = function(dbx, FolderDir, callback){
     var filelist=[];
@@ -300,8 +338,9 @@ const UTIL = (function(){
       sendrenameRest : sendrenameRest,
       list: listfile,
       delete: deletefile,
-      upload: uploadfile,
+      uploadSplit: uploadfileSplit,
       download: downloadfile,
+      downloadSplit: downloadfileSplit,
       sendsearchRest: sendsearchRest,
       sendselectRest: sendselectRest
     }

@@ -258,7 +258,7 @@ module.exports = function(){
       // res.redirect('/'+FolderID);
       //비동기 필요
       dbx_init(req.user, function(client){
-          dbxutil.dbx.upload(client, FileInfo,FolderID);
+          dbxutil.dbx.upload(client, FileInfo, FolderID);
       })
 
     });

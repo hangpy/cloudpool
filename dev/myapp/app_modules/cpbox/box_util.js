@@ -64,12 +64,39 @@ module.exports = (function(){
     });
   }
 
+  var uploadFileSplit = function(client, FilePath, FolderID){
+    var splitedname = FilePath.split("\\");
+    var FileName =splitedname[(splitedname.length)-1];
+    var stream = fs.createReadStream(FilePath);
+    client.files.uploadFile(FolderID, FileName, stream, function(err ,newfile){
+      if(err) console.log(err);
+      else{
+        //파일 아이디
+        console.log(newfile.entries[0].id);
+      }
+    });
+  }
+
+
   var downloadFile = function(client, fileId){
     client.files.getReadStream(fileId).then(stream => {
       client.files.get(fileId).then(file => {
         var fileName = file.name;
         console.log(fileName);
         var output = fs.createWriteStream('../app_modules/cpbox/download/'+fileName);
+        stream.pipe(output);
+      })
+    })
+  }
+
+
+  var downloadFileSplit = function(client, fileId, callback){
+    client.files.getReadStream(fileId).then(stream => {
+      client.files.get(fileId).then(file => {
+        var fileName = file.name;
+        console.log(fileName);
+        callback(filename);
+        var output = fs.createWriteStream(__dirname+'/downloads/dis/'+fileName);
         stream.pipe(output);
       })
     })
@@ -162,7 +189,9 @@ module.exports = (function(){
   return {
     listFile: listFile,
     uploadFile: uploadFile,
+    uploadSplit: uploadFileSplit,
     downloadFile: downloadFile,
+    downloadSplit: downloadFileSplit,
     deleteFile: deleteFile,
     renameFile: renameFile,
     renameFolder: renameFolder,

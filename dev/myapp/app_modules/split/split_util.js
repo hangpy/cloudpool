@@ -11,9 +11,16 @@
    var multer = require('multer');
    var java = require('java');
    var path = require('path');
+   var formidable = require('formidable');
+   var async = require('async');
    var dbxUtil=require('../cpdropbox/dropbox_util.js');
    var googleUtil=require('../cpgoogle/google_util.js');
    var boxUtil=require('../cpbox/box_util.js');
+
+   var dbx_init = require('../cpdropbox/dropbox_init');
+   var google_init = require('../cpgoogle/google_init');
+   var box_init = require('../cpbox/box_init');
+
    var async = require('async');
    const min = 65536;
    var commonname='';
@@ -83,11 +90,58 @@ const UTIL = (function() {
     dbxUil.checkSpace();
   }
 
-  var upload = function(FileInfo){
-    console.log(FileInfo.getSync(0));
-    googleUtil.uploadSplit(FileInfo.getSync(0) , 'root');
-    dbxUtil.dbx.uploadSplit(FileInfo.getSync(1) , '');
-    boxUtil.uploadSplit(FileInfo.getSync(2) , '0');
+  var upload = function(FileInfo, req, res){
+
+    var FileInfoG = FileInfo.getSync(0);
+    var FileInfoD = FileInfo.getSync(1);
+    var FileInfoB = FileInfo.getSync(2);
+    console.log('uploadSplit:FileInfoG:: '+FileInfoG);
+    console.log('uploadSplit:FileInfoD:: '+FileInfoD);
+    console.log('uploadSplit:FileInfoB:: '+typeof(FileInfoB));
+    async.parallel([
+
+      function(callback){
+        google_init(req.user, function(client) {
+          var folderID = 'root'
+          //var form = new formidable.IncomingForm();
+            // form.parse(req, function(err, fields, files) {
+            googleUtil.uploadSplit(FileInfoG, folderID, client);
+
+            //res.redirect('/google/' + folderID);
+            callback(null, 'google_finish');
+          // });
+        })
+      },
+      function(callback){
+        dbx_init(req.user, function(client){
+              dbxUtil.dbx.uploadSplit(client, FileInfoD , '');
+        });
+        callback(null, 'dropbox_finish');
+      },
+      function(callback){
+        box_init(req.user, function(client){
+          var FolderID = '0';
+            //var form = new formidable.IncomingForm();
+            //form.parse(req, function(err, fields, files) {
+
+              var FileInfo = FileInfoB;
+
+              //res.redirect('/' + FolderID);
+
+                //비동기 필요
+              boxUtil.uploadSplit(client, FileInfoB, FolderID);
+              callback(null, 'box_finish');
+          //  });
+          });
+      }
+    ],function(err, results){
+      console.log(results);
+
+    })
+
+
+
+
   }
 
 //downloads
@@ -129,7 +183,7 @@ const UTIL = (function() {
       });
     }
     //Google
-    googleUtil.download(fileId, function(filename){
+    googleUtil.downloadSplit(fileId, function(filename){
       var zip = filename.split(".");
 
       if(zip[zip.length-1]=='zip'){

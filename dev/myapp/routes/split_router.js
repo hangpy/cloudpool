@@ -1,6 +1,6 @@
 module.exports = function(){
 
-  var route = require('express').Router();
+  var router = require('express').Router();
   var java = require('java');
   var path = require('path');
   var splitUtil = require('../app_modules/split/split_util.js');
@@ -8,20 +8,21 @@ module.exports = function(){
   var storage = splitUtil.storage;
   var multer = require('multer');
 
+
   var upload = multer({
     storage: storage
   });
   //
   //
-  // route.use(bodyParser.urlencoded({ extended: false }));
-  route.get('/', (req, res)=>{
+  router.use(bodyParser.urlencoded({ extended: false }));
+  router.use(bodyParser.json());
+  router.get('/', (req, res)=>{
     console.log('split main');
     res.render('upload');
   });
 //
-  route.post('/upload/',upload.single('userfile'),function(req, res)
+  router.post('/upload/', upload.single('userfile'), function(req, res)
   {
-
     var orgFile = splitUtil.orgFile(__dirname, req.file.path);
     var filesToAdd = splitUtil.filesToAdd;
     filesToAdd.addSync(orgFile);
@@ -42,7 +43,7 @@ module.exports = function(){
           }
           else{
             console.log("Complete Zip4J from " +req.file.filename);
-            splitUtil.upload(results);
+            splitUtil.upload(results, req, res);
             //파일 삭제 추가
           }
         });
@@ -52,12 +53,11 @@ module.exports = function(){
   });
 
 
-  route.post('/download',function(req, res){
-    
+  router.post('/download',function(req, res){
     splitUtil.download(Filename, FolderDir, req, res, function(zippath){
       splitUtil.unzip_zip4j(zippath, req, res);
     });
   });
 
-    return route;
+    return router;
   }
