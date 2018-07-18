@@ -295,7 +295,7 @@ router.get('/token/refresh', function(req, res, next){
   console.log('============ GET /box/token/refresh !! =============');
 
   /*                 min  sec  milli     */
-  const EXPIRE_TIME = 1 * 60 * 1000;
+  const EXPIRE_TIME = 1 * 10 * 1000;
   var userID = req.query.user_id;
   console.log("req.user.userID: " + userID);
 
@@ -308,8 +308,11 @@ router.get('/token/refresh', function(req, res, next){
     /**/
     if (Date.now() - recent_time > EXPIRE_TIME) {
       console.log('====== 만료시간이 넘음 =======');
-      refreshBoxToken(userID);
-      loopRefreshEvent(recent_time, EXPIRE_TIME, userID, i, loopRefreshEvent);
+      refreshBoxToken(userID).then(function(recent_time){
+        var i = 0;
+        loopRefreshEvent(recent_time, EXPIRE_TIME, userID, i, loopRefreshEvent);
+      });
+
     } else {
       console.log('==== 만료시간이 아직 안됨 ====');
 
@@ -364,7 +367,14 @@ var refreshBoxToken = function(userID) {
           }).then(function() {
             /* REST API SERVER로 최신 업데이트 이력 및 엑세스토큰 전송 */
             console.log('ACCESS TOKEN IS REFRESHED SUCCESSFULLY!');
-            resolve("TOKEN UPDATE SUCCESS");
+
+            knex.select('recentRefreshTime_b').from('BOX_CONNECT_TB').where('userID', userID)
+            .then(function(rows){
+                resolve(moment(rows[0].recentRefreshTime_b));
+            }).catch(function(err){
+              console.log(err)
+            })
+
             /*
             if (res) {
               res.send({
