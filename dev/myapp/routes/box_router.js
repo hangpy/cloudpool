@@ -147,6 +147,24 @@ router.post('/search', function(req, res) {
     var searchText = 'test';
     box_util.search(client, searchText, function(filelist) {
       console.log("return - 4");
+      console.log(filelist);
+      res.render('box_list', {
+        FolderID: 0,
+        filelist: filelist
+      });
+    });
+  });
+});
+
+router.post('/listAllFiles', function(req, res) {
+  box_init(req.user, function(client){
+    var folderID = 0;
+    box_util.listAllFiles(client, folderID, function(filelist) {
+      console.log("return - 5");
+      res.render('box_list', {
+        FolderID: folderID,
+        filelist: filelist
+      });
     });
   });
 });
