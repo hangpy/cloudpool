@@ -18,6 +18,8 @@ const knex = require('../app_modules/db/knex');
 
 const CLIENT_ID = box_client.getClientId();
 const CLIENT_SECRET = box_client.getClientSecret();
+/*                 min  sec  milli     */
+const EXPIRE_TIME = 59 * 60 * 1000;
 
 var sdk = new BoxSDK({
   clientID: CLIENT_ID,
@@ -177,6 +179,7 @@ router.get('/token', function(req, res) {
 });
 
 router.get('/callback', function(req, res, next) {
+  var userID = req.user.userID;
   if (req.query.error) {
     return res.send('ERROR ' + req.query.error + ': ' + req.query.error_description);
   }
@@ -196,11 +199,20 @@ router.get('/callback', function(req, res, next) {
 
       // insert token into database
       knex('BOX_CONNECT_TB').insert({
-        userID: req.user.userID,
+        userID: userID,
         accessToken_b: USER_ACCESS_TOKEN,
         refreshToken_b: USER_REFRESH_TOKEN
       }).then(function() {
         res.redirect("/");
+        knex.select('recentRefreshTime_b').from('BOX_CONNECT_TB').where('userID', userID).then(function(rows) {
+          var recent_time = moment(rows[0].recentRefreshTime_b);
+          redis_client.hgetall('USER'+userID, function(err, obj){
+            var i = 1;
+            loopRefreshEvent(recent_time, EXPIRE_TIME, userID, obj.loginIndex , i, loopRefreshEvent);
+          });
+        }).catch(function(err){
+          console.log(err);
+        });
       }).catch(function(err) {
         console.log(err);
         res.status(500);
@@ -255,8 +267,6 @@ router.get('/refresh', function(req, res) {
 });
 
 router.get('/token/refresh', function(req, res, next){
-  /*                 min  sec  milli     */
-  const EXPIRE_TIME = 1 * 15 * 1000;
   var userID = req.query.user_id;
   console.log("req.user.userID: " + userID);
   // 사용자가 박스를 등록을 했을 때 시행

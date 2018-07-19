@@ -23,6 +23,9 @@ const oauth2Client = new OAuth2(
   google_client.getRedirectUrl()
 );
 
+/*                 min  sec  milli     */
+const EXPIRE_TIME = 59 * 60 * 1000;
+
 router.use(bodyParser.urlencoded({
   extended: false
 }));
@@ -156,7 +159,8 @@ router.post('/searchname/:id',function(req,res){
 
 /* insert user access token into database */
 router.get('/callback', function(req, res) {
-  console.log("enter the /google/callback and userID is " + req.user.userID);
+  var userID = req.user.userID;
+  console.log("enter the /google/callback and userID is " + userID);
   var code = req.query.code;
   oauth2Client.getToken(code, function(error, tokens) {
     if (error) {
@@ -170,11 +174,20 @@ router.get('/callback', function(req, res) {
 
     knex('GOOGLE_CONNECT_TB').insert({
       // todo: session에서 userID 추출
-      userID: req.user.userID,
+      userID: userID,
       accessToken_g: accessToken,
       refreshToken_g: refreshToken
     }).then(function() {
       res.redirect('/');
+      knex.select('recentRefreshTime_g').from('GOOGLE_CONNECT_TB').where('userID', userID).then(function(rows) {
+        var recent_time = moment(rows[0].recentRefreshTime_g);
+        redis_client.hgetall('USER'+userID, function(err, obj){
+          var i = 1;
+          loopRefreshEvent(recent_time, EXPIRE_TIME, userID, obj.loginIndex , i, loopRefreshEvent);
+        });
+      }).catch(function(err){
+        console.log(err);
+      });
     }).catch(function(err) {
       console.log(err);
       res.status(500);
@@ -232,11 +245,9 @@ router.get('/refresh', function(req, res) {
 
 
 router.get('/token/refresh', function(req, res, next){
-  /*                 min  sec  milli     */
-  const EXPIRE_TIME = 59 * 60 * 1000;
   var userID = req.query.user_id;
   console.log("req.user.userID: " + userID);
-  // 사용자가 박스를 등록을 했을 때 시행
+  // 사용자가 구글을 등록을 했을 때 시행
   knex.select('recentRefreshTime_g').from('GOOGLE_CONNECT_TB').where('userID', userID).then(function(rows) {
     var recentRefreshTime = rows[0].recentRefreshTime_g;
     var recent_time = moment(recentRefreshTime);

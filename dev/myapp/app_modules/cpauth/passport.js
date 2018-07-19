@@ -38,6 +38,7 @@ module.exports = function(passport) {
             return done(false, null);
           } else {
             var user = rows[0];
+            var userID = user.userID
             hasher({
               password: password,
               salt: user.salt
@@ -47,7 +48,7 @@ module.exports = function(passport) {
                 return done(false, null);
               } else {
                 data = {
-                  "user_id": user.userID
+                  "user_id": userID
                 }
                 request.post({
                   url: 'http://localhost:4000/api/dropbox/login/',
@@ -58,42 +59,51 @@ module.exports = function(passport) {
                   console.log(body);
                 });
 
-                redis_client.hmset("USER" + user.userID, {
+                redis_client.hmset("USER" + userID, {
                   "isAuthenticated": 1,
                   "loginIndex": Date.now()
                 }, function(err, reply) {
                   if (err) {
                     console.log("REDIS ERROR: " + err);
                   } else {
-                    request.get({
-                      url: 'http://localhost:3000/box/token/refresh?user_id=' + user.userID,
-                    }, function(err, response) {
-                      if (err) {
-                        console.log(err);
-                      } else {
-                        console.log('response: ' + response.msg);
+                    knex.select().from('DRIVE_STATE_TB').where('userID', userID)
+                    .then(function(rows){
+
+                      var google_state = rows[0].googleCount;
+                      var dropbox_state = rows[0].dropboxCount;
+                      var box_state = rows[0].boxCount;
+
+                      if(google_state > 0){
+                        request.get({
+                          url: 'http://localhost:3000/google/token/refresh?user_id=' + userID,
+                        }, function(err, response) {
+                          if (err) {
+                            console.log(err);
+                          } else {
+                            console.log('response: ' + response.msg);
+                          }
+                        });
                       }
-                    });
 
-                    request.get({
-                      url: 'http://localhost:3000/google/token/refresh?user_id=' + user.userID,
-                    }, function(err, response) {
-                      if (err) {
-                        console.log(err);
-                      } else {
-                        console.log('response: ' + response.msg);
+                      if(box_state > 0){
+                        request.get({
+                          url: 'http://localhost:3000/box/token/refresh?user_id=' + userID,
+                        }, function(err, response) {
+                          if (err) {
+                            console.log(err);
+                          } else {
+                            console.log('response: ' + response.msg);
+                          }
+                        });
                       }
+                    }).catch(function(err){
+                      console.log(err);
                     });
-
-
                     console.log("REDIS REPLY: " + reply);
                   }
                 });
 
-
-
-
-                console.log(user.userName + ' is logged in');
+                console.log('[INFO] ' + userID + ' IS LOGGED IN');
                 return done(null, user);
               }
             });
