@@ -41,6 +41,7 @@
         <p></p>
         <button type="button" onClick='Refresh()' >파일 리스트 최신화</button>
         <p></p>
+        <input type="text" name="foldername" placeholder="newname">
         <button type="button" onClick='CreateFolder()' >폴더 만들기</button>
 
         <table border="1" id="table_dropbox" data-id='<%=FolderID%>'>
@@ -56,11 +57,11 @@
                 <%
                 var folderList = FolderID.split("*");
                 if(folderList[0]==FolderID){%>
-                  <tr data-id=''>
+                  <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>">
                      <td></td>
                       <td></td>
                       <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                      <td><a href="#" onclick ="moveFolder_dropbox(this)" value="folder/">/</a></td>
+                      <td><a data-id=' ' href="#" onclick ="moveFolder_dropbox(this)" value="folder/">/</a></td>
                       <td></td>
                       <td></td>
                       <td></td>
@@ -190,6 +191,17 @@
   </div>
 
   <script language=javascript>
+    function checkSpace(str) { if(str.search(/\s/) != -1) { return true; } else { return false; } }
+    function removeSpace(str){
+        if(checkSpace(str)){
+          var AfterFoldername = str.replace(/[ ]/g,"%20");
+        }
+        else {
+          var AfterFoldername = str;
+        }
+        return AfterFoldername;
+    }
+
     function dragStart(event) {
       event.dataTransfer.setData("data", event.target.attributes[2].nodeValue);
     }
@@ -215,7 +227,9 @@
              dataType: "JSON",
              success: function(json) {
                console.log(json);
-               $('.graph').load("dropbox/folder/<%=FolderID%>");
+
+               var PresentFolderID = removeSpace("<%=FolderID%>");
+               $('.graph').load("dropbox/folder/"+PresentFolderID);
               },beforeSend:function(){
                   // (이미지 보여주기 처리)
                 $('.wrap-loading').removeClass('display-none');
@@ -235,11 +249,6 @@
         // action_dropbox.action='dropbox/download/<%=FolderID%>';
         action_dropbox.action='dropbox/download/';
       }
-      if(index===2){
-
-        action_dropbox.action='dropbox/delete/';
-        $('.graph').load("dropbox/folder/<%=FolderID%>");
-      }
       action_dropbox.submit();
     };
 
@@ -255,7 +264,7 @@
           }
         }
       if(name==''){
-        alert("이름을 변경하실 파일이나 폴더를 체크해주세요");
+        alert("삭제하실 파일이나 폴더를 체크해주세요");
       }
       else{
         var body= {
@@ -270,7 +279,8 @@
              dataType: "JSON",
              success: function(json) {
                console.log(json);
-               $('.graph').load("dropbox/folder/<%=FolderID%>");
+               var PresentFolderID = removeSpace("<%=FolderID%>");
+               $('.graph').load("dropbox/folder/"+PresentFolderID);
              },
              beforeSend:function(){
                  // (이미지 보여주기 처리)
@@ -293,7 +303,8 @@
            async: false,
            success: function(json) {
              console.log(json);
-             $('.graph').load("dropbox/folder/<%=FolderID%>");
+             var PresentFolderID = removeSpace("<%=FolderID%>");
+             $('.graph').load("dropbox/folder/"+PresentFolderID);
            },beforeSend:function(){
                // (이미지 보여주기 처리)
              $('.wrap-loading').removeClass('display-none');
@@ -310,7 +321,8 @@
     function UploadSubmit(){
         uploadform.action='dropbox/upload/<%=FolderID%>';
         uploadform.submit();
-        $('.graph').load("dropbox/<%=FolderID%>");
+        var PresentFolderID = removeSpace("<%=FolderID%>");
+        $('.graph').load("dropbox/folder/"+PresentFolderID);
     };
 
     $('.upload-btn').on('click', function (){
@@ -413,16 +425,17 @@
           "originname" : originname,
           "newname" : newname
         }
-
+        var PresentFolderID = removeSpace("<%=FolderID%>");
         $.ajax({
              type: "POST",
-             url: "dropbox/rename/<%=FolderID%>",
+             url: "dropbox/rename/"+PresentFolderID,
              async: true,
              data: body,
              dataType: "JSON",
              success: function(json) {
                console.log(json);
-               $('.graph').load("dropbox/folder/<%=FolderID%>");
+               var PresentFolderID = removeSpace("<%=FolderID%>");
+               $('.graph').load("dropbox/folder/"+PresentFolderID);
              },
              beforeSend:function(){
                  // (이미지 보여주기 처리)
@@ -444,17 +457,17 @@
       var body= {
         "selecttype" : selecttype
       }
+      var PresentFolderID = removeSpace("<%=FolderID%>");
       $.ajax({
            type: "POST",
-           url: "dropbox/select/<%=FolderID%>",
+           url: "dropbox/select/"+PresentFolderID,
            async: false,
            data: body,
            dataType: "JSON",
            success: function(json) {
              var obj = JSON.stringify(json);
              console.log(obj);
-
-             $('.graph').load("dropbox/selectview/folder/<%=FolderID%>",{obj:obj});
+             $('.graph').load("dropbox/selectview/folder/"+PresentFolderID,{obj:obj});
            },
            beforeSend:function(){
                // (이미지 보여주기 처리)
@@ -472,20 +485,20 @@
     function Search(){
       var searchname = action_dropbox.searchname.value;
       var searchFolder = action_dropbox.searchfoldertype.value;
-
+      var PresentFolderID = removeSpace("<%=FolderID%>");
       var body= {
         "searchname" : searchname,
         "searchfolder" : searchFolder
       }
       $.ajax({
            type: "POST",
-           url: "dropbox/search/<%=FolderID%>",
+           url: "dropbox/search/"+PresentFolderID,
            async: false,
            data: body,
            dataType: "JSON",
            success: function(json) {
              var obj = JSON.stringify(json);
-             $('.graph').load("dropbox/searchview/folder/<%=FolderID%>",{obj:obj});
+             $('.graph').load("dropbox/searchview/folder/"+PresentFolderID,{obj:obj});
            },
            beforeSend:function(){
                // (이미지 보여주기 처리)
@@ -501,22 +514,26 @@
     }
 
     function CreateFolder(){
-      var selecttype = action_dropbox.selecttype.value;
+      var foldername = action_dropbox.foldername.value;
+      var presentFolder = "<%=FolderID%>";
+      if(presentFolder == undefined || presentFolder==''){
+          foldername =  "/"+foldername;
+      }
+      else foldername =  presentFolder+"/"+foldername;
 
       var body= {
-        "selecttype" : selecttype
+        "foldername" : foldername
       }
       $.ajax({
            type: "POST",
-           url: "dropbox/select/<%=FolderID%>",
+           url: "dropbox/makeFolder/",
            async: false,
            data: body,
            dataType: "JSON",
            success: function(json) {
              var obj = JSON.stringify(json);
-             console.log(obj);
-
-             $('.graph').load("dropbox/selectview/folder/<%=FolderID%>",{obj:obj});
+             var PresentFolderID = removeSpace("<%=FolderID%>");
+             $('.graph').load("dropbox/folder/"+PresentFolderID);
            },
            beforeSend:function(){
                // (이미지 보여주기 처리)
@@ -546,8 +563,8 @@
     }
     .wrap-loading div{ /*로딩 이미지*/
         position: fixed;
-        top:20%;
-        left:20%;
+        top:50%;
+        left:50%;
         margin-left: -21px;
         margin-top: -21px;
     }

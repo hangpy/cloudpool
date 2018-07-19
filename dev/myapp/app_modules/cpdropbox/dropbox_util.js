@@ -32,7 +32,6 @@ const UTIL = (function() {
    */
 
   var getlistRest = function(user_id, FolderDir, callback) {
-    // initDropbox(usr_session, function(dbx){
     var user_id = user_id;
     var data = {
       "user_id": user_id,
@@ -47,8 +46,6 @@ const UTIL = (function() {
         callback(body);
       }
     );
-
-    // });
   }
 
   //refresh
@@ -161,7 +158,27 @@ const UTIL = (function() {
     // });
   }
 
+  var makeFolderRest = function(user_id, foldername, callback){
+    // initDropbox(usr_session, function(dbx){
+    var user_id = user_id;
+    console.log("==========makefolder=======");
+    // var accesstoken = dbx.accessToken;
+    var data = {
+      "user_id": user_id,
+      "folderDir": foldername
+    };
+    request.post({
+        url: 'http://localhost:4000/api/dropbox/makefolder/',
+        body: data,
+        json: true
+      },
+      function(error, response, body) {
+        callback("finish_makefolder_the_file");
+      }
+    );
 
+    // });
+  }
 
   // deletefile
   var deletefile = function(dbx, Filename, FolderDir, userID, callback) {
@@ -361,7 +378,8 @@ const UTIL = (function() {
       sendsearchRest: sendsearchRest,
       sendsearchtypeRest: sendsearchtypeRest,
       getrefreshRest: getrefreshRest,
-      movefileRest : movefileRest
+      movefileRest : movefileRest,
+      makeFolderRest : makeFolderRest
 
   }
 

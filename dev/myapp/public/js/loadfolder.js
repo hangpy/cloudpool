@@ -53,6 +53,6 @@ function moveFolder_box(obj){
 
 function moveFolder_dropbox(obj){
   var beforeFolderID = $(obj).attr('value');
-  var FolderID = beforeFolderID.replace(" ","%20");
+  var FolderID = beforeFolderID.replace(/[ ]/g,"%20");
   $('.graph').load("dropbox/"+FolderID);
 }

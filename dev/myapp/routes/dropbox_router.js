@@ -378,6 +378,20 @@ module.exports = function(){
     })
   });
 
+  router.post('/makeFolder/', function(req, res){
+    console.log("======makeFolder route===========");
+    var foldername = req.body.foldername;
+    console.log(foldername);
+    dbxutil.makeFolderRest(req.user.userID, foldername, function(result){
+      if(result =="finish_makefolder_the_file"){
+        res.json("finish");
+      }
+      else{
+        res.json("error");
+      }
+    })
+  });
+
   return router;
 }
 // module.exports = route;
