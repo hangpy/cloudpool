@@ -66,6 +66,10 @@ app.use('/dropbox', dropbox);
 app.use('/setting', setting);
 
 
+app.get('/test', (req,res)=>{
+  res.render('/test');
+})
+
 // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
 //   next(createError(404));
