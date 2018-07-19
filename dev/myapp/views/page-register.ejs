@@ -40,7 +40,7 @@
             <div class="login-content card">
               <div class="login-form">
                 <h4>회원가입</h4>
-                <form name="joinACtion" id="joinAction" action="auth/register" method="post">
+                <form name="joinACtion" id="joinForm" action="auth/register" method="post">
                   <div class="form-group row">
                     <label class="col-lg-4 col-form-label" for="val-username">이름 <span class="text-danger">*</span></label>
                     <div class="col-lg-6">
@@ -127,7 +127,7 @@
             if (email === '' || !re.test(email)) {
               alert("이메일을 확인하세요.");
             } else {
-              $('#joinAction').submit();
+              $('#joinForm').submit();
             }
           }
         }

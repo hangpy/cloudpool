@@ -175,8 +175,6 @@ router.get('/token', function(req, res) {
       redirect_uri: box_auth.generateRedirectURI(req)
     }
   }));
-
-
 });
 
 router.get('/callback', function(req, res, next) {
@@ -211,40 +209,8 @@ router.get('/callback', function(req, res, next) {
     }
   });
 });
-/*
- knex.select('recentRefreshTime_b')
- .from('BOX_CONNECT_TB')
- .where('userID', req.user.userID)
- .then(function(rows){
-   console.log(rows[0]);
-   res.redirect('/box/refresh');
-
-   var recentRefreshTime = rows[0];
-   console.log(rows[0]);
-   if(rows[0] == null){
-     knex.select('registerTime_b')
-     .from('BOX_CONNECT_TB')
-     .where('userID', req.user.userID)
-     .then(function(rows){
-       var registerTime = rows[0];
-       console.log("---------------[no recentRefreshTime, so registerTime]: " + registerTime)
-     })
-     .catch(function(err){
-       console.log(err);
-     });
-   } else {
-     console.log("----------------[recentRefreshTime]: " + recentRefreshTime);
-   }
-
- })
- .catch(function(err){
-   console.log(err);
- })
- */
-
 
 router.get('/refresh', function(req, res) {
-
   knex.select('refreshToken_b')
     .from('BOX_CONNECT_TB')
     .where('userID', req.user.userID)
@@ -289,10 +255,9 @@ router.get('/refresh', function(req, res) {
     });
 });
 
-
 router.get('/token/refresh', function(req, res, next){
   /*                 min  sec  milli     */
-  const EXPIRE_TIME = 1 * 10 * 1000;
+  const EXPIRE_TIME = 59 * 60 * 1000;
   var userID = req.query.user_id;
   console.log("req.user.userID: " + userID);
   // 사용자가 박스를 등록을 했을 때 시행
@@ -323,10 +288,6 @@ router.get('/token/refresh', function(req, res, next){
     console.log(err);
   });
 });
-
-
-
-
 
 var refreshBoxToken = function(userID) {
   return new Promise(function(resolve, reject) {
@@ -362,7 +323,6 @@ var refreshBoxToken = function(userID) {
   })
 }
 
-
 var loopRefreshEvent = function(recent_time, EXPIRE_TIME, userID, loginIndex, i, callback) {
   console.log('[INFO] ' + userID + ' USER\'S ACCESS TOKEN WILL BE REFRESHED AT ' + recent_time);
   var job = schedule.scheduleJob(recent_time + EXPIRE_TIME, function() {
@@ -373,7 +333,6 @@ var loopRefreshEvent = function(recent_time, EXPIRE_TIME, userID, loginIndex, i,
       } else {
         if(obj.isAuthenticated === "1" && obj.loginIndex === loginIndex){  // state of login
           refreshBoxToken(userID).then(function(msg) {
-            console.log(msg);
             knex.select('recentRefreshTime_b').from('BOX_CONNECT_TB').where('userID', userID).then(function(rows){
               var new_recent_time = moment(rows[0].recentRefreshTime_b);
               callback(new_recent_time, EXPIRE_TIME, userID, obj.loginIndex, i, callback);
