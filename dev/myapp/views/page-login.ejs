@@ -86,23 +86,23 @@
   <script src="js/scripts.js"></script>
 
   <script>
-  function login() {
-    // 빈칸 체크
-    // 비밀번호 길이 영어숫자 확인
-    var email = $('#email').val();
-    var pw = $('#password').val();
-    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i; // email check
+    function login() {
+      // 빈칸 체크
+      // 비밀번호 길이 영어숫자 확인
+      var email = $('#email').val();
+      var pw = $('#password').val();
+      var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i; // email check
 
-    if (email == '' || pw == '') {
-      alert("모든 칸을 채워주세요.");
-    } else {
-      if(!re.test(email)){
-        alert('이메일 형식을 다시 확인해 주세요');
+      if (email == '' || pw == '') {
+        alert("모든 칸을 채워주세요.");
       } else {
-        $('#loginForm').submit();
+        if(!re.test(email)){
+          alert('이메일 형식을 다시 확인해 주세요');
+        } else {
+          $('#loginForm').submit();
+        }
       }
     }
-  }
   </script>
 
 </body>

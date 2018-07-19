@@ -1,10 +1,13 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var router = express.Router();
-var formidable = require('formidable');
-var fs = require('fs');
-var google_util = require('../app_modules/cpgoogle/google_util.js'); //수정
-var google_init = require('../app_modules/cpgoogle/google_init');
+const express = require('express');
+const bodyParser = require('body-parser');
+const router = express.Router();
+const formidable = require('formidable');
+const fs = require('fs');
+const google_util = require('../app_modules/cpgoogle/google_util.js'); //수정
+const google_init = require('../app_modules/cpgoogle/google_init');
+const moment = require('moment');
+const schedule = require('node-schedule');
+const redis_client = require('../app_modules/config/redis')
 
 /* modules for getting user access token 지우지마!*/
 const knex = require('../app_modules/db/knex');
@@ -225,7 +228,105 @@ router.get('/refresh', function(req, res) {
     console.log(err);
     res.redirect('/');
   });
-
 });
+
+
+router.get('/token/refresh', function(req, res, next){
+  /*                 min  sec  milli     */
+  const EXPIRE_TIME = 59 * 60 * 1000;
+  var userID = req.query.user_id;
+  console.log("req.user.userID: " + userID);
+  // 사용자가 박스를 등록을 했을 때 시행
+  knex.select('recentRefreshTime_g').from('GOOGLE_CONNECT_TB').where('userID', userID).then(function(rows) {
+    var recentRefreshTime = rows[0].recentRefreshTime_g;
+    var recent_time = moment(recentRefreshTime);
+    if (Date.now() - recent_time > EXPIRE_TIME) {
+      console.log('[INFO] ' + userID + ' USER\'S GOOGLE ACCESS TOKEN IS ALREADY EXPIRED');
+      refreshGoogleToken(userID).then(function(recent_time){
+        redis_client.hgetall('USER'+userID, function(err, obj){
+          var i = 1;
+          loopRefreshEvent(recent_time, EXPIRE_TIME, userID, obj.loginIndex , i, loopRefreshEvent);
+        });
+      });
+    } else {
+      console.log('[INFO] ' + userID + ' USER\'S GOOGLE ACCESS TOKEN IS NOT YET EXPIRED');
+      redis_client.hgetall('USER'+userID, function(err, obj){
+        var i = 1;
+        loopRefreshEvent(recent_time, EXPIRE_TIME, userID, obj.loginIndex , i, loopRefreshEvent);
+      });
+      res.send({
+        msg: "GOOGLE TOKEN REFRESH EVENT LOOP WILL RUN PERIODICALLY"
+      })
+    }
+    // refresh token 할때마다 엑세스토큰 rest api server로
+    // res로 응답하기 -> 안그러면 연결 끊어지면서 소켓 에러 발생
+  }).catch(function(err) {
+    console.log(err);
+  });
+});
+
+var refreshGoogleToken = function(userID) {
+  return new Promise(function(resolve, reject) {
+    knex.select('accessToken_g', 'refreshToken_g').from('GOOGLE_CONNECT_TB').where('userID', userID).then(function(rows) {
+      const USER_REFRESH_TOKEN = rows[0].refreshToken_g;
+
+      oauth2Client.credentials = {
+        access_token: rows[0].accessToken_g,
+        refresh_token: rows[0].refreshToken_g
+      };
+      oauth2Client.refreshAccessToken(function(err, tokens){
+        if(err){
+          console.log(err);
+        } else {
+          var new_accessToken_g = tokens.access_token;
+          knex('GOOGLE_CONNECT_TB').where('userID', userID).update({
+            accessToken_g: new_accessToken_g
+          }).then(function() {
+            /* REST API SERVER로 최신 업데이트 이력 및 엑세스토큰 전송 */
+            console.log('[INFO] ' + userID + ' USER\'S GOOGLE ACCESS TOKEN IS REFRESHED SUCCESSFULLY!');
+            knex.select('recentRefreshTime_g').from('GOOGLE_CONNECT_TB').where('userID', userID)
+            .then(function(rows){
+                resolve(moment(rows[0].recentRefreshTime_g));
+            }).catch(function(err){
+              console.log(err)
+            })
+          }).catch(function(err) {
+            console.log(err);
+            reject(err);
+          });
+        }
+      });
+    }).catch(function(err) {
+      console.log(err);
+    });
+  })
+}
+
+var loopRefreshEvent = function(recent_time, EXPIRE_TIME, userID, loginIndex, i, callback) {
+  console.log('[INFO] ' + userID + ' USER\'S GOOGLE ACCESS TOKEN WILL BE REFRESHED AT ' + recent_time);
+  var job = schedule.scheduleJob(recent_time + EXPIRE_TIME, function() {
+    console.log('[INFO] ' + userID + ' USER\'S GOOGLE REFRESH EVENT LOOP RUN IN ' + i++ + ' TIME');
+    redis_client.hgetall('USER'+userID, function(err, obj){
+      if(err){
+        console.log('[ERROR] REDIS HGETALL ERROR: ' + err);
+      } else {
+        if(obj.isAuthenticated === "1" && obj.loginIndex === loginIndex){  // state of login
+          refreshGoogleToken(userID).then(function(msg) {
+            knex.select('recentRefreshTime_g').from('GOOGLE_CONNECT_TB').where('userID', userID).then(function(rows){
+              var new_recent_time = moment(rows[0].recentRefreshTime_g);
+              callback(new_recent_time, EXPIRE_TIME, userID, obj.loginIndex, i, callback);
+              job.cancel();
+            })
+          })
+        } else {
+          console.log('[INFO] ' + userID + ' USER\'S GOOGLE REFRESH EVENT LOOP NO LONGER RUN');
+          return 0;
+        }
+      }
+    });
+  });
+  return 0;
+}
+
 
 module.exports = router;

@@ -6,7 +6,6 @@ const async = require('async');
 const box_init = require('../app_modules/cpbox/box_init');
 const moment = require('moment');
 const schedule = require('node-schedule');
-const passport = require('passport');
 const redis_client = require('../app_modules/config/redis')
 
 /* modules required to get athentication from box */
@@ -257,7 +256,7 @@ router.get('/refresh', function(req, res) {
 
 router.get('/token/refresh', function(req, res, next){
   /*                 min  sec  milli     */
-  const EXPIRE_TIME = 59 * 60 * 1000;
+  const EXPIRE_TIME = 1 * 15 * 1000;
   var userID = req.query.user_id;
   console.log("req.user.userID: " + userID);
   // 사용자가 박스를 등록을 했을 때 시행
@@ -265,7 +264,7 @@ router.get('/token/refresh', function(req, res, next){
     var recentRefreshTime = rows[0].recentRefreshTime_b;
     var recent_time = moment(recentRefreshTime);
     if (Date.now() - recent_time > EXPIRE_TIME) {
-      console.log('[INFO] ' + userID + ' USER\'S ACCESS TOKEN IS ALREADY EXPIRED');
+      console.log('[INFO] ' + userID + ' USER\'S BOX ACCESS TOKEN IS ALREADY EXPIRED');
       refreshBoxToken(userID).then(function(recent_time){
         redis_client.hgetall('USER'+userID, function(err, obj){
           var i = 1;
@@ -273,13 +272,13 @@ router.get('/token/refresh', function(req, res, next){
         });
       });
     } else {
-      console.log('[INFO] ' + userID + ' USER\'S ACCESS TOKEN IS NOT YET EXPIRED');
+      console.log('[INFO] ' + userID + ' USER\'S BOX ACCESS TOKEN IS NOT YET EXPIRED');
       redis_client.hgetall('USER'+userID, function(err, obj){
         var i = 1;
         loopRefreshEvent(recent_time, EXPIRE_TIME, userID, obj.loginIndex , i, loopRefreshEvent);
       });
       res.send({
-        msg: "REFRESH EVENT LOOP WILL RUN PERIODICALLY"
+        msg: "BOX TOKEN REFRESH EVENT LOOP WILL RUN PERIODICALLY"
       })
     }
     // refresh token 할때마다 엑세스토큰 rest api server로
@@ -304,7 +303,7 @@ var refreshBoxToken = function(userID) {
             refreshToken_b: new_refreshToken_b
           }).then(function() {
             /* REST API SERVER로 최신 업데이트 이력 및 엑세스토큰 전송 */
-            console.log('[INFO] ' + userID + ' USER\'S ACCESS TOKEN IS REFRESHED SUCCESSFULLY!');
+            console.log('[INFO] ' + userID + ' USER\'S BOX ACCESS TOKEN IS REFRESHED SUCCESSFULLY!');
             knex.select('recentRefreshTime_b').from('BOX_CONNECT_TB').where('userID', userID)
             .then(function(rows){
                 resolve(moment(rows[0].recentRefreshTime_b));
@@ -324,9 +323,9 @@ var refreshBoxToken = function(userID) {
 }
 
 var loopRefreshEvent = function(recent_time, EXPIRE_TIME, userID, loginIndex, i, callback) {
-  console.log('[INFO] ' + userID + ' USER\'S ACCESS TOKEN WILL BE REFRESHED AT ' + recent_time);
+  console.log('[INFO] ' + userID + ' USER\'S BOX ACCESS TOKEN WILL BE REFRESHED AT ' + recent_time);
   var job = schedule.scheduleJob(recent_time + EXPIRE_TIME, function() {
-    console.log('[INFO] ' + userID + ' USER\'S REFRESH EVENT LOOP RUN IN ' + i++ + ' TIME');
+    console.log('[INFO] ' + userID + ' USER\'S BOX REFRESH EVENT LOOP RUN IN ' + i++ + ' TIME');
     redis_client.hgetall('USER'+userID, function(err, obj){
       if(err){
         console.log('[ERROR] REDIS HGETALL ERROR: ' + err);
@@ -340,7 +339,7 @@ var loopRefreshEvent = function(recent_time, EXPIRE_TIME, userID, loginIndex, i,
             })
           })
         } else {
-          console.log('[INFO] ' + userID + ' USER\'S REFRESH EVENT LOOP NO LONGER RUN');
+          console.log('[INFO] ' + userID + ' USER\'S BOX REFRESH EVENT LOOP NO LONGER RUN');
           return 0;
         }
       }

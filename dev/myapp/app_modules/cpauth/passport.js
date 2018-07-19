@@ -71,10 +71,21 @@ module.exports = function(passport) {
                       if (err) {
                         console.log(err);
                       } else {
-
                         console.log('response: ' + response.msg);
                       }
                     });
+
+                    request.get({
+                      url: 'http://localhost:3000/google/token/refresh?user_id=' + user.userID,
+                    }, function(err, response) {
+                      if (err) {
+                        console.log(err);
+                      } else {
+                        console.log('response: ' + response.msg);
+                      }
+                    });
+
+
                     console.log("REDIS REPLY: " + reply);
                   }
                 });
