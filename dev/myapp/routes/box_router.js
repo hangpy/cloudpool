@@ -56,7 +56,7 @@ router.post('/upload/:id', function(req, res) {
 
       var FileInfo = files.userfile;
 
-      res.redirect('/' + FolderID);
+      res.redirect('/');
 
       //비동기 필요
       box_util.uploadFile(client, FileInfo, FolderID);
