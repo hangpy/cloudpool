@@ -58,7 +58,10 @@ module.exports = function(passport) {
                   console.log(body);
                 });
 
-                redis_client.hset("USER" + user.userID, "isAuthenticated", 1, function(err, reply) {
+                redis_client.hmset("USER" + user.userID, {
+                  "isAuthenticated": 1,
+                  "loginIndex": Date.now()
+                }, function(err, reply) {
                   if (err) {
                     console.log("REDIS ERROR: " + err);
                   } else {

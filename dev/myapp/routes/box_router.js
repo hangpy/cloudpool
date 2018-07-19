@@ -291,46 +291,33 @@ router.get('/refresh', function(req, res) {
 
 
 router.get('/token/refresh', function(req, res, next){
-
-  console.log('============ GET /box/token/refresh !! =============');
-
   /*                 min  sec  milli     */
   const EXPIRE_TIME = 1 * 10 * 1000;
   var userID = req.query.user_id;
   console.log("req.user.userID: " + userID);
-
   // 사용자가 박스를 등록을 했을 때 시행
-
   knex.select('recentRefreshTime_b').from('BOX_CONNECT_TB').where('userID', userID).then(function(rows) {
     var recentRefreshTime = rows[0].recentRefreshTime_b;
-
     var recent_time = moment(recentRefreshTime);
-    /**/
     if (Date.now() - recent_time > EXPIRE_TIME) {
-      console.log('====== 만료시간이 넘음 =======');
+      console.log('[INFO] ' + userID + ' USER\'S ACCESS TOKEN IS ALREADY EXPIRED');
       refreshBoxToken(userID).then(function(recent_time){
-        var i = 0;
-        loopRefreshEvent(recent_time, EXPIRE_TIME, userID, i, loopRefreshEvent);
+        redis_client.hgetall('USER'+userID, function(err, obj){
+          var i = 1;
+          loopRefreshEvent(recent_time, EXPIRE_TIME, userID, obj.loginIndex , i, loopRefreshEvent);
+        });
       });
-
     } else {
-      console.log('==== 만료시간이 아직 안됨 ====');
-
-      // recentRefreshTime으로부터 58분이 지난 시점부터 세션 만료전까지 리프레시 이벤트 루프 실행
-
-      var i = 1;
-      loopRefreshEvent(recent_time, EXPIRE_TIME, userID, i, loopRefreshEvent);
-      /*
+      console.log('[INFO] ' + userID + ' USER\'S ACCESS TOKEN IS NOT YET EXPIRED');
+      redis_client.hgetall('USER'+userID, function(err, obj){
+        var i = 1;
+        loopRefreshEvent(recent_time, EXPIRE_TIME, userID, obj.loginIndex , i, loopRefreshEvent);
+      });
       res.send({
         msg: "REFRESH EVENT LOOP WILL RUN PERIODICALLY"
       })
-      */
-
     }
-    // 세션 만료 전까지 refresh 정책 루프
     // refresh token 할때마다 엑세스토큰 rest api server로
-
-
     // res로 응답하기 -> 안그러면 연결 끊어지면서 소켓 에러 발생
   }).catch(function(err) {
     console.log(err);
@@ -344,20 +331,10 @@ router.get('/token/refresh', function(req, res, next){
 var refreshBoxToken = function(userID) {
   return new Promise(function(resolve, reject) {
     knex.select('refreshToken_b').from('BOX_CONNECT_TB').where('userID', userID).then(function(rows) {
-      console.log('================= Entered refresh part ===============');
       const USER_REFRESH_TOKEN = rows[0].refreshToken_b;
       sdk.getTokensRefreshGrant(USER_REFRESH_TOKEN, function(err, tokenInfo) {
         if (err) {
           console.log(err);
-          /*
-          if (res) {
-            res.send({
-              msg: "Access token refresh is failed",
-              state: 0,
-              err: err
-            });
-          }
-          */
         } else {
           var new_accessToken_b = tokenInfo.accessToken;
           var new_refreshToken_b = tokenInfo.refreshToken;
@@ -366,79 +343,45 @@ var refreshBoxToken = function(userID) {
             refreshToken_b: new_refreshToken_b
           }).then(function() {
             /* REST API SERVER로 최신 업데이트 이력 및 엑세스토큰 전송 */
-            console.log('ACCESS TOKEN IS REFRESHED SUCCESSFULLY!');
-
+            console.log('[INFO] ' + userID + ' USER\'S ACCESS TOKEN IS REFRESHED SUCCESSFULLY!');
             knex.select('recentRefreshTime_b').from('BOX_CONNECT_TB').where('userID', userID)
             .then(function(rows){
                 resolve(moment(rows[0].recentRefreshTime_b));
             }).catch(function(err){
               console.log(err)
             })
-
-            /*
-            if (res) {
-              res.send({
-                msg: "Access token is refreshed successfully",
-                state: 1
-              });
-            }
-            */
           }).catch(function(err) {
             console.log(err);
             reject(err);
-            /*
-            if (res) {
-              res.send({
-                msg: "DB ERROR GENERATED WHEN UPDATING ACCESS_TOKEN",
-                state: 0,
-                err: err
-              });
-            }
-            */
           });
         }
       })
     }).catch(function(err) {
       console.log(err);
-      /*
-      if (res) {
-        res.sned({
-          msg: "DB ERROR GENERATED WHEN EXTRACTING REFRESH_TOKEN",
-          state: 0,
-          err: err
-        });
-      }
-      */
     });
   })
 }
 
 
-var loopRefreshEvent = function(recent_time, EXPIRE_TIME, userID, i, callback) {
-  console.log('---------------ENTER LOOP!--------------');
-
+var loopRefreshEvent = function(recent_time, EXPIRE_TIME, userID, loginIndex, i, callback) {
+  console.log('[INFO] ' + userID + ' USER\'S ACCESS TOKEN WILL BE REFRESHED AT ' + recent_time);
   var job = schedule.scheduleJob(recent_time + EXPIRE_TIME, function() {
-    console.log('================= Schedule ' + i++);
-
+    console.log('[INFO] ' + userID + ' USER\'S REFRESH EVENT LOOP RUN IN ' + i++ + ' TIME');
     redis_client.hgetall('USER'+userID, function(err, obj){
-
-      console.log('================== hgetall entered =====================');
-      console.log('userID' + userID);
-      console.log("obj.isAuthenticated: " + obj.isAuthenticated)
       if(err){
-        console.log('REDIS HGETALL ERROR: ' + err);
+        console.log('[ERROR] REDIS HGETALL ERROR: ' + err);
       } else {
-        if(obj.isAuthenticated === "1"){  // state of login
+        if(obj.isAuthenticated === "1" && obj.loginIndex === loginIndex){  // state of login
           refreshBoxToken(userID).then(function(msg) {
             console.log(msg);
             knex.select('recentRefreshTime_b').from('BOX_CONNECT_TB').where('userID', userID).then(function(rows){
               var new_recent_time = moment(rows[0].recentRefreshTime_b);
-              callback(new_recent_time, EXPIRE_TIME, userID, i, callback);
+              callback(new_recent_time, EXPIRE_TIME, userID, obj.loginIndex, i, callback);
               job.cancel();
             })
           })
         } else {
-          console.log("REFRESH LOOP IS TERMINATED BECAUSE " + userID + " USER LOGOUT");
+          console.log('[INFO] ' + userID + ' USER\'S REFRESH EVENT LOOP NO LONGER RUN');
           return 0;
         }
       }
@@ -446,10 +389,6 @@ var loopRefreshEvent = function(recent_time, EXPIRE_TIME, userID, i, callback) {
   });
   return 0;
 }
-
-
-
-
 
 
 
