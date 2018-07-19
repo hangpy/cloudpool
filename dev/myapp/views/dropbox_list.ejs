@@ -500,6 +500,36 @@
         });
     }
 
+    function CreateFolder(){
+      var selecttype = action_dropbox.selecttype.value;
+
+      var body= {
+        "selecttype" : selecttype
+      }
+      $.ajax({
+           type: "POST",
+           url: "dropbox/select/<%=FolderID%>",
+           async: false,
+           data: body,
+           dataType: "JSON",
+           success: function(json) {
+             var obj = JSON.stringify(json);
+             console.log(obj);
+
+             $('.graph').load("dropbox/selectview/folder/<%=FolderID%>",{obj:obj});
+           },
+           beforeSend:function(){
+               // (이미지 보여주기 처리)
+             $('.wrap-loading').removeClass('display-none');
+           },complete:function(){
+               // (이미지 감추기 처리)
+           $('.wrap-loading').addClass('display-none');
+           },
+           error: function(error) {
+              console.log(error);
+           }
+        });
+    }
 
 
   </script>
