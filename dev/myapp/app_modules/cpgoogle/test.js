@@ -1,69 +1,136 @@
-var path = require('path')
-, {google} = require('googleapis')
-, async = require('async')
-, fs = require('fs')
-, initGoogle = require('./google_init')
-, https = require('https')
-, request  = require('request');
+"use strict";
 
-var usr_session = null;
-initGoogle(usr_session, function(oauth2Client){
+/**
+* @file google_init
+* @author hangbok
+*
+* @description This module is for simplifying process of getting google auth
+* @param {object, callback}
+* return value invovles google user's access and refresh token attributes within
+* oauth2Client.credentials
+*/
+console.time('alpha');
+const {google} = require('googleapis');
+const client_info = require('../config/client_info');
+var async=require('async');
+var request=require('request');
+
+  // Select google client info part out of several drives
+  const google_client = client_info.GOOGLE;
+  var OAuth2 = google.auth.OAuth2;
+
+  var CLIENT_ID = google_client.getClientId(),
+      CLIENT_SECRET = google_client.getClientSecret(),
+      REDIRECT_URL = google_client.getRedirectUrl();
+ 
+  function sleep(milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+      if ((new Date().getTime() - start) > milliseconds){
+        console.log('=============================Sleep! at the===================');
+        break;
+      }
+    }
+  }
+  var oauth2Client = new OAuth2(
+    CLIENT_ID,
+    CLIENT_SECRET,
+    REDIRECT_URL
+  );
+
+  oauth2Client.credentials = {
+    access_token: 'ya29.Glz8BRzz4uq8wzY3xiLwTzZ5MUJq4NKzUYC3i_3O4qp5WstAnZogj-fAFpx6H6lX-CGsd0e9m12FX6An5J9ydDsj0ESFYFWngJ8QtjMkEfy9eXxGvXtJ-aYBt778yg'
+    ,refresh_token: '1/QZnltKi5QGjNVKUltA7W4t0_yvzTmsisN0D1bOV30hI'};
+
   var fileId = '1wi6vB5fWXer4T2ULA_0bNNGsl2Ff675g';
   var folderId = '0AGCP8EhCswtnUk9PVA';
 
   var drive = google.drive({version : 'v3', auth: oauth2Client });
-  drive.files.get({
-    fileId: '1biYix0CIBgLWs5h78J5dDt4BTd5rTblH',
-    // fileId: '1gd2kkvnSjz95WUM9KWePmhDc_BrAdlqq',
-    // auth: oauth2Client,// daily 인증 횟수 오류 뜨면 활성화 
-    fields:'thumbnailLink'
-  }, (err, metadata) => {
-    if (err) {
-      console.log('The API returned an error!!!!!!!!!!!!!!!!!!!!: ' + err);
-      console.log('222222!!!!!!!!!!!!!!!!!!!!: ');
-      return;
-    }
-    else{
-      console.log('metadata: ',metadata.data.thumbnailLink);
-    }
-  });
+  var ll=[];
+  var pageToken = null;
+// Using the NPM module 'async'
 
-  // var fileMetadata = {
-  //   'name': 'Invoices2',
-  //   'mimeType': 'application/vnd.google-apps.folder',
-  //   parents:['1gd2kkvnSjz95WUM9KWePmhDc_BrAdlqq']
-  //   // 'parents' : '1gd2kkvnSjz95WUM9KWePmhDc_BrAdlqq'
-  // };
+  var recurApi=function(folderId,Fdepth){//,CallBack){
+    var FileList=[];
+    var filelist =[];
+    var query = "parents in '"+folderId+"' and trashed =false";
 
-  // drive.files.copy({
-  //   fileId: '11rC3uKPv3VpVSTkXNoWEn11TmlkT9DmDRRSjMR_4kPk',
-  //   // fields: 'id, parents'
-  // }, function (err, file) {
+    async.doWhilst(function (callback1) {
+      drive.files.list({
+        q: query,
+        fields: "nextPageToken, files(id,name,mimeType,createdTime,modifiedTime,size,parents)",
+        pageSize: 1000,
+        spaces: 'drive',
+        pageToken: pageToken
+      }, function (err, res) {
+        if (err) {
+          console.log('async.doWhilst err : ',err);
+          callback(err)
+        } 
+        else {
+          async.map(res.data.files, function(file, callback2){
+            var fileinfo = {
+              'id' : file.id,
+              'name' : file.name,
+              'mimeType' : file.mimeType,
+              'modifiedTime' : file.modifiedTime,
+              'size' : file.size,
+              'parents' : folderId,
+              'depth' : Fdepth
+            };
+            filelist.push(fileinfo);
+          }, function(err, result){
+            if(err) console.log(err);
+            else {
+              console.log('Finish the File list:'+folderId);
+              callback(filelist);
+            }
+          });
+
+            filelist=filelist.concat(res.data.files);
+            pageToken = res.data.nextPageToken;
+            callback();
+        }
+      });
+      }, function () {
+      return !!pageToken;
+    }, function (err) {
+      if (err) {
+        console.log('async.doWhilst Final err : ',err);
+      }
+      else{
+        console.log(filelist);
+      }
+    });
+  }
+
+// console.time('alpha');
+recurApi('root',1);
+
+// { id: '1gd2kkvnSjz95WUM9KWePmhDc_BrAdlqq',
+// name: 'dir1',
+// mimeType: 'application/vnd.google-apps.folder',
+// parents: [ '0AGCP8EhCswtnUk9PVA' ],
+// createdTime: '2018-05-03T06:49:40.133Z',
+// modifiedTime: '2018-05-03T06:49:40.133Z' },
+
+  // drive.files.list({
+  //   q: "parents in 'root' and trashed = false",
+  //   fields: "nextPageToken, files(id,name,mimeType,createdTime,modifiedTime,size,parents)",
+  //   pageSize: 1000,
+  //   spaces: 'drive',
+  //   pageToken: pageToken
+  // }, function (err, res) {
   //   if (err) {
   //     // Handle error
-  //     console.error(err);
-  //   } else {
-  //     console.log('Folder Id: ', file.data);
+  //     console.log('first api call error : ',err);
+  //     callback(err)
+  //   } 
+  //   else {
+  //     console.log(res.data.files[0].parents[0]);
+  //     callback();
   //   }
   // });
+  
+ 
 
-
-
-      // var query = "parents in "" and trashed = false ";
-      // var Filetype = 'application/vnd.google-apps.folder';
-      // var query = "mimeType contains '"+Filetype+"' and trashed = false ";
-      // drive.files.list({
-      //   q: query,
-      //   auth: oauth2Client,
-      //   pageSize: 100,
-      //   fields: "nextPageToken, files(id,name,mimeType,createdTime,modifiedTime,size,parents)"
-      // }, function(err, response) {
-      //   if (err) {
-      //     console.log('The API returned an error 1: ' + err);
-      //     return;
-      //   }
-      //   else{
-      //     console.log(response.data.files);
-      //   }
-      // });
-});
