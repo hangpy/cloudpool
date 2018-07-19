@@ -2,55 +2,43 @@ module.exports = (function(){
   var async = require('async');
   var fs = require('fs');
 
-  var listFile = function(client, FolderID, callback){
-    client.folders.get(FolderID).then(items => {
-      var filelist = [];
-      if(FolderID!='0') {
-        var before={
-          'id' : items.parent.id,
+  var listFile = function(client, folderId, callback){
+    var filelist = [];
+    client.folders.get(folderId).then(function(folder){
+      if(folder.id!=0){
+        var iteminfo = {
+          'id' : folder.parent.id,
           'name' : '..',
-          'mimeType' : 'folder'
-        };
-        filelist.push(before);
+          'mimeType' : folder.type
+        }
+        filelist.push(iteminfo);
       }
-      async.map(items.item_collection.entries, function(item, callback_list){
-        client.folders.get(item.id).then(function(folder){
-          var iteminfo={
-            'id' : item.id,
-            'name' : item.name,
-            'mimeType' : item.type,
-            'modifiedTime' : folder.modified_at,
-            'size' : folder.size,
-            'parents' : FolderID
-          };
-          filelist.push(iteminfo);
-          callback_list(null, 'finish');
-
-        }, function(err){
-          client.files.get(item.id).then(file => {
-            var iteminfo={
+      client.folders.getItems(
+        folderId,
+        {
+          fields: 'name,size,modified_at'
+        })
+        .then(function(items){
+          async.map(items.entries, function(item, callback_list){
+            var iteminfo = {
               'id' : item.id,
               'name' : item.name,
               'mimeType' : item.type,
-              'modifiedTime' : file.modified_at,
-              'size' : file.size,
-              'parents' : FolderID
-            };
+              'modifiedTime' : item.modified_at,
+              'size' : item.size,
+              'parents' : folderId
+            }
             filelist.push(iteminfo);
-            callback_list(null, 'finish');
-          })
-        })
-      },
-      function(err,result){
-        if(err) console.log(err);
-        //list 받아오기 완료
-        else {
-          console.log('Finish the File list');
-          callback(filelist);
-        }
-
-      });
-    });
+            callback_list(null, "finish");
+          }, function(err, result){
+            if(err) console.log(err);
+            else {
+              console.log('Finish the File list');
+              callback(filelist);
+            }
+          });
+        });
+    })
   }
 
   var uploadFile = function(client, FileInfo, FolderID){
@@ -131,7 +119,8 @@ module.exports = (function(){
     client.search.query(
   	searchText,
   	{
-  		//restriction
+  		//options
+      type: 'file'
   	})
   	.then(results => {
       var filelist = [];
@@ -141,7 +130,8 @@ module.exports = (function(){
           'name' : item.name,
           'mimeType' : item.type,
           'modifiedTime' : item.modified_at,
-          'size' : item.size
+          'size' : item.size,
+          'parents' : item.parent.id
         };
         filelist.push(iteminfo);
         callback_list(null, 'finish');
@@ -158,6 +148,40 @@ module.exports = (function(){
   	});
   }
 
+  var listAllFiles = function(client, folderId, callback) {
+    client.folders.getItems(
+      folderId,
+      {
+        fields: 'name,size,modified_at'
+      })
+      .then(function(items){
+      var filelist = [];
+      async.map(items.entries, function(item, callback_list){
+        var iteminfo = {
+          'id' : item.id,
+          'name' : item.name,
+          'mimeType' : item.type,
+          'modifiedTime' : item.modified_at,
+          'size' : item.size,
+          'parents' : folderId
+        }
+        filelist.push(iteminfo);
+        if(item.type=='folder'){
+          listAllFiles(client,item.id,function(filelist_child){
+            filelist = filelist.concat(filelist_child);
+            callback_list(null, "finish");
+          });
+        } else callback_list(null, "finish");
+      }, function(err, result){
+        if(err) console.log(err);
+        else {
+          console.log('Finish the File list:'+folderId);
+          callback(filelist);
+        }
+      });
+    });
+  }
+
 
   return {
     listFile: listFile,
@@ -169,7 +193,8 @@ module.exports = (function(){
     moveFile: moveFile,
     moveFolder: moveFolder,
     thumbnail: thumbnail,
-    search: search
+    search: search,
+    listAllFiles: listAllFiles
   }
 
 })();
