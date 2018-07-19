@@ -25,7 +25,21 @@
 // //   var trid = $this.find('tr[data-id]').data('id');
 // //   $('.graph').load("google/"+trid);
 // // });
+// <!-- 한글 -> 유니코드 -->
+function replaceAll(strTemp, strValue1, strValue2){
+        while(1){
+            if( strTemp.indexOf(strValue1) != -1 )
+                strTemp = strTemp.replace(strValue1, strValue2);
+            else
+                break;
+        }
+        return strTemp;
+ }
 
+ function korToUnicode(beforename){
+    var aftername = escape(replaceAll(beforename, "\\", "%"));
+    return aftername;
+}
 
 function moveFolder_google(obj){
   var FolderID = $(obj).attr('value');
@@ -38,6 +52,7 @@ function moveFolder_box(obj){
 }
 
 function moveFolder_dropbox(obj){
-  var FolderID = $(obj).attr('value');
+  var beforeFolderID = $(obj).attr('value');
+  var FolderID = beforeFolderID.replace(" ","%20");
   $('.graph').load("dropbox/"+FolderID);
 }
