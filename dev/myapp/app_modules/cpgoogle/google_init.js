@@ -41,10 +41,12 @@ module.exports = function(usr_session, callback){
         con.release();
         throw err;
       }
+
       // usr_access_token = result[0].Gaccess;
       // usr_refresh_token = result[0].Grefresh;
-      var usr_access_token='';
-      var usr_refresh_token='';
+      var usr_access_token='ya29.Glv0Bf4DJwl6_2RXS9UOU-LoZCbiudmX9Ff1Jr8dE8kiTn-nwcYQ0rfKpy7WnBNUZhJ3M3qPEfs7QI700DROifuQwIwAFloIrZ2DkiU_FLnUxuGqEnj8bdGc6BBn';
+      var usr_refresh_token='1/hINc3cnOlfwviix4DVdr2AJURRyBAshUYMRGldoBu0-qF89GW_6dsaI7Q3-IwJV4';
+
       oauth2Client.credentials = {
         access_token: usr_access_token,
         refresh_token: usr_refresh_token
