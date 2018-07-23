@@ -1,44 +1,22 @@
 module.exports = (function(){
   var async = require('async');
   var fs = require('fs');
+  var request = require('request');
 
-  var listFile = function(client, folderId, callback){
-    var filelist = [];
-    client.folders.get(folderId).then(function(folder){
-      if(folder.id!=0){
-        var iteminfo = {
-          'id' : folder.parent.id,
-          'name' : '..',
-          'mimeType' : folder.type
-        }
-        filelist.push(iteminfo);
+  var listFileRest = function(user_id, folderId, callback){
+    var data = {
+      "user_id": user_id,
+      "folderID": folderId
+    };
+    request.post({
+        url: 'http://localhost:4000/api/box/check/',
+        body: data,
+        json: true
+      },
+      function(error, response, body) {
+        callback(body.list);
       }
-      client.folders.getItems(
-        folderId,
-        {
-          fields: 'name,size,modified_at'
-        })
-        .then(function(items){
-          async.map(items.entries, function(item, callback_list){
-            var iteminfo = {
-              'id' : item.id,
-              'name' : item.name,
-              'mimeType' : item.type,
-              'modifiedTime' : item.modified_at,
-              'size' : item.size,
-              'parents' : folderId
-            }
-            filelist.push(iteminfo);
-            callback_list(null, "finish");
-          }, function(err, result){
-            if(err) console.log(err);
-            else {
-              console.log('Finish the File list');
-              callback(filelist);
-            }
-          });
-        });
-    })
+    );
   }
 
   var uploadFile = function(client, FileInfo, FolderID){
@@ -148,43 +126,9 @@ module.exports = (function(){
   	});
   }
 
-  var listAllFiles = function(client, folderId, callback) {
-    client.folders.getItems(
-      folderId,
-      {
-        fields: 'name,size,modified_at'
-      })
-      .then(function(items){
-      var filelist = [];
-      async.map(items.entries, function(item, callback_list){
-        var iteminfo = {
-          'id' : item.id,
-          'name' : item.name,
-          'mimeType' : item.type,
-          'modifiedTime' : item.modified_at,
-          'size' : item.size,
-          'parents' : folderId
-        }
-        filelist.push(iteminfo);
-        if(item.type=='folder'){
-          listAllFiles(client,item.id,function(filelist_child){
-            filelist = filelist.concat(filelist_child);
-            callback_list(null, "finish");
-          });
-        } else callback_list(null, "finish");
-      }, function(err, result){
-        if(err) console.log(err);
-        else {
-          console.log('Finish the File list:'+folderId);
-          callback(filelist);
-        }
-      });
-    });
-  }
-
 
   return {
-    listFile: listFile,
+    listFileRest: listFileRest,
     uploadFile: uploadFile,
     downloadFile: downloadFile,
     deleteFile: deleteFile,
@@ -193,8 +137,7 @@ module.exports = (function(){
     moveFile: moveFile,
     moveFolder: moveFolder,
     thumbnail: thumbnail,
-    search: search,
-    listAllFiles: listAllFiles
+    search: search
   }
 
 })();
