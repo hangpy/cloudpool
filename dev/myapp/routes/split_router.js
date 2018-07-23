@@ -61,11 +61,20 @@ module.exports = function(){
     var fileID = req.body.name;
     console.log('fileID : ' + req.body.name);
     splitUtil.download(fileID, req, res, function(zippath){
-      splitUtil.unzip_zip4j(zippath, req, res, function(orgdir, orgfilename){
-        splitUtil.sendfile(orgdir, orgfilename, req, res);
+      splitUtil.unzip_zip4j(fileID, zippath, req, res, function(orgdir, orgfilename){
+        res.download(file, function(){
+          fs.unlink(file);
+        });
 
       });
     });
+  });
+
+
+  router.post('/rename/', function(req, res){
+    var newName =req.body.filename;
+    var splitFileID= req.body.name;
+    splitUtil.rename(splitFileID,newName);
   });
 
     return router;
