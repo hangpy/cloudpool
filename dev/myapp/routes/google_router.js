@@ -170,28 +170,59 @@ router.get('/callback', function(req, res) {
     var accessToken = tokens.access_token;
     var refreshToken = tokens.refresh_token;
 
-    console.log(accessToken);
-
-    knex('GOOGLE_CONNECT_TB').insert({
-      // todo: session에서 userID 추출
-      userID: userID,
-      accessToken_g: accessToken,
-      refreshToken_g: refreshToken
-    }).then(function() {
-      res.redirect('/');
-      knex.select('recentRefreshTime_g').from('GOOGLE_CONNECT_TB').where('userID', userID).then(function(rows) {
-        var recent_time = moment(rows[0].recentRefreshTime_g);
-        redis_client.hgetall('USER'+userID, function(err, obj){
-          var i = 1;
-          loopRefreshEvent(recent_time, EXPIRE_TIME, userID, obj.loginIndex , i, loopRefreshEvent);
-        });
-      }).catch(function(err){
-        console.log(err);
+    if(refreshToken == null){
+      knex.select('refreshToken_g').from('GOOGLE_RELIEVE_TB').where('userID', userID).then(function(rows){
+        if(rows != null){
+          refreshToken = rows[0].refreshToken_g;
+          knex('GOOGLE_CONNECT_TB').insert({
+            // todo: session에서 userID 추출
+            userID: userID,
+            accessToken_g: accessToken,
+            refreshToken_g: refreshToken
+          }).then(function() {
+            knex.delete().from('GOOGLE_RELIEVE_TB').where({userID: userID, refreshToken_g: refreshToken}).then(function(rows){
+              console.log("[INFO] " + userID + "\'S RELIEVE ROW IS DELETED FROM GOOGLE_RELIEVE_TB");
+            });
+            res.redirect('/');
+            knex.select('recentRefreshTime_g').from('GOOGLE_CONNECT_TB').where('userID', userID).then(function(rows) {
+              var recent_time = moment(rows[0].recentRefreshTime_g);
+              redis_client.hgetall('USER'+userID, function(err, obj){
+                var i = 1;
+                loopRefreshEvent(recent_time, EXPIRE_TIME, userID, obj.loginIndex , i, loopRefreshEvent);
+              });
+            }).catch(function(err){
+              console.log(err);
+            });
+          }).catch(function(err) {
+            console.log(err);
+            res.status(500);
+          });
+        } else {
+          console.log('[ERR] something is wrong when getting refresh token from google_relieve_tb');
+        }
       });
-    }).catch(function(err) {
-      console.log(err);
-      res.status(500);
-    });
+    } else {
+      knex('GOOGLE_CONNECT_TB').insert({
+        // todo: session에서 userID 추출
+        userID: userID,
+        accessToken_g: accessToken,
+        refreshToken_g: refreshToken
+      }).then(function() {
+        res.redirect('/');
+        knex.select('recentRefreshTime_g').from('GOOGLE_CONNECT_TB').where('userID', userID).then(function(rows) {
+          var recent_time = moment(rows[0].recentRefreshTime_g);
+          redis_client.hgetall('USER'+userID, function(err, obj){
+            var i = 1;
+            loopRefreshEvent(recent_time, EXPIRE_TIME, userID, obj.loginIndex , i, loopRefreshEvent);
+          });
+        }).catch(function(err){
+          console.log(err);
+        });
+      }).catch(function(err) {
+        console.log(err);
+        res.status(500);
+      });
+    }
   });
 });
 
@@ -229,7 +260,7 @@ router.get('/refresh', function(req, res) {
         .catch(function(err){
           console.log(err);
           res.send({
-            msg: "Failed refresh token, check database",
+            msg: "Failed to refresh token, check database",
             state: 0,
             err: err
           });
@@ -243,6 +274,22 @@ router.get('/refresh', function(req, res) {
   });
 });
 
+router.get('/relieve', function(req, res, next){
+  var userID = req.user.userID;
+  knex.delete().from('GOOGLE_CONNECT_TB').where('userID', userID).then(function(rows){
+    console.log("[INFO] " + userID + "\'S GOOGLE TOKEN IS RELIEVED SUCCESSFULLY");
+    res.send({
+      msg: "Relieve google connection successfully",
+      state: 1
+    });
+  }).catch(function(err){
+    console.log(err);
+    res.send({
+      msg: "Failed to relieved google token",
+      state: 0
+    })
+  });
+});
 
 router.get('/token/refresh', function(req, res, next){
   var userID = req.query.user_id;
