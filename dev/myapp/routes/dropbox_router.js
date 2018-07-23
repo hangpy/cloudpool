@@ -253,7 +253,7 @@ module.exports = function(){
 
   //upload - folder
   router.post('/upload/:id',function(req,res){
-    var folderID = '/'+req.params.id.replace(/[*]/g,"/");
+    var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
 
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
@@ -388,6 +388,17 @@ module.exports = function(){
       else{
         res.json("error");
       }
+    })
+  });
+
+  router.post('/getThumbnail/', function(req, res){
+    console.log("======getThumbnail route===========");
+    var filepath = req.body.path;
+
+    dbxutil.getThumbnailRest(req.user.userID, filepath, function(imageurl){
+      var result = [req.body.order, req.body.hashID, imageurl]
+
+       res.json(result);
     })
   });
 
