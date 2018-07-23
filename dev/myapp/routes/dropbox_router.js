@@ -352,6 +352,23 @@ module.exports = function(){
     }));
   });
 
+  router.get('/relieve', function(req, res, next){
+    var userID = req.user.userID;
+    knex.delete().from('DROPBOX_CONNECT_TB').where('userID', userID).then(function(rows){
+      console.log("[INFO] " + userID + "\'S DROPBOX TOKEN IS RELIEVED SUCCESSFULLY");
+      res.send({
+        msg: "Relieved dropbox connection successfully",
+        state: 1
+      });
+    }).catch(function(err){
+      console.log(err);
+      res.send({
+        msg: "Failed to relieved dropbox token",
+        state: 0
+      })
+    });
+  });
+
 
   //send for refresh the user file list
   router.get('/refresh', function(req, res) {

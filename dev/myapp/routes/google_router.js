@@ -279,7 +279,7 @@ router.get('/relieve', function(req, res, next){
   knex.delete().from('GOOGLE_CONNECT_TB').where('userID', userID).then(function(rows){
     console.log("[INFO] " + userID + "\'S GOOGLE TOKEN IS RELIEVED SUCCESSFULLY");
     res.send({
-      msg: "Relieve google connection successfully",
+      msg: "Relieved google connection successfully",
       state: 1
     });
   }).catch(function(err){
