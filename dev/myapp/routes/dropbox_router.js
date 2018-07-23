@@ -1,7 +1,7 @@
 module.exports = function(){
   var router = require('express').Router();
   var fs = require('fs');
-  var dbxutil=require('../app_modules/cpdropbox/dropbox_util.js');
+  var dbxutil=require('../app_modules/cpdropbox/dropbox_util');
   var formidable = require('formidable');
   var bodyParser = require('body-parser');
   var dbx_init = require('../app_modules/cpdropbox/dropbox_init');
@@ -14,10 +14,9 @@ module.exports = function(){
 
 
   //list - root
-  router.get('/folder/', (req,res)=>{
+  router.get('/folder', (req,res)=>{
       var folderID = '';
       console.log("read folder/");
-
         dbxutil.getlistRest(req.user.userID, folderID, function(filelist){
           res.render('dropbox_list',{
               FolderID : '',

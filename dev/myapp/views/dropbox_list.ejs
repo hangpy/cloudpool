@@ -116,11 +116,10 @@
                           var size = formatBytes(oneItem.size,3);
                           if(oneItem.mimeType=='folder'){
                             if(FolderID==''){
-                              //if(oneItem.name=="%"){
-                              //  var Foldername = oneItem.name+'25';
-                            //  }
-                            //  else
-                              var Foldername = oneItem.name;
+                              if(oneItem.name=="%"){
+                                var Foldername = oneItem.name+'25';
+                              }
+                              else var Foldername = oneItem.name;
                             %>
                             <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=Foldername%>">
                                <td><input type="checkbox" name="name" value="<%=oneItem.name%>" ></td>
@@ -137,11 +136,10 @@
                             <%
                             }
                             else {
-                              //if(oneItem.name=="%"){
-                              //  var Foldername = oneItem.name+'25';
-                              //}
-                              //else
-                              var Foldername = oneItem.name;
+                              if(oneItem.name=="%"){
+                                var Foldername = oneItem.name+'25';
+                              }
+                              else var Foldername = oneItem.name;
                             %>
                             <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=FolderID%>*<%=Foldername%>">
                                <td><input type="checkbox" name="name" value="<%=oneItem.name%>" ></td>
@@ -217,8 +215,6 @@
           "filename" : filename,
           "toFolder" : toFolder
         }
-        alert("filename : "+filename +" \ntoFolder :" + toFolder);
-
         $.ajax({
              type: "POST",
              url: "dropbox/move/",
