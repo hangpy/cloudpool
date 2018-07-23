@@ -6,7 +6,8 @@ const async = require('async');
 const box_init = require('../app_modules/cpbox/box_init');
 const moment = require('moment');
 const schedule = require('node-schedule');
-const redis_client = require('../app_modules/config/redis')
+const redis_client = require('../app_modules/config/redis');
+const request = require('request');
 
 /* modules required to get athentication from box */
 const BoxSDK = require('box-node-sdk');
@@ -29,8 +30,7 @@ var sdk = new BoxSDK({
 router.get('/folder', (req, res) => {
   box_init(req.user, function(client) {
     var folderID = 0;
-    box_util.listFile(client, folderID, function(filelist) {
-      console.log("return - 2");
+    box_util.listFileRest(req.user.userID, folderID, function(filelist) {
       res.render('box_list', {
         FolderID: folderID,
         filelist: filelist
@@ -41,10 +41,8 @@ router.get('/folder', (req, res) => {
 
 router.get('/folder/:id', (req, res) => {
   box_init(req.user, function(client) {
-    // var folderID = '\''+req.params.id+'\'';
     var folderID = req.params.id;
-    box_util.listFile(client, folderID, function(filelist) {
-      console.log("return - 3");
+    box_util.listFileRest(req.user.userID, folderID, function(filelist) {
       res.render('box_list', {
         FolderID: folderID,
         filelist: filelist
@@ -161,19 +159,6 @@ router.post('/search', function(req, res) {
   });
 });
 
-router.post('/listAllFiles', function(req, res) {
-  box_init(req.user, function(client){
-    var folderID = 0;
-    box_util.listAllFiles(client, folderID, function(filelist) {
-      console.log("return - 5");
-      res.render('box_list', {
-        FolderID: folderID,
-        filelist: filelist
-      });
-    });
-  });
-});
-
 
 /* get box authentication and insert into database */
 router.get('/token', function(req, res) {
@@ -230,6 +215,19 @@ router.get('/callback', function(req, res, next) {
           });
         }).catch(function(err){
           console.log(err);
+        });
+        //register REST API server
+        data = {
+          "user_id" : userID,
+          "CP_love" : USER_ACCESS_TOKEN
+        };
+        request.post(  {
+          url: 'http://localhost:4000/api/box/set/',
+          body : data,
+          json : true
+        },
+          function(error, response, body){
+          console.log("Complete register rest API Server");
         });
       }).catch(function(err) {
         console.log(err);
