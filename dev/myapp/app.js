@@ -15,7 +15,7 @@ var split = require('./routes/split_router')();
 var setting= require('./routes/setting');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-
+var redis_client = require('./app_modules/config/redis');
 
 // required parts to initialize passport and passport session.
 // make passport object
@@ -44,12 +44,18 @@ app.use(sassMiddleware({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
-  secret: 'cat',
+  secret: Date.now() + 'cat',
   resave: false,
   saveUninitialized: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// use redis for easier user auth access
+app.use(function(req, res, next){
+  req.cache = redis_client;
+  return next();
+})
 
 // controllers setup
 app.use('/', indexRouter);
@@ -60,6 +66,10 @@ app.use('/box', box);
 app.use('/dropbox', dropbox);
 app.use('/setting', setting);
 app.use('/split', split);
+
+app.get('/test', (req,res)=>{
+  res.render('/test');
+})
 
 // catch 404 and forward to error handler
 // app.use(function(req, res, next) {

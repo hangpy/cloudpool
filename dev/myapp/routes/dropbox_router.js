@@ -1,7 +1,7 @@
 module.exports = function(){
   var router = require('express').Router();
   var fs = require('fs');
-  var dbxutil=require('../app_modules/cpdropbox/dropbox_util.js');
+  var dbxutil=require('../app_modules/cpdropbox/dropbox_util');
   var formidable = require('formidable');
   var bodyParser = require('body-parser');
   var dbx_init = require('../app_modules/cpdropbox/dropbox_init');
@@ -11,12 +11,13 @@ module.exports = function(){
   const url = require('url');
   const request = require('request');
   const dropbox_auth = require('../app_modules/cpdropbox/dropbox_auth')();
+
+
   //list - root
-  router.get('/folder/', (req,res)=>{
+  router.get('/folder', (req,res)=>{
       var folderID = '';
       console.log("read folder/");
-
-        dbxutil.dbx.getlistRest(req.user.userID, folderID, function(filelist){
+        dbxutil.getlistRest(req.user.userID, folderID, function(filelist){
           res.render('dropbox_list',{
               FolderID : '',
               filelist: filelist
@@ -27,16 +28,16 @@ module.exports = function(){
   });
 
   //list - folder
-
+  //%25
   router.get('/folder/:id', (req,res)=>{
-      console.log("read folder/id");
+      console.log("-------------------------------read folder/id");
     if(req.params.id.includes('%25')){
       var name = req.params.id.replace("%25","%");
     }
-    else var name = req.params.id
-
+    else name = req.params.id
+    console.log(name);
     var folderID = '/'+name.replace(/[*]/g,"/");
-    dbxutil.dbx.getlistRest(req.user.userID, folderID, function(filelist){
+    dbxutil.getlistRest(req.user.userID, folderID, function(filelist){
       res.render('dropbox_list',{
           FolderID : req.params.id,
           filelist : filelist
@@ -49,6 +50,7 @@ module.exports = function(){
   router.post('/searchview/folder/', (req,res)=>{
       var folderID = '';
       console.log("read search folder/");
+      console.log(req.body.obj);
       var searchfilelist = JSON.parse(req.body.obj);
       res.render('dropbox_list',{
             FolderID : '',
@@ -58,12 +60,14 @@ module.exports = function(){
 
   //search list view - folder
 
+  //%25
   router.post('/searchview/folder/:id', (req,res)=>{
       console.log("read folder/id");
-    if(req.params.id.includes('%25')){
-      var name = req.params.id.replace("%25","%");
-    }
-    else var name = req.params.id
+    // if(req.params.id.includes('%25')){
+    //   var name = req.params.id.replace("%25","%");
+    // }
+    // else
+    var name = req.params.id
     var folderID = '/'+name.replace(/[*]/g,"/");
     var searchfilelist = JSON.parse(req.body.obj);
     res.render('dropbox_list',{
@@ -85,13 +89,14 @@ module.exports = function(){
   });
 
   //select list - folder
-
+  //%25
   router.post('/selectview/folder/:id', (req,res)=>{
       console.log("read folder/id");
-    if(req.params.id.includes('%25')){
-      var name = req.params.id.replace("%25","%");
-    }
-    else var name = req.params.id
+    // if(req.params.id.includes('%25')){
+    //   var name = req.params.id.replace("%25","%");
+    // }
+    // else
+    var name = req.params.id
     var folderID = '/'+name.replace(/[*]/g,"/");
     var searchfilelist = JSON.parse(req.body.obj);
     res.render('dropbox_list',{
@@ -110,7 +115,7 @@ module.exports = function(){
     var type = originName.split(".")[1];
     var newName = req.body.newname+"."+type;
     console.log("rename name : " +req.user.userID);
-    dbxutil.dbx.sendrenameRest(req.user.userID, newName, originName, FolderID, function(result){
+    dbxutil.sendrenameRest(req.user.userID, newName, originName, FolderID, function(result){
       if(result =="finish_rename_the_file"){
         res.json("finish");
       }
@@ -127,7 +132,7 @@ module.exports = function(){
     var originName = req.body.originname;
     var type = originName.split(".")[1];
     var newName = req.body.newname+"."+type;
-    dbxutil.dbx.sendrenameRest(req.user.userID, newName, originName, FolderID, function(result){
+    dbxutil.sendrenameRest(req.user.userID, newName, originName, FolderID, function(result){
       if(result =="finish_rename_the_file"){
         res.json("finish");
       }
@@ -143,8 +148,7 @@ module.exports = function(){
     var FolderID = '';
     var searchname = req.body.searchname;
     var searchFolder = req.body.searchfolder;
-    var searchtype = req.body.searchtype;
-    dbxutil.dbx.sendsearchRest(req.user.userID, searchname, searchFolder, searchtype, FolderID, function(result){
+    dbxutil.sendsearchRest(req.user.userID, searchname, searchFolder, FolderID, function(result){
         res.json(result);
     })
   });
@@ -156,7 +160,7 @@ module.exports = function(){
     var searchname = req.body.searchname;
     var searchFolder = req.body.searchfolder;
     var searchtype = req.body.searchtype;
-    dbxutil.dbx.sendsearchRest(req.user.userID, searchname, searchFolder, searchtype, FolderID, function(result){
+    dbxutil.sendsearchRest(req.user.userID, searchname, searchFolder, searchtype, FolderID, function(result){
         res.json(result);
     })
   });
@@ -166,7 +170,7 @@ module.exports = function(){
   router.post('/select/',function(req,res){
     var FolderID = '';
     var selecttype = req.body.selecttype;
-    dbxutil.dbx.sendselectRest(req.user.userID, selecttype, FolderID, function(result){
+    dbxutil.sendsearchtypeRest(req.user.userID, selecttype, FolderID, function(result){
         res.json(result);
     })
   });
@@ -176,7 +180,7 @@ module.exports = function(){
   router.post('/select/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
     var selecttype = req.body.selecttype;
-    dbxutil.dbx.sendselectRest(req.user.userID, selecttype, FolderID, function(result){
+    dbxutil.sendsearchtypeRest(req.user.userID, selecttype, FolderID, function(result){
         res.json(result);
     })
   });
@@ -184,64 +188,48 @@ module.exports = function(){
   //delete - root
 
   router.post('/delete/',function(req,res){
-    var FolderID = '';
-    var FileName = req.body.name.split("*")[0];
+    var Splitname = req.body.name.split("*");
+    console.log(Splitname);
+    var FileID = Splitname[Splitname.length-1];
+    for(var i = 0; i < Splitname.length-1 ; i++){
+      if(i==0){
+      var FolderID = Splitname[i];
+      }
+      else FolderID = FolderID +"/"+ Splitname[i];
+    }
+    if(FolderID ==undefined){
+      FolderID='';
+    }
     dbx_init(req.user, function(client){
-        dbxutil.dbx.delete(client, FileName,FolderID);
+        dbxutil.delete(client, FileID,FolderID, req.user.userID, function(result){
+          res.json(result);
+        });
     })
-
-    //삭제하고나서 리프레쉬!
-    // dbxutil.dbx.list(FolderID, function(filelist){
-    //   res.render('dropbox_list',{
-    //       FolderID : '',
-    //       filelist:filelist
-    //   });
-    // });
-
-  });
-
-  //delete -folder
-
-  router.post('/delete/:id',function(req,res){
-    var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
-    var FileName = req.body.name.split("*")[0];
-    dbx_init(req.user, function(client){
-        dbxutil.dbx.delete(client, FileName,FolderID);
-    })
-      res.redirect('dropbox/'+req.params.id);
-      //비동기 필요
-      // dbxutil.dbx.delete(FileName,FolderID);
   });
 
 
-  //download - root
+
+
 
   router.post('/download/',function(req,res){
-    var FolderID = '';
-    console.log(req.body);
-    var FileID = req.body.name.split("*")[0];
+    // var FolderID = '';
+    var Splitname = req.body.name.split("*");
+    console.log(Splitname);
+    var FileID = Splitname[Splitname.length-1];
+    for(var i = 0; i < Splitname.length-1 ; i++){
+      if(i==0){
+      var FolderID = Splitname[i];
+      }
+      else FolderID = FolderID +"/"+ Splitname[i];
+    }
+    if(FolderID ==undefined){
+      FolderID='';
+    }
+    console.log(FolderID);
     dbx_init(req.user, function(client){
-        dbxutil.dbx.download(client, FileID,FolderID,req,res);
-    })
-      //비동기 필요
-      // res.redirect('/'+FolderID);
-  });
-
-  //download - folder
-
-  router.post('/download/:id',function(req,res){
-    var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
-    var FileID = req.body.name.split("*")[0];
-
-    dbx_init(req.user, function(client){
-        dbxutil.dbx.download(client, FileID,FolderID,req,res);
+        dbxutil.download(client, FileID,FolderID,req,res);
     })
   });
-
-
-
-
-
 
 
   //upload - root
@@ -253,12 +241,11 @@ module.exports = function(){
     form.parse(req, function(err, fields, files) {
 
       var FileInfo = files.uploads_list;
-
       // console.log(FileInfo);
       // res.redirect('/'+FolderID);
       //비동기 필요
       dbx_init(req.user, function(client){
-          dbxutil.dbx.upload(client, FileInfo, FolderID);
+          dbxutil.upload(client, FileInfo, FolderID,res);
       })
 
     });
@@ -275,7 +262,7 @@ module.exports = function(){
       // res.redirect('/'+req.params.id);
       //비동기 필요
       dbx_init(req.user, function(client){
-          dbxutil.dbx.upload(client, FileInfo,FolderID);
+          dbxutil.upload(client, FileInfo,FolderID);
       })
 
     });
@@ -365,6 +352,44 @@ module.exports = function(){
     }));
   });
 
+
+  //send for refresh the user file list
+  router.get('/refresh', function(req, res) {
+    var user_id = req.user.userID;
+    console.log("Get in the refresh router");
+    var FolderDir = '';
+    dbxutil.getrefreshRest(user_id, FolderDir, function(result){
+      res.json(result);
+    });
+  });
+
+  router.post('/move/', function(req, res){
+    console.log("======move route===========");
+    var fromFile = req.body.filename;
+    var toFolder = req.body.toFolder;
+    dbxutil.movefileRest(req.user.userID, fromFile, toFolder, function(result){
+      if(result =="finish_move_the_file"){
+        res.json("finish");
+      }
+      else{
+        res.json("error");
+      }
+    })
+  });
+
+  router.post('/makeFolder/', function(req, res){
+    console.log("======makeFolder route===========");
+    var foldername = req.body.foldername;
+    console.log(foldername);
+    dbxutil.makeFolderRest(req.user.userID, foldername, function(result){
+      if(result =="finish_makefolder_the_file"){
+        res.json("finish");
+      }
+      else{
+        res.json("error");
+      }
+    })
+  });
 
   return router;
 }

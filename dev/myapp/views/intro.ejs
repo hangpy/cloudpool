@@ -12,20 +12,18 @@
     <div class="title">
       <h1>클라우드 풀에 오신걸 환영합니다~♥</h1><br>
       <h3>모든 드라이브를 한자리에서 관리해보세요!</h3>
+      <img id='intro-img' src="/icons/drive-icon/intro_whale.png" alt="출처 - 네이버 라인 스토어">
     </div>
-
     <br>
-
-
 
     <div class="link-container">
         <!-- 세션값 있을 시, register, login은 보이지 않아야 함  -->
       <% if(!isUser) { %>
-        <div class="button-link"><button type="button" class="btn btn-outline-primary"><a href="/login">로그인</a></button></div>
-        <div class="button-link"><button type="button" class="btn btn-outline-primary"><a href="/register">회원가입</a></button></div>
+        <div class="button-link"><a href="/login"><button type="button" class="btn btn-outline-primary">로그인</button></a></div>
+        <div class="button-link"><a href="/register"><button type="button" class="btn btn-outline-primary">회원가입</button></a></div>
       <% } else { %>
         <!-- 세션값 없을 시, logout은 보이지 않아야 함 -->
-        <div class="button-link"><button type="button" class="btn btn-outline-primary"><a href="/logout">로그아웃</a></button></div>
+        <div class="button-link"><a href="/logout"><button type="button" class="btn btn-outline-primary">로그아웃</button></a></div>
       <% } %>
     </div>
   </div>
@@ -51,7 +49,6 @@
     }
 
     .link-container {
-      margin-top: 150px;
       display: flex;
       justify-content: center;
     }
@@ -63,6 +60,11 @@
 
     .content {
       margin: 15px;
+    }
+
+    #intro-img {
+      width: 300px;
+      height: 300px;
     }
   </style>
 

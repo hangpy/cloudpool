@@ -10,7 +10,7 @@
   <meta name="author" content="">
   <!-- Favicon icon -->
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
-  <title>Ela - Bootstrap Admin Dashboard Template</title>
+  <title>로그인</title>
   <!-- Bootstrap Core CSS -->
   <link href="css/lib/bootstrap/bootstrap.min.css" rel="stylesheet">
   <!-- Custom CSS -->
@@ -39,27 +39,27 @@
           <div class="col-lg-4">
             <div class="login-content card">
               <div class="login-form">
-                <h4>Login</h4>
-                <form name='loginAction' action="/auth/login" method="post">
+                <h4>로그인</h4>
+                <form name='loginAction' id="loginForm" action="/auth/login" method="post">
                   <div class="form-group">
-                    <label>Email</label>
-                    <input type="text" class="form-control" name="email" placeholder="Enter your Email..">
+                    <label>이메일</label>
+                    <input type="text" class="form-control" id="email" name="email" placeholder="예시) user@email.com">
                   </div>
                   <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="form-control" name="password" placeholder="Enter your password">
+                    <label>비밀번호</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호를 입력하세요">
                   </div>
                   <div class="checkbox">
                     <label>
-        							<input type="checkbox"> Remember Me
+        							<input type="checkbox"> Remember me
                     </label>
                     <label class="pull-right">
-                      <a href="#">Forgotten Password?</a>
+                      <a href="#">비밀번호를 잊으셨나요?</a>
                     </label>
                   </div>
-                  <button type="submit" class="btn btn-primary btn-flat m-b-30 m-t-30">Sign in</button>
+                  <button type="button" onClick="login()" class="btn btn-primary btn-flat m-b-30 m-t-30">로그인</button>
                   <div class="register-link m-t-15 text-center">
-                    <p>Don't have account ? <a href="/register"> Sign Up Here</a></p>
+                    <p>계정이 없으세요? <a href="/register"> 회원가입</a></p>
                   </div>
                 </form>
               </div>
@@ -84,6 +84,26 @@
   <script src="js/lib/sticky-kit-master/dist/sticky-kit.min.js"></script>
   <!--Custom JavaScript -->
   <script src="js/scripts.js"></script>
+
+  <script>
+    function login() {
+      // 빈칸 체크
+      // 비밀번호 길이 영어숫자 확인
+      var email = $('#email').val();
+      var pw = $('#password').val();
+      var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i; // email check
+
+      if (email == '' || pw == '') {
+        alert("모든 칸을 채워주세요.");
+      } else {
+        if(!re.test(email)){
+          alert('이메일 형식을 다시 확인해 주세요');
+        } else {
+          $('#loginForm').submit();
+        }
+      }
+    }
+  </script>
 
 </body>
 
