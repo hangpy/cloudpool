@@ -24,6 +24,9 @@ $(function(){
       $('.graph').load("card");
   });
 
+  $('#split').click( function() {
+      $('.graph').load("split/");
+  });
   $('#box').click( function() {
       $('.graph').load("box/folder/");
   });

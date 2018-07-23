@@ -64,7 +64,7 @@ module.exports = (function(){
     });
   }
 
-  var uploadFileSplit = function(client, FilePath, FolderID){
+  var uploadFileSplit = function(client, FilePath, FolderID, callback){
     var splitedname = FilePath.split("\\");
     var FileName =splitedname[(splitedname.length)-1];
     var stream = fs.createReadStream(FilePath);
@@ -73,6 +73,7 @@ module.exports = (function(){
       else{
         //파일 아이디
         console.log(newfile.entries[0].id);
+        callback(newfile.entries[0].id);
       }
     });
   }
@@ -94,9 +95,9 @@ module.exports = (function(){
     client.files.getReadStream(fileId).then(stream => {
       client.files.get(fileId).then(file => {
         var fileName = file.name;
-        console.log(fileName);
-        callback(filename);
-        var output = fs.createWriteStream(__dirname+'/downloads/dis/'+fileName);
+        console.log("box fileName : "+ fileName);
+        callback(fileName);
+        var output = fs.createWriteStream('../routes/downloads/dis/'+fileName);
         stream.pipe(output);
       })
     })

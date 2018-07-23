@@ -145,7 +145,7 @@ var downloadFile = function(res, fileId,oauth2Client) {
     }).pipe(res);
 }
 
-var downloadFileSplit = function(res, fileId, oauth2Client, callback) {
+var downloadFileSplit = function(fileId, oauth2Client, callback) {
     var drive = google.drive({
       version: 'v3',
       auth: oauth2Client
@@ -162,7 +162,7 @@ var downloadFileSplit = function(res, fileId, oauth2Client, callback) {
         return;
       }
       console.log('Downloading %s...', metadata.name);
-      downpath_google=__dirname+'/downloads/dis/'+metadata.name;
+      downpath_google='../routes/downloads/dis/'+metadata.name;
       dest = fs.createWriteStream(downpath_google);
       callback(downpath_google);
     }).pipe(dest);
@@ -224,7 +224,7 @@ var downloadFileSplit = function(res, fileId, oauth2Client, callback) {
   }
 
 
-    var uploadFileSplit = function(FilePath, Folder, oauth2Client) {
+    var uploadFileSplit = function(FilePath, Folder, oauth2Client, callback) {
         var drive = google.drive({
           version: 'v3',
           auth: oauth2Client
@@ -286,7 +286,7 @@ var downloadFileSplit = function(res, fileId, oauth2Client, callback) {
               console.error(err);
             } else {
               console.log('Uploaded!');
-
+              callback(file.data.id);
             }
           });
         }

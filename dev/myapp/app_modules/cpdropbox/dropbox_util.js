@@ -168,26 +168,25 @@ const UTIL = (function(){
           }
           var dropdownpath;
           var fullname = Filename.split(".");
-          var mimetype = mime.getType(fullname[fullname.length-1]);
+          var mimetype = 'application/octet-stream';
           // var mimetype = mime.lookup(totalDir);
           //zo3 같이 분할 파일은 null값
           var URL = dbx.filesGetTemporaryLink({path: totalDir});
-          console.log(mimetype);
-          console.log(Filename);
+          console.log('dbx mimetype: '+mimetype);
+          console.log('dbx filename:' + Filename);
           var newFileName = encodeURIComponent(Filename);
-          res.setHeader('Content-disposition', 'attachment; filename*=UTF-8\'\''+newFileName); //origFileNm으로 로컬PC에 파일 저장
-          res.setHeader('Content-type', mimetype);
+          // res.setHeader('Content-disposition', 'attachment; filename*=UTF-8\'\''+newFileName); //origFileNm으로 로컬PC에 파일 저장
+          // res.setHeader('Content-type', mimetype);
           URL.then(function(result){
-            dropdownpath=__dirname+'/downloads/dis/'+savefilename;
-            callback(dropdownpath);
+            dropdownpath='../routes/downloads/dis/'+Filename;
             var output = fs.createWriteStream(dropdownpath);
             var request = https.get(result.link, function(file) {
               // console.log(URL);
               console.log(output);
               file.pipe(output).on('finish', () => {
-                totalpath=totalpath+",M,"+dropdownpath;
               });
           });
+          callback(dropdownpath);
         // });
 
       });
