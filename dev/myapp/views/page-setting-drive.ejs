@@ -22,7 +22,7 @@
     </div>
     <div>
       <% if(google_state > 0) { %>
-      <button type="button" class="btn btn-danger m-b-10 m-l-5">연결해제</button>
+      <button type="button" id="google_relieve_btn" class="btn btn-danger m-b-10 m-l-5">연결해제</button>
       <button type="button" id="google_refresh_btn" class="btn btn-danger m-b-10 m-l-5">리프래쉬</button>
       <% } else { %>
       <a href="<%= google_url %>"><button type="button" class="btn btn-info m-b-10 m-l-5">연결하기</button></a>
@@ -107,7 +107,30 @@
     }).done(function() {
 
     });
-  })
+  });
+
+  $('#google_relieve_btn').click(function(){
+    var result = confirm('정말로 구글 연동을 해제하시겠습니까?');
+    if(result){
+      $.ajax({
+        type: "GET",
+        url: "/google/relieve",
+        success: function(data){
+          if(data.state){
+            alert(data.msg);
+            $('.graph').load("setting/page-setting-drive");
+          } else {
+            alert("?");
+          }
+        }
+      }).done(function() {
+
+      });
+    } else {
+
+    }
+  });
+
   $('#box_refresh_btn').click(function(){
     $.ajax({
       type: "GET",
@@ -121,6 +144,6 @@
     }).done(function() {
 
     });
-  })
+  });
 
 </script>
