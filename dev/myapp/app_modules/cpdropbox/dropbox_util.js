@@ -417,7 +417,25 @@ const UTIL = (function() {
     // });
   };
 
-
+  var getThumbnailRest = function(user_id, filepath, callback){
+    var user_id = user_id;
+    console.log("==========getThumbnailRest=======");
+    // var accesstoken = dbx.accessToken;
+    var data = {
+      "user_id": user_id,
+      "filepath": filepath
+    };
+    request.post({
+        url: 'http://localhost:4000/api/dropbox/getThumbnail/',
+        body: data,
+        json: true
+      },
+      function(error, body) {
+      
+        callback(body.body.entries[0].thumbnail);
+      }
+    );
+  }
 
 
 
@@ -435,7 +453,8 @@ const UTIL = (function() {
       sendsearchtypeRest: sendsearchtypeRest,
       getrefreshRest: getrefreshRest,
       movefileRest : movefileRest,
-      makeFolderRest : makeFolderRest
+      makeFolderRest : makeFolderRest,
+      getThumbnailRest : getThumbnailRest
 
   }
 

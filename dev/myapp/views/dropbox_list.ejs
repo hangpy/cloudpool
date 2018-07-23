@@ -14,7 +14,6 @@
           <button type="button" onclick='UploadSubmit()' >업로드</button>
 
         </form> -->
-
     <form id="file_form" name='action_dropbox' method='post'>
         <button type="button" onClick='Submit(1)' >다운로드</button>
         <button type="button" onClick='Delete()' >삭제</button>
@@ -60,9 +59,9 @@
                   <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>">
                      <td></td>
                       <td></td>
+                      <td><img src="icons/filetype-icon/back.png"></td>
                       <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
                       <td><a data-id=' ' href="#" onclick ="moveFolder_dropbox(this)" value="folder/">/</a></td>
-                      <td></td>
                       <td></td>
                       <td></td>
                   </tr>
@@ -86,18 +85,67 @@
 
                 %>
                 <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>">
-                   <td></td>
-                    <td></td>
+                   <td data-id='<%=beforeFolder%>'></td>
+                    <td data-id='<%=beforeFolder%>'></td>
+                    <td data-id='<%=beforeFolder%>'><img src="icons/filetype-icon/back.png"></td>
                     <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                    <td >
+                    <td data-id='<%=beforeFolder%>'>
                       <a data-id='<%=beforeFolder%>' href="#" onclick ="moveFolder_dropbox(this)" value='folder/<%=beforeFolder%>' ><%=beforeFolderName%></a></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td data-id='<%=beforeFolder%>'></td>
+                    <td data-id='<%=beforeFolder%>'></td>
                 </tr>
                   <%
                 }
                 <!-- 한글 -> 유니코드 -->
+                function getImagePath(name){
+                    var splitdata = name.split(".");
+                    var mimetype = splitdata[splitdata.length-1];
+                    var imagesrc='';
+                    if(mimetype=='jpg'||mimetype=='jpeg'||mimetype=='png'||mimetype=='tiff'||mimetype=='tif'||mimetype=='gif'||mimetype=='bmp'){
+                      imagesrc='icons/filetype-icon/jpg.png'
+                    }
+                    else if(mimetype==='avi'){
+                      imagesrc='icons/filetype-icon/avi.png';
+                    }
+                    else if(mimetype==='csv'){
+                      imagesrc='icons/filetype-icon/csv.png';
+                    }
+                    else if(mimetype==='doc'){
+                      imagesrc='icons/filetype-icon/doc.png';
+                    }
+                    else if(mimetype==='iso'){
+                      imagesrc='icons/filetype-icon/iso.png';
+                    }
+                    else if(mimetype==='mp3'){
+                      imagesrc='icons/filetype-icon/mp3.png';
+                    }
+                    else if(mimetype==='mp4'){
+                      imagesrc='icons/filetype-icon/mp4.png';
+                    }
+                    else if(mimetype==='pdf'){
+                      imagesrc='icons/filetype-icon/pdf.png';
+                    }
+                    else if(mimetype==='ppt'||mimetype=='pptx'){
+                      imagesrc='icons/filetype-icon/ppt.png';
+                    }
+                    else if(mimetype==='svg'){
+                      imagesrc='icons/filetype-icon/svg.png';
+                    }
+                    else if(mimetype==='txt'){
+                      imagesrc='icons/filetype-icon/txt.png';
+                    }
+                    else if(mimetype==='xls'){
+                      imagesrc='icons/filetype-icon/xls.png';
+                    }
+                    else if(mimetype==='zip'){
+                      imagesrc='icons/filetype-icon/zip.png';
+                    }
+                    else{
+                      imagesrc='icons/filetype-icon/file.png';
+                    }
+
+                    return imagesrc;
+                }
 
 
                   <!--byte to kb,mb,gb  -->
@@ -114,6 +162,7 @@
                        {
                           var oneItem = filelist[i];
                           var size = formatBytes(oneItem.size,3);
+
                           if(oneItem.mimeType=='folder'){
                             if(FolderID==''){
                               if(oneItem.name=="%"){
@@ -123,15 +172,15 @@
                             %>
                             <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=Foldername%>">
                                <td><input type="checkbox" name="name" value="<%=oneItem.name%>" ></td>
-                                <td><%=i%></td>
+                                <td data-id='<%=Foldername%>'><%=i%></td>
+                                <td data-id='<%=Foldername%>'><img name="imgsrc" src="icons/filetype-icon/folder.png"></td>
                                 <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
                                 <td data-id='<%=Foldername%>'>
                                   <!-- <a href="/dropbox/<%=Foldername%>" id="Folder_<%=i%>" value="<%=Foldername%>"> -->
 
                                   <a href="#" onclick ="moveFolder_dropbox(this)" value='folder/<%=Foldername%>' ><%=oneItem.name%></a></td>
-                                <td><%=oneItem.mimeType%></td>
-                                <td><%=oneItem.modifiedTime%></td>
-                                <td><%=size%></td>
+                                <td data-id='<%=Foldername%>'><%=oneItem.modifiedTime%></td>
+                                <td data-id='<%=Foldername%>'><%=size%></td>
                             </tr>
                             <%
                             }
@@ -142,15 +191,15 @@
                               else var Foldername = oneItem.name;
                             %>
                             <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=FolderID%>*<%=Foldername%>">
-                               <td><input type="checkbox" name="name" value="<%=oneItem.name%>" ></td>
-                                <td><%=i%></td>
+                               <td data-id='<%=FolderID%>*<%=Foldername%>'><input type="checkbox" name="name" value="<%=oneItem.name%>" ></td>
+                                <td data-id='<%=FolderID%>*<%=Foldername%>'><%=i%></td>
+                                <td data-id='<%=FolderID%>*<%=Foldername%>'><img name="imgsrc" src="icons/filetype-icon/folder.png"></td>
                                 <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
                                 <td data-id='<%=FolderID%>*<%=Foldername%>'>
                                   <!-- <a href="/dropbox/<%=FolderID%>*<%=Foldername%>"  id="Folder_<%=i%>" value="<%=FolderID%>*<%=Foldername%>"> -->
                                   <a href="#" onclick ="moveFolder_dropbox(this)" value='folder/<%=FolderID%>*<%=Foldername%>'><%=oneItem.name%></a></td>
-                                <td><%=oneItem.mimeType%></td>
-                                <td><%=oneItem.modifiedTime%></td>
-                                <td><%=size%></td>
+                                <td data-id='<%=FolderID%>*<%=Foldername%>'><%=oneItem.modifiedTime%></td>
+                                <td data-id='<%=FolderID%>*<%=Foldername%>'><%=size%></td>
                             </tr>
                             <%
                             }
@@ -167,13 +216,14 @@
                               }
                             }
                             filename = filename + "*" + oneItem.name;
+                            <!--여기서 이미지 파일이면 xhr 요청하고 받자  -->
 
                             %>
                           <tr ondragstart="dragStart(event)" draggable="true" value="<%=filename%>">
                              <td><input type="checkbox" name="name" value="<%=filename%>" ></td>
                               <td><%=i%></td>
+                              <td><img name="imgsrc" src="<%=getImagePath(oneItem.name)%>"></td>
                               <td><%=oneItem.name%></td>
-                              <td><%=oneItem.mimeType%></td>
                               <td><%=oneItem.modifiedTime%></td>
                               <td><%=size%></td>
                           </tr>
@@ -189,6 +239,7 @@
   </div>
 
   <script language=javascript>
+
     function checkSpace(str) { if(str.search(/\s/) != -1) { return true; } else { return false; } }
     function removeSpace(str){
         if(checkSpace(str)){
@@ -509,6 +560,17 @@
         });
     }
 
+    String.prototype.hashCode = function() {
+      var hash = 0, i, chr;
+      if (this.length === 0) return hash;
+      for (i = 0; i < this.length; i++) {
+        chr   = this.charCodeAt(i);
+        hash  = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+      }
+      return hash;
+    };
+
     function CreateFolder(){
       var foldername = action_dropbox.foldername.value;
       var presentFolder = "<%=FolderID%>";
@@ -543,7 +605,49 @@
            }
         });
     }
+    $(function() {
+      var length = action_dropbox.name.length;
+      for(i=0; i<length; i++){
+         if(action_dropbox.imgsrc[i].src == 'http://localhost:3000/icons/filetype-icon/jpg.png'){
+           var hashID = action_dropbox.name[i].value.hashCode();
+           var body= {
+             "order" : i,
+             "hashID" : hashID,
+             "path" : action_dropbox.name[i].value
+           }
+           $.ajax({
+                type: "POST",
+                url: "dropbox/getThumbnail/",
+                async: true,
+                data: body,
+                dataType: "JSON",
+                success: function(json) {
+                  try{
+                    var hashCheck=action_dropbox.name[json[0]].value.hashCode();
+                    if(hashCheck ==json[1]){
+                      action_dropbox.imgsrc[json[0]].src="data:image/jpeg;base64,"+json[2];
+                    }
+                  }
+                  catch(error){
 
+                  }
+
+                },
+                beforeSend:function(){
+                    // (이미지 보여주기 처리)
+                  // $('.wrap-loading').removeClass('display-none');
+                },complete:function(){
+                    // (이미지 감추기 처리)
+                // $('.wrap-loading').addClass('display-none');
+                },
+                error: function(error) {
+                   console.log(error);
+                }
+             });
+
+         }
+       }
+    });
 
   </script>
   <style type="text/css" >
