@@ -265,21 +265,6 @@ router.get('/refresh', function(req, res) {
             })
             .then(function() {
 
-<<<<<<< HEAD
-              var data = {
-                "user_id": userID,
-                "accesstoken": new_accessToken_b
-              };
-              request.post({
-                url: 'http://localhost:4000/api/box/refresh/token/',
-                body: data,
-                json: true
-              }, function(error, response, body){
-                console.log('[INFO] ' + userID + '\'S BOX REFERSH TOKEN RESULT: ' + body);
-              });
-
-=======
->>>>>>> dev
               res.send({
                 msg: "Access token is refreshed successfully",
                 state: 1
@@ -369,8 +354,6 @@ var refreshBoxToken = function(userID) {
             console.log('[INFO] ' + userID + ' USER\'S BOX ACCESS TOKEN IS REFRESHED SUCCESSFULLY!');
             knex.select('recentRefreshTime_b').from('BOX_CONNECT_TB').where('userID', userID)
               .then(function(rows) {
-<<<<<<< HEAD
-=======
                 var data = {
                   "user_id": userID,
                   "accesstoken": new_accessToken_b
@@ -382,7 +365,6 @@ var refreshBoxToken = function(userID) {
                 }, function(error, response, body){
                   console.log('[INFO] ' + userID + '\'S BOX REFERSH TOKEN RESULT: ' + body);
                 });
->>>>>>> dev
                 resolve(moment(rows[0].recentRefreshTime_b));
               }).catch(function(err) {
                 console.log(err)
