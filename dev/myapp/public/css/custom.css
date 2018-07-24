@@ -172,3 +172,47 @@ ul.contextMenu li:last-child{
 ul.contextMenu li:last-child a{width:26%;}
 ul.contextMenu li:last-child:hover a{color:#2c3e50}
 ul.contextMenu li:last-child:hover a:hover{color:#2980b9}
+
+
+/* Intro Page */
+.masthead h1 {
+  font-size: 4rem;
+  margin: 0;
+  padding: 0;
+  color: #f8f9fa;
+}
+
+@media (min-width: 992px) {
+  .masthead {
+    height: 100vh;
+  }
+  .masthead h1 {
+    font-size: 5.5rem;
+    color: #f8f9fa;
+  }
+}
+
+.text-center {
+    text-align: center!important;
+    margin-top: 50px !important;
+    margin-bottom: 100px !important;
+}
+
+.masthead .text-center .mb-5, .my-5 {
+    color: #f8f9fa;
+    font-size: 3.5rem;
+    font-weight: lighter;
+}
+
+.mb-5 em {
+  font-style:normal !important;
+}
+.intro-button-group .btn {
+  font-weight: 700;
+  margin: 2rem;
+  padding: 1.0rem 2.5rem;
+}
+
+.masthead {
+  padding-top: 4rem;
+}

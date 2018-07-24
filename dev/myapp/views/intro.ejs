@@ -20,11 +20,14 @@
 
     <!-- Custom CSS -->
     <link href="css/intro/stylish-portfolio.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
 
   </head>
 
   <body id="page-top">
+
     <!-- Navigation -->
+    <!--
     <a class="menu-toggle rounded" href="#">
       <i class="fa fa-bars"></i>
     </a>
@@ -50,21 +53,30 @@
         </li>
       </ul>
     </nav>
+    -->
 
     <!-- Header -->
     <header class="masthead d-flex">
       <div class="container text-center my-auto">
         <h1 class="mb-1">Cloud Pool</h1>
         <h3 class="mb-5">
-          <em>모든 드라이브를 한자리에서 관리하자!</em>
+          <em>내가 등록한 클라우드 드라이브들을 모두 한 자리에서 관리하자!</em>
         </h3>
-        <a class="btn btn-primary btn-xl js-scroll-trigger" href="/login">로그인</a>
-        <a class="btn btn-primary btn-xl js-scroll-trigger" href="/register">회원가입</a>
+        <div class="intro-button-group">
+        <% if(!isUser) { %>
+          <a class="btn btn-xl btn-light mr-4" href="/login">로그인</a>
+          <a class="btn btn-xl btn-dark" href="/register">등록하기</a>
+        <% } else { %>
+          <a class="btn btn-xl btn-light mr-4" href="/logout">로그아웃</a>
+        <% } %>
+        </div>
       </div>
       <div class="overlay"></div>
     </header>
 
+
     <!-- About -->
+    <!--
     <section class="content-section bg-light" id="about">
       <div class="container text-center">
         <div class="row">
@@ -77,69 +89,70 @@
         </div>
       </div>
     </section>
+    -->
 
     <!-- Services -->
     <section class="content-section bg-primary text-white text-center" id="services">
       <div class="container">
         <div class="content-section-heading">
-          <h3 class="text-secondary mb-0">Services</h3>
-          <h2 class="mb-5">What We Offer</h2>
+          <h3 class="text-secondary mb-0">Services</h3><br>
+          <h2 class="mb-5">제공되는 기능</h2>
         </div>
         <div class="row">
           <div class="col-lg-3 col-md-6 mb-5 mb-lg-0">
             <span class="service-icon rounded-circle mx-auto mb-3">
-              <i class="icon-screen-smartphone"></i>
+              <img id="google-img" src="icons\drive-icon\google.png" alt="">
             </span>
             <h4>
-              <strong>Responsive</strong>
+              <strong>구글연동</strong>
             </h4>
-            <p class="text-faded mb-0">Looks great on any screen size!</p>
+            <!-- <p class="text-faded mb-0">Looks great on any screen size!</p> -->
           </div>
           <div class="col-lg-3 col-md-6 mb-5 mb-lg-0">
             <span class="service-icon rounded-circle mx-auto mb-3">
-              <i class="icon-pencil"></i>
+              <img id="dropbox_img" src="icons\drive-icon\dropbox.png" alt="">
             </span>
             <h4>
-              <strong>Redesigned</strong>
+              <strong>드랍박스 연동</strong>
             </h4>
-            <p class="text-faded mb-0">Freshly redesigned for Bootstrap 4.</p>
+            <!-- <p class="text-faded mb-0">Freshly redesigned for Bootstrap 4.</p> -->
           </div>
           <div class="col-lg-3 col-md-6 mb-5 mb-md-0">
             <span class="service-icon rounded-circle mx-auto mb-3">
-              <i class="icon-like"></i>
+              <img id="box-img" src="icons\drive-icon\box_blue.png" alt="">
             </span>
             <h4>
-              <strong>Favorited</strong>
+              <strong>박스 연동</strong>
             </h4>
-            <p class="text-faded mb-0">Millions of users
+            <!-- <p class="text-faded mb-0">Millions of users
               <i class="fa fa-heart"></i>
-              Start Bootstrap!</p>
+              Start Bootstrap!</p> -->
           </div>
           <div class="col-lg-3 col-md-6">
             <span class="service-icon rounded-circle mx-auto mb-3">
-              <i class="icon-mustache"></i>
+              <i class="fa fa-upload"></i>
             </span>
             <h4>
-              <strong>Question</strong>
+              <strong>통합 분할 업로드</strong>
             </h4>
-            <p class="text-faded mb-0">I mustache you a question...</p>
+            <!-- <p class="text-faded mb-0">I mustache you a question...</p> -->
           </div>
         </div>
       </div>
     </section>
 
     <!-- Callout -->
-    <section class="callout">
+    <!-- <section class="callout">
       <div class="container text-center">
         <h2 class="mx-auto mb-5">Welcome to
           <em>your</em>
           next website!</h2>
         <a class="btn btn-primary btn-xl" href="https://startbootstrap.com/template-overviews/stylish-portfolio/">Download Now!</a>
       </div>
-    </section>
+    </section> -->
 
     <!-- Portfolio -->
-    <section class="content-section" id="portfolio">
+    <!-- <section class="content-section" id="portfolio">
       <div class="container">
         <div class="content-section-heading text-center">
           <h3 class="text-secondary mb-0">Portfolio</h3>
@@ -192,25 +205,25 @@
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- Call to Action -->
-    <section class="content-section bg-primary text-white">
+    <!-- <section class="content-section bg-primary text-white">
       <div class="container text-center">
         <h2 class="mb-4">The buttons below are impossible to resist...</h2>
         <a href="#" class="btn btn-xl btn-light mr-4">Click Me!</a>
         <a href="#" class="btn btn-xl btn-dark">Look at Me!</a>
       </div>
-    </section>
+    </section> -->
 
     <!-- Map -->
-    <section id="contact" class="map">
+    <!-- <section id="contact" class="map">
       <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=Twitter,+Inc.,+Market+Street,+San+Francisco,+CA&amp;aq=0&amp;oq=twitter&amp;sll=28.659344,-81.187888&amp;sspn=0.128789,0.264187&amp;ie=UTF8&amp;hq=Twitter,+Inc.,+Market+Street,+San+Francisco,+CA&amp;t=m&amp;z=15&amp;iwloc=A&amp;output=embed"></iframe>
       <br/>
       <small>
         <a href="https://maps.google.com/maps?f=q&amp;source=embed&amp;hl=en&amp;geocode=&amp;q=Twitter,+Inc.,+Market+Street,+San+Francisco,+CA&amp;aq=0&amp;oq=twitter&amp;sll=28.659344,-81.187888&amp;sspn=0.128789,0.264187&amp;ie=UTF8&amp;hq=Twitter,+Inc.,+Market+Street,+San+Francisco,+CA&amp;t=m&amp;z=15&amp;iwloc=A"></a>
       </small>
-    </section>
+    </section> -->
 
     <!-- Footer -->
     <footer class="footer text-center">
@@ -232,7 +245,7 @@
             </a>
           </li>
         </ul>
-        <p class="text-muted small mb-0">Copyright &copy; Your Website 2017</p>
+        <p class="text-muted small mb-0">Copyright &copy; CloudPool 2018</p>
       </div>
     </footer>
 
