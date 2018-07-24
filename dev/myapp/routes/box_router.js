@@ -49,8 +49,7 @@ router.get('/folder/:id', (req, res) => {
 
 router.post('/folder/refresh/', (req, res) => {
   box_util.refreshFileRest(req.user.userID, function(result) {
-    console.log("refresh filelist : "+result);
-    res.redirect('/');
+    res.json(result)
   });
 });
 

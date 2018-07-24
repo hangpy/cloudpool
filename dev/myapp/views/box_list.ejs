@@ -65,6 +65,9 @@
                 %>
       </table>
 </form>
+<p></p>
+<button type="button" onClick='Refresh()'>파일 리스트 최신화</button>
+<p></p>
 <form action='box/rename/file' method='post' enctype="multipart/form-data">
   <button type="submit" >파일 이름바꾸기</button>
 </form>
@@ -83,9 +86,6 @@
 <form action='box/search' method='post' enctype="multipart/form-data">
   <button type="submit" >검색</button>
 </form>
-<form action='box/folder/refresh' method='post' enctype="multipart/form-data">
-  <button type="submit" >새로고침</button>
-</form>
 </body>
 <script>
   function Submit(index){
@@ -98,11 +98,27 @@
     }
     document.action_box.submit();
   };
-  var UploadSubmit = function (){
+
+  function UploadSubmit(){
       uploadform.action='box/upload/<%=FolderID%>';
       uploadform.submit();
       // $('.replace').load("box/<%=FolderID%>");
   };
+
+  function Refresh() {
+    $.ajax({
+      type: "POST",
+      url: "box/folder/refresh/",
+      async: false,
+      success: function(json) {
+        console.log(json);
+        $('.replace').load("box/folder/<%=FolderID%>");
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  }
 
 </script>
 <script src="js/loadfolder.js"></script>
