@@ -13,7 +13,7 @@
 $(function(){
 
   $('#split').click( function() {
-      $('.replace').load("split/");
+      $('.replace').load("split/folder/");
   });
 
   $('#box').click( function() {

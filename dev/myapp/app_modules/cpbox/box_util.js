@@ -9,14 +9,27 @@ module.exports = (function(){
       "folderID": folderId
     };
     request.post({
-        url: 'http://localhost:4000/api/box/check/',
-        body: data,
-        json: true
-      },
-      function(error, response, body) {
-        callback(body.list);
-      }
-    );
+      url: 'http://localhost:4000/api/box/check/',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body.list);
+    });
+  }
+
+  var refreshFileRest = function(user_id, callback){
+    var data = {
+      "user_id": user_id
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/refresh/filelist',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body);
+    });
   }
 
   var uploadFile = function(client, FileInfo, FolderID){
@@ -157,6 +170,7 @@ module.exports = (function(){
 
   return {
     listFileRest: listFileRest,
+    refreshFileRest: refreshFileRest,
     uploadFile: uploadFile,
     uploadSplit: uploadFileSplit,
     downloadFile: downloadFile,

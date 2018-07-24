@@ -28,26 +28,29 @@ var sdk = new BoxSDK({
 });
 
 router.get('/folder', (req, res) => {
-  box_init(req.user, function(client) {
-    var folderID = 0;
-    box_util.listFileRest(req.user.userID, folderID, function(filelist) {
-      res.render('box_list', {
-        FolderID: folderID,
-        filelist: filelist
-      });
+  var folderID = 0;
+  box_util.listFileRest(req.user.userID, folderID, function(filelist) {
+    res.render('box_list', {
+      FolderID: folderID,
+      filelist: filelist
     });
   });
 });
 
 router.get('/folder/:id', (req, res) => {
-  box_init(req.user, function(client) {
-    var folderID = req.params.id;
-    box_util.listFileRest(req.user.userID, folderID, function(filelist) {
-      res.render('box_list', {
-        FolderID: folderID,
-        filelist: filelist
-      });
+  var folderID = req.params.id;
+  box_util.listFileRest(req.user.userID, folderID, function(filelist) {
+    res.render('box_list', {
+      FolderID: folderID,
+      filelist: filelist
     });
+  });
+});
+
+router.post('/folder/refresh/', (req, res) => {
+  box_util.refreshFileRest(req.user.userID, function(result) {
+    console.log("refresh filelist : "+result);
+    res.redirect('/');
   });
 });
 
@@ -218,8 +221,8 @@ router.get('/callback', function(req, res, next) {
         });
         //register REST API server
         data = {
-          "user_id": userID,
-          "CP_love": USER_ACCESS_TOKEN
+          "user_id" : userID,
+          "accesstoken" : USER_ACCESS_TOKEN
         };
         request.post({
             url: 'http://localhost:4000/api/box/set/',
