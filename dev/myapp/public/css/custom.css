@@ -144,6 +144,10 @@ ul.contextMenu li{
   border-bottom:1px solid #ecf0f1;
 }
 
+ul.contextMenu li i{
+  margin-right: 15px;
+}
+
 ul.contextMenu li a{
   color:#333;
   text-decoration:none;
