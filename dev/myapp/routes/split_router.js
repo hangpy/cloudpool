@@ -16,14 +16,35 @@ module.exports = function(){
   //
   router.use(bodyParser.urlencoded({ extended: false }));
   router.use(bodyParser.json());
-  router.get('/', (req, res)=>{
+
+  router.get('/folder/', (req, res)=>{
     console.log('split main');
     splitUtil.loadData(req.user.userID, function(rows){
-      res.render('split_list',{
-      FolderID : '',
-      filelist : rows
+      splitUtil.directory(rows, 1, '',function(childList, folderList){
+        console.log('childList : '+childList);
+        console.log('folderList : '+folderList);
+        res.render('split_list',{
+          FolderID : '',
+          filelist : childList,
+          folderlist: folderList
+        });
+      });
     });
   });
+
+  router.get('/folder/:id', (req, res)=>{
+    console.log('split main');
+    var head = req.body.head;
+    var depth = req.body.depth;
+    splitUtil.loadData(req.user.userID, function(rows){
+      splitUtil.directory(rows, depth, head,function(childList, folderList){
+        res.render('split_list',{
+          FolderID : head,
+          filelist : childList,
+          folderlist: folderList
+        });
+      });
+    });
   });
 //
   router.post('/upload/', upload.single('userfile'), function(req, res)
@@ -62,10 +83,9 @@ module.exports = function(){
     console.log('fileID : ' + req.body.name);
     splitUtil.download(fileID, req, res, function(zippath){
       splitUtil.unzip_zip4j(fileID, zippath, req, res, function(orgdir, orgfilename){
-        res.download(file, function(){
-          fs.unlink(file);
+        res.download(orgdir, function(){
+          fs.unlink(orgdir);
         });
-
       });
     });
   });
@@ -75,6 +95,16 @@ module.exports = function(){
     var newName =req.body.filename;
     var splitFileID= req.body.name;
     splitUtil.rename(splitFileID,newName);
+
+  });
+
+  router.post('/folder/', function(req,res){
+
+
+  })
+
+  router.post('/folder/:id', function(req, res){
+
   });
 
     return router;

@@ -346,7 +346,81 @@ var loadData = function(userID, callback){
   });
 }
 
-var directory = function(path){
+var directory = function(rows, depth, head, callback){
+  var childList = [];
+  var folderList = [];
+  async.map(rows, function(row, callback_list){
+    console.log("parent : "+row.parents);
+
+    if(row.parent=="/"){
+      console.log("root : "+row.parents);
+      childList.push(row);
+      callback_list(null, "finish");
+    }else{
+      var path = row.parents.split('/');
+
+      console.log("path.length : "+path.length);
+      console.log('head : '+ head) ;
+      console.log("path[depth] : "+path[depth]);
+      //root는 depth 1
+      if(path.length-1 == depth && head == path[depth]){
+        childList.push(row);
+        console.log('child push');
+      }else if(path[depth]==head && path.length-1 > depth)
+        console.log('path[depth+1] : ' + path[depth+1]);
+        console.log('path[depth] : '+  path[depth]);
+        var folder = {
+          "name" : path[depth],
+          "parent" : path[depth-1]
+        };
+        console.log('folder name : '+folder.name);
+        console.log('folder parent : '+folder.parent);
+        folderList.push(folder);
+        console.log('folder push');
+        callback_list(null, "finish");
+      }
+  },
+  function(err, result){
+    if(err){console.log(err);}
+    else {
+      console.log(childList);
+      console.log(folderList);
+      callback(childList, folderList);
+    }
+  });
+    // for(var i =0; i<rows.length; i++){
+    //     console.log("parent : "+rows[i].parents);
+    //
+    //   if(rows[i].parent=="/"){
+    //     console.log("root : "+rows[i].parents);
+    //     childList.push(rows[i]);
+    //     i++;
+    //   }
+    //
+    //   var path = rows[i].parents.split('/');
+    //   var childList = [];
+    //   var folderList = [];
+    //   console.log("path.length : "+path.length);
+    //   console.log('head : '+ head) ;
+    //   console.log("path[depth] : "+path[depth]);
+    //   //root는 depth 1
+    //   if(path.length-1 == depth && head == path[depth]){
+    //     childList.push(rows[i]);
+    //     console.log('child push');
+    //   }else if(path[depth]==head && path.length-1 > depth)
+    //     console.log('path[depth+1] : ' + path[depth+1]);
+    //     console.log(' path[depth] : '+  path[depth]);
+    //     var folder = {
+    //       "name" : path[depth+1],
+    //       "parent" : path[depth]
+    //     };
+    //     console.log('folder name : '+folder.name);
+    //     console.log('folder parent : '+folder.parent);
+    //     folderList.push(folder);
+    //     console.log('folder push');
+    // }
+    // callback(childList, folderList);
+
 
 }
 
@@ -370,8 +444,6 @@ var rename = function(splitFileID, newName){
     console.log("SQL Error");
     console.log(err);
   });
-
-
 
 }
 
