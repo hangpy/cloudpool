@@ -408,7 +408,7 @@ module.exports = function(){
     })
   });
 
-  router.post('/getThumbnail/', function(req, res){
+  router.post('/thumbnail/', function(req, res){
     console.log("======getThumbnail route===========");
     var filepath = req.body.path;
 
