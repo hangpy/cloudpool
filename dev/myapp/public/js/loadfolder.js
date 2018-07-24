@@ -56,3 +56,9 @@ function moveFolder_dropbox(obj){
   var FolderID = beforeFolderID.replace(/[ ]/g,"%20");
   $('.replace').load("dropbox/"+FolderID);
 }
+
+function moveFolder_split(obj){
+  var FolderID = $(obj).attr('value');
+
+  $('.replace').load("split/folder/"+FolderID);
+}
