@@ -112,7 +112,7 @@ if(index===1){
 }
 if(index===2){
   action_google.action='google/delete';
-  $('.graph').load("google/<%=FolderID%>");
+  $('.replace').load("google/<%=FolderID%>");
 }
 
 if(index===3){
@@ -122,7 +122,7 @@ if(index===3){
 if(index===4){
 
   action_google.action='google/searchtype';
-  // $('.graph').load("google/searchtype",{post});
+  // $('.replace').load("google/searchtype",{post});
 
 }
 
@@ -133,7 +133,7 @@ action_google.submit();
 function UploadSubmit(){
   uploadform.action='google/upload/<%=FolderID%>';
   uploadform.submit();
-  $('.graph').load("google/<%=FolderID%>");
+  $('.replace').load("google/<%=FolderID%>");
 };
 </script>
 
