@@ -51,7 +51,8 @@
         <button type="button" onClick='CreateFolder()'>폴더 만들기</button>
     </div>
     <div class="table-responsive">
-    <table class="table" id="table_dropbox" data-id='<%=FolderID%>'>
+    <table class="table table-hover" id="table_dropbox" data-id='<%=FolderID%>'>
+      <thead>
       <tr>
         <td> </td>
         <td>번 호</td>
@@ -60,10 +61,14 @@
         <td>올린날짜</td>
         <td>파일용량</td>
       </tr>
+      </thead>
       <!-- 이전 폴더로 이동 -->
+      <tbody>
       <%
                 var folderList = FolderID.split("*");
-                if(folderList[0]==FolderID){%>
+                if(folderList[0]==FolderID){
+      %>
+
         <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>">
           <td></td>
           <td></td>
@@ -78,8 +83,8 @@
                 else{
                   var beforeFolder='';
                   var beforeFolderName='';
-                  for(var i=0; i<folderList.length-1 ; i++){
-                    if(i==0){
+                  for(var i=0; i < folderList.length-1 ; i++){
+                    if(i == 0){
                       beforeFolder=folderList[i];
                       beforeFolderName=folderList[i];
                     }
@@ -167,19 +172,19 @@
                      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
                   }
                     if(filelist.length>0){
-                       for(var i=0; i<filelist.length; i++)
+                       for(var i=0; i < filelist.length; i++)
                        {
                           var oneItem = filelist[i];
                           var size = formatBytes(oneItem.size,3);
 
                           if(oneItem.mimeType=='folder'){
                             if(FolderID==''){
-                              if(oneItem.name=="%"){
+                              if(oneItem.name=='%'){
                                 var Foldername = oneItem.name+'25';
                               }
                               else var Foldername = oneItem.name;
                             %>
-            <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=Foldername%>">
+            <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=Foldername%>" class="folder-row">
               <td><input type="checkbox" name="name" value="<%=oneItem.name%>"></td>
               <td data-id='<%=Foldername%>'>
                 <%=i%>
@@ -208,7 +213,7 @@
                               }
                               else var Foldername = oneItem.name;
                             %>
-              <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=FolderID%>*<%=Foldername%>">
+              <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=FolderID%>*<%=Foldername%>" class="folder-row">
                 <td data-id='<%=FolderID%>*<%=Foldername%>'><input type="checkbox" name="name" value="<%=oneItem.name%>"></td>
                 <td data-id='<%=FolderID%>*<%=Foldername%>'>
                   <%=i%>
@@ -246,7 +251,7 @@
                             <!--여기서 이미지 파일이면 xhr 요청하고 받자  -->
 
                             %>
-                <tr ondragstart="dragStart(event)" draggable="true" value="<%=filename%>">
+                <tr ondragstart="dragStart(event)" draggable="true" value="<%=filename%>" class="file-row">
                   <td><input type="checkbox" name="name" value="<%=filename%>"></td>
                   <td>
                     <%=i%>
@@ -262,11 +267,13 @@
                     <%=size%>
                   </td>
                 </tr>
+
                 <%
                         }
                       }
                     }
                   %>
+                  </tbody>
     </table>
     </div>
     <!-- end of table-responsive -->
@@ -739,6 +746,12 @@
     /*감추기*/
     display: none;
   }
+
+  td>img {
+    height:36px;
+    width:36px;
+  }
+
 </style>
 
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/0.10.0/lodash.min.js"></script>
