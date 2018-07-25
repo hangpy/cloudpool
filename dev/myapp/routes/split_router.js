@@ -18,30 +18,39 @@ module.exports = function(){
   router.use(bodyParser.json());
 
   router.get('/folder/', (req, res)=>{
-    console.log('split main');
     splitUtil.loadData(req.user.userID, function(rows){
-      splitUtil.directory(rows, 1, '',function(childList, folderList){
-        console.log('childList : '+childList);
-        console.log('folderList : '+folderList);
+      splitUtil.directory(rows, 1 ,function(childList, folderList, depth){
         res.render('split_list',{
           FolderID : '',
           filelist : childList,
-          folderlist: folderList
+          folderlist: folderList,
+          depth : 1
         });
       });
     });
   });
 
   router.get('/folder/:id', (req, res)=>{
-    console.log('split main');
-    var head = req.body.head;
-    var depth = req.body.depth;
+    var params = req.params.id;
+    var variables = params.split('*');
+    var id = variables[0];
+    var depth = variables[1];
+    depth *= 1;
+    depth += 1;
+    console.log('params : '+ req.params.id);
+    console.log('id : '+ id);
+    console.log('depth : '+ depth);
     splitUtil.loadData(req.user.userID, function(rows){
-      splitUtil.directory(rows, depth, head,function(childList, folderList){
+      splitUtil.directory(rows, depth, function(childList, folderList, depth){
+        console.log('log router');
+          console.log('childList : '+childList);
+          console.log('folderList : '+folderList);
+          console.log('depth : ' + depth);
         res.render('split_list',{
-          FolderID : head,
+          FoldreID : id,
           filelist : childList,
-          folderlist: folderList
+          folderlist: folderList,
+          depth : depth
         });
       });
     });
@@ -95,15 +104,6 @@ module.exports = function(){
     var newName =req.body.filename;
     var splitFileID= req.body.name;
     splitUtil.rename(splitFileID,newName);
-
-  });
-
-  router.post('/folder/', function(req,res){
-
-
-  })
-
-  router.post('/folder/:id', function(req, res){
 
   });
 

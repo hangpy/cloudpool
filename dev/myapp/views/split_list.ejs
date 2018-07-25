@@ -37,6 +37,11 @@
                    i = Math.floor(Math.log(bytes) / Math.log(k));
                return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
             }
+
+
+
+            var depthSave = depth;
+
               if(folderlist.length > 0){
                 for(var i = 0; i< folderlist.length; i++){
                   var folderItem = folderlist[i];
@@ -47,7 +52,7 @@
                       <td></td>
                       <td>/</td>
                       <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                      <td><a href="#" onclick="moveFolder_split(this)" value ="<%=folderItem.name%>"> <%=folderItem.name%></a></td>
+                      <td><a href="#" onclick="moveFolder_split(this)" value ="<%=folderItem.name%>*<%=depthSave%>"> <%=folderItem.name%></a></td>
                       <!-- <td><a href="http://localhost:3000/google/<%=oneItem%>">..</a></td> -->
                       <td></td>
                       <td></td>
@@ -85,7 +90,6 @@ function Submit(index){
   }
   if(index===2){
     action_split.action='split/delete';
-    $('.graph').load("split/<%=FolderID%>");
   }
 
   if(index===3){
