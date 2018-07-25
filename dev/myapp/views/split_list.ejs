@@ -1,11 +1,8 @@
-
-
   <h4 class="card-title">Dropzone</h4>
   <h6 class="card-subtitle">For multiple file upload put class <code>.dropzone</code> to form.</h6>
   <form name="uploadform" id="uploadform" action='split/upload/' method='post' enctype="multipart/form-data">
     <input type='file' name='userfile'>
     <button type="button" onclick='UploadSubmit()' >업로드</button>
-
   </form>
 
 <form name='action_split' method='post'>
@@ -20,9 +17,9 @@
     <option value="application/vnd.google-apps.document">document-docx</option>
     <option value="image/jpeg">image</option>
   </select> -->
-  <button  type="submit" onClick='Submit(4)' >골라보기</button>
+  <button  type="submit" onClick='Submit(4)' >새 폴더 생성</button>
 
-  <table border="1" id="table_split" data-id = '<%=FolderID%>'>
+  <table border="1" id="table_split" data-id = '<%=folderItem%>'>
           <tr>
               <td> </td>
               <td>번   호</td>
@@ -31,7 +28,6 @@
               <td>올린날짜</td>
               <td>파일용량</td>
           </tr>
-
             <%
             function formatBytes(bytes,decimals) {
                if(bytes == 0) return '0 Bytes';
@@ -41,86 +37,71 @@
                    i = Math.floor(Math.log(bytes) / Math.log(k));
                return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
             }
-              if(filelist.length>0){
-                 for(var i=0; i<filelist.length+1; i++)
-                 {
-                      if(i==0){
-                        var oneItem = filelist[0];
-                        %>
-                        <tr>
+              if(folderlist.length > 0){
+                for(var i = 0; i< folderlist.length; i++){
+                  var folderItem = folderlist[i];
 
-                            <td></td>
-                            <td>/</td>
-                            <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                            <td data-id=<%=oneItem%>><a href="#" onclick="moveFolder_split(this);" value ='<%=oneItem%>'>..</a></td>
-                            <!-- <td><a href="http://localhost:3000/google/<%=oneItem%>">..</a></td> -->
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <%
-                        }
-                        else{
-                              var oneItem = filelist[i-1];
-                              var size = formatBytes(oneItem.size,3);
-                              if(oneItem.mimeType=="application/vnd.google-apps.folder"){
-                                %>
-                                <tr>
-                                  <td><input type="checkbox" name="id" value="<%=oneItem.splitFileID%>" ></td>
-                                    <td><%=i%></td>
-                                    <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                                    <td data-id='<%=oneItem.id%>'><a href="#" onclick="moveFolder_split(this);" value ='<%=oneItem.id%>'><%=oneItem.name%></a></td>
-                                    <!-- <a href="#"><%=oneItem.name%></a> -->
-                                    <!-- <td><a href="http://localhost:3000/google/<%=oneItem.id%>"><%=oneItem.name%></a></td> -->
-                                    <td><%=oneItem.mimeType%></td>
-                                    <td><%=oneItem.modifiedTime%></td>
-                                    <td><%=size%></td>
-                                </tr>
-                                <%
+                  %>
+                  <tr>
 
-                              }
-                        else{
-                          %>
-                        <tr>
-                          <td><input type="checkbox" name="name" value="<%=oneItem.splitFileID%>" ></td>
-                            <td><%=i%></td>
-                            <td><%=oneItem.fileName%></td>
-                            <td><%=oneItem.mimeType%></td>
-                            <td><%=oneItem.modifiedTime%></td>
-                            <td><%=oneItem.size%></td>
-                        </tr>
-                          <%
-                      }
-                  }
+                      <td></td>
+                      <td>/</td>
+                      <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
+                      <td><a href="#" onclick="moveFolder_split(this)" value ="<%=folderItem.name%>"> <%=folderItem.name%></a></td>
+                      <!-- <td><a href="http://localhost:3000/google/<%=oneItem%>">..</a></td> -->
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                  </tr>
+                  <%
                 }
               }
+
+              if(filelist.length>0){
+                 for(var i=0; i < filelist.length; i++){
+                    var oneItem = filelist[i];
+                    var size = formatBytes(oneItem.size,3);
+
+                    %>
+                  <tr>
+                   <td><input type="checkbox" name="name" value="<%=oneItem.splitFileID%>" ></td>
+                   <td><%=i%></td>
+                   <td><%=oneItem.fileName%></td>
+                   <td><%=oneItem.mimeType%></td>
+                   <td><%=oneItem.modifiedTime%></td>
+                   <td><%=oneItem.size%></td>
+                  </tr>
+                <%
+              }
+            }
             %>
   </table>
 </form>
 <script language=javascript>
 function Submit(index){
-if(index===1){
-  action_split.action='split/download';
-  $('.graph').load("split");
-}
-if(index===2){
-  action_split.action='split/delete';
-  $('.graph').load("split/<%=FolderID%>");
-}
+  if(index===1){
+    action_split.action='split/download';
+    $('.graph').load("split");
+  }
+  if(index===2){
+    action_split.action='split/delete';
+    $('.graph').load("split/<%=FolderID%>");
+  }
 
-if(index===3){
-  action_split.action='split/rename';
-}
+  if(index===3){
+    action_split.action='split/rename';
+    $('.graph').load("split");
+  }
 
-if(index===4){
+  if(index===4){
+    action_split.action='split/createFolder';
+    $('.graph').load("split");
+    // $('.graph').load("google/searchtype",{post});
+  }
 
-  action_split.action='split/searchtype';
-  // $('.graph').load("google/searchtype",{post});
-
-}
-
-action_split.submit();
+  action_split.submit();
 };
+
 
 
 function UploadSubmit(){

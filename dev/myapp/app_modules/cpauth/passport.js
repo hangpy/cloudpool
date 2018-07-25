@@ -12,13 +12,13 @@ module.exports = function(passport) {
 
   //인증후 사용자 정보를 세션에 저장
   passport.serializeUser(function(user, done) {
-    console.log('serializeUser', user);
+    console.log('[INFO] ' + user.userID + '\'S SESSION VALUES ARE STORED IN SESSION: \n', user);
     done(null, user);
   });
 
   //인증후, 사용자 정보를 세션에서 읽어서 request.user에 저장
   passport.deserializeUser(function(user, done) {
-    console.log('deserializeUser', user);
+    console.log('[INFO] ' + user.userID + '\'S FOLLOWING SESSION VALUES ARE ATTACHED TO req.user: \n', user);
     done(null, user);
   });
 
@@ -38,7 +38,13 @@ module.exports = function(passport) {
             return done(false, null);
           } else {
             var user = rows[0];
-            var userID = user.userID
+            var userID = rows[0].userID
+            /* session define */
+            var session = {
+              userID: userID,
+              email: rows[0].email,
+              userName: rows[0].userName
+            }
             hasher({
               password: password,
               salt: user.salt
@@ -52,6 +58,14 @@ module.exports = function(passport) {
                 }
                 request.post({
                   url: 'http://localhost:4000/api/dropbox/login/',
+                  body: data,
+                  json: true
+                }, function(error, response, body) {
+                  console.log('========================localhost:4000=========================');
+                  console.log(body);
+                });
+                request.post({
+                  url: 'http://localhost:4000/api/box/login/',
                   body: data,
                   json: true
                 }, function(error, response, body) {
@@ -104,7 +118,7 @@ module.exports = function(passport) {
                 });
 
                 console.log('[INFO] ' + userID + ' IS LOGGED IN');
-                return done(null, user);
+                return done(null, session);
               }
             });
           }

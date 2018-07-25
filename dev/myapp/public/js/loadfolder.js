@@ -6,13 +6,13 @@
 //     var tdid = $this.find('td[data-id]').data('id');
 //     e.stopPropagation();
 //     e.preventDefault();
-//     $('.graph').load("google/"+tdid);
+//     $('.replace').load("google/"+tdid);
 //     e.stopPropagation();
 //     e.preventDefault();
 //   }
 //   else{
 //     var trid = $this.closest('tr').data('id');
-//     $('.graph').load("google/"+trid);
+//     $('.replace').load("google/"+trid);
 //   }
 //   e.stopPropagation();
 //   e.preventDefault();
@@ -23,7 +23,7 @@
 // //   e.stopPropagation();
 // //   var $this = $(this);
 // //   var trid = $this.find('tr[data-id]').data('id');
-// //   $('.graph').load("google/"+trid);
+// //   $('.replace').load("google/"+trid);
 // // });
 // <!-- 한글 -> 유니코드 -->
 function replaceAll(strTemp, strValue1, strValue2){
@@ -43,16 +43,22 @@ function replaceAll(strTemp, strValue1, strValue2){
 
 function moveFolder_google(obj){
   var FolderID = $(obj).attr('value');
-  $('.graph').load("google/folder/"+FolderID);
+  $('.replace').load("google/folder/"+FolderID);
 }
 
 function moveFolder_box(obj){
   var FolderID = $(obj).attr('value');
-  $('.graph').load("box/folder/"+FolderID);
+  $('.replace').load("box/folder/"+FolderID);
 }
 
 function moveFolder_dropbox(obj){
   var beforeFolderID = $(obj).attr('value');
   var FolderID = beforeFolderID.replace(/[ ]/g,"%20");
-  $('.graph').load("dropbox/"+FolderID);
+  $('.replace').load("dropbox/"+FolderID);
+}
+
+function moveFolder_split(obj){
+  var FolderID = $(obj).attr('value');
+
+  $('.replace').load("split/folder/"+FolderID);
 }

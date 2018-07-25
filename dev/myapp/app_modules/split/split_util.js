@@ -24,7 +24,6 @@
    var knex = require('../db/knex');
    var async = require('async');
    const min = 65536;
-   var commonname='';
    var present;
    var totalSize;
    java.classpath.push(path.resolve(__dirname,'zip4j-1.3.2.jar'));
@@ -125,7 +124,7 @@ const UTIL = (function() {
       },
       function(callback){
         dbx_init(req.user, function(client){
-              dbxUtil.dbx.uploadSplit(client, FileInfoD , '');
+              dbxUtil.uploadSplit(client, FileInfoD , '');
               callback(null, temp);
         });
 
@@ -186,7 +185,6 @@ const UTIL = (function() {
         //fileName = req.body.name;
     //var fileName='1532015476688(M)20180125_주제 탐색1_SJS_마침.pptx';
     console.log("splitFileID : "+splitFileID);
-    commonname = splitFileID;
     console.log('test');
     knex.select('*').from('SPLIT_FILE_TB').where('splitFileID', splitFileID)
     .then(function(rows){
@@ -208,7 +206,7 @@ const UTIL = (function() {
       //Dropbox
   function(callback){
       dbx_init(req.user, function(client){
-        dbxUtil.dbx.downloadSplit(client, dbxPath, '',req, res, function(dropdownpath){
+        dbxUtil.downloadSplit(client, dbxPath, '',req, res, function(dropdownpath){
           console.log('dropdownpath'+dropdownpath);
           var zip = dropdownpath.split(".");
           if(zip[zip.length-1]=='zip'){
@@ -272,9 +270,19 @@ const UTIL = (function() {
 
 }
 
-var unzip_zip4j = function(zippath, req, res,callback){
-  console.log(commonname);
-  var file = java.newInstanceSync("java.io.File", "../routes/downloads/dis/"+commonname+".zip");
+var unzip_zip4j = function(splitFileID, zippath, req, res,callback){
+  var fileName;
+
+  knex.select('fileName').from('SPLIT_FILE_TB').where('splitFileID', splitFileID)
+  .then(function(rows){
+    fileName = rows[0].fileName;
+    console.log("fileName"+fileName);
+  }).catch(function(err){
+    console.log("SQL Error");
+    console.log(err);
+  });
+
+  var file = java.newInstanceSync("java.io.File", "../routes/downloads/dis/"+fileName+".zip");
 
   var zipFile = java.newInstanceSync("net.lingala.zip4j.core.ZipFile", file.getAbsolutePathSync());
 
@@ -282,12 +290,14 @@ var unzip_zip4j = function(zippath, req, res,callback){
     if(err) console.log(err);
     else{
         console.log("Complete unzip : "+zippath);
-        var patharr = ["../routes/downloads/dis/"+commonname+".zip","../routes/downloads/dis/"+commonname+".z01","../routes/downloads/dis/"+commonname+".z02"];
+        var patharr = ["../routes/downloads/dis/"+fileName+".zip","../routes/downloads/dis/"+fileName+".z01","../routes/downloads/dis/"+fileName+".z02"];
         //파일 최종 이름 가져오기
         var separatedfile =  patharr[1].split("/");
         var filename=separatedfile[separatedfile.length-1];
         var timestamp = filename.split('(M)')[0];
-        var orgfilename = timestamp+"(M)"+commonname;
+
+
+        var orgfilename = timestamp+"(M)"+fileName;
         async.map(patharr,
                 function(path, callback){
                   //원본파일삭제 patharr[0]은 undefine이라서 예외처리
@@ -329,10 +339,114 @@ var loadData = function(userID, callback){
   //각각 드라이브 DB에서 액세스 토큰 및 파일 리스트 읽어오기
   knex.select('*').from('SPLIT_FILE_TB').where('userID', userID)
   .then(function(rows){
-
     callback(rows);
+  }).catch(function(err){
+    console.log("SQL Error");
+    console.log(err);
+  });
+}
 
-  })};
+var directory = function(rows, depth, head, callback){
+  var childList = [];
+  var folderList = [];
+  async.map(rows, function(row, callback_list){
+    console.log("parent : "+row.parents);
+
+    if(row.parent=="/"){
+      console.log("root : "+row.parents);
+      childList.push(row);
+      callback_list(null, "finish");
+    }else{
+      var path = row.parents.split('/');
+
+      console.log("path.length : "+path.length);
+      console.log('head : '+ head) ;
+      console.log("path[depth] : "+path[depth]);
+      //root는 depth 1
+      if(path.length-1 == depth && head == path[depth]){
+        childList.push(row);
+        console.log('child push');
+      }else if(path[depth]==head && path.length-1 > depth)
+        console.log('path[depth+1] : ' + path[depth+1]);
+        console.log('path[depth] : '+  path[depth]);
+        var folder = {
+          "name" : path[depth],
+          "parent" : path[depth-1]
+        };
+        console.log('folder name : '+folder.name);
+        console.log('folder parent : '+folder.parent);
+        folderList.push(folder);
+        console.log('folder push');
+        callback_list(null, "finish");
+      }
+  },
+  function(err, result){
+    if(err){console.log(err);}
+    else {
+      console.log(childList);
+      console.log(folderList);
+      callback(childList, folderList);
+    }
+  });
+    // for(var i =0; i<rows.length; i++){
+    //     console.log("parent : "+rows[i].parents);
+    //
+    //   if(rows[i].parent=="/"){
+    //     console.log("root : "+rows[i].parents);
+    //     childList.push(rows[i]);
+    //     i++;
+    //   }
+    //
+    //   var path = rows[i].parents.split('/');
+    //   var childList = [];
+    //   var folderList = [];
+    //   console.log("path.length : "+path.length);
+    //   console.log('head : '+ head) ;
+    //   console.log("path[depth] : "+path[depth]);
+    //   //root는 depth 1
+    //   if(path.length-1 == depth && head == path[depth]){
+    //     childList.push(rows[i]);
+    //     console.log('child push');
+    //   }else if(path[depth]==head && path.length-1 > depth)
+    //     console.log('path[depth+1] : ' + path[depth+1]);
+    //     console.log(' path[depth] : '+  path[depth]);
+    //     var folder = {
+    //       "name" : path[depth+1],
+    //       "parent" : path[depth]
+    //     };
+    //     console.log('folder name : '+folder.name);
+    //     console.log('folder parent : '+folder.parent);
+    //     folderList.push(folder);
+    //     console.log('folder push');
+    // }
+    // callback(childList, folderList);
+
+
+}
+
+var rename = function(splitFileID, newName){
+  //update
+  console.log("splitFileID : "+splitFileID);
+  console.log("newName : "+newName);
+  var orgName;
+  knex.select().from('SPLIT_FILE_TB').where('splitFileID', splitFileID)
+  .then(function(rows){
+    orgName = rows[0].fileName;
+    console.log("orgName1 : "+orgName);
+    var splitedName = orgName.split(".");
+    var result = newName+"."+splitedName[splitedName.length-1];
+
+    knex('SPLIT_FILE_TB').where('splitFileID',splitFileID).update('fileName', result).then(function(results){
+      console.log('rename result : '+ results);
+    });
+
+  }).catch(function(err){
+    console.log("SQL Error");
+    console.log(err);
+  });
+
+}
+
 
   return {
     storage: storage,
@@ -344,7 +458,9 @@ var loadData = function(userID, callback){
     parameters: parameters,
     filesToAdd: filesToAdd,
     orgFile: orgFile,
-    zipFileU : zipFileU
+    zipFileU : zipFileU,
+    rename : rename,
+    directory : directory
   }
 })();
 

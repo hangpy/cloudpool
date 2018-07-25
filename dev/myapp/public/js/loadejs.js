@@ -1,5 +1,4 @@
 /*
-
   # Author: Hang
   # Developer by: Hang
 
@@ -8,28 +7,21 @@
 
   # The logic is better to be programmed with selection logic
   For example, out of several buttons, only one ejs file must be responsed.
-
-
-
 */
 
 
 $(function(){
-  // 버튼을 누를 때 해당 ejs 파일만 로드할 수 있게
-
-
-  $('#card1').click( function() {
-      $('.graph').load("card");
-  });
 
   $('#split').click( function() {
-      $('.graph').load("split/");
+      $('.replace').load("split/folder/");
   });
+
   $('#box').click( function() {
-      $('.graph').load("box/folder/");
+      $('.replace').load("box/folder/");
   });
+
   $('#dropbox').click( function() {
-      $('.graph').load("dropbox/folder");
+      $('.replace').load("dropbox/folder");
      //  for (int i = 0; i < 3; i++)
      // {
      //    alert( $("#Folder_"+i).attr('value') );
@@ -37,11 +29,11 @@ $(function(){
      // }
   });
   $('.setting-drive').click( function() {
-      $('.graph').load("setting/page-setting-drive");
+      $('.replace').load("setting/page-setting-drive");
   });
 
   $('#google').click( function() {
-    $('.graph').load("google/folder/");
+    $('.replace').load("google/folder/");
 });
 
 });
