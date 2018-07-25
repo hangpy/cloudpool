@@ -182,7 +182,7 @@ function Select(){
           success: function(json) {
             // var obj = JSON.stringify(json);
             // console.log(obj);
-            $('.graph').load("google/search/",{list:json});
+            $('.replace').load("google/search/",{list:json});
           },
           error: function(error) {
             console.log(error);

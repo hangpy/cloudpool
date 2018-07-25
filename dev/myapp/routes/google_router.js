@@ -8,6 +8,7 @@ const google_init = require('../app_modules/cpgoogle/google_init');
 const moment = require('moment');
 const schedule = require('node-schedule');
 const redis_client = require('../app_modules/config/redis')
+const request = require('request');
 
 /* modules for getting user access token 지우지마!*/
 const knex = require('../app_modules/db/knex');
@@ -32,8 +33,8 @@ router.use(bodyParser.urlencoded({
 
 
 router.get('/folder/', (req, res) => {
-  var userId='lee';
-  var folderId= '0AGCP8EhCswtnUk9PVA';
+  var userId='0000000001';
+  var folderId= 'root';
   var orderkey; // check
   google_util.list(userId,folderId, orderkey, function(fileList){
 
@@ -45,7 +46,7 @@ router.get('/folder/', (req, res) => {
 });
 
 router.get('/folder/:id', (req, res) => {
-  var userId='lee';
+  var userId='0000000001';
   var folderId = req.params.id;
   var orderkey;
   google_util.list(userId,folderId, orderkey, function(filelist){
@@ -68,11 +69,11 @@ router.post('/search/',function(req,res){
 });
 
 router.post('/searchtype/',function(req,res){
-    var userId='lee';
+    var userId='0000000001';
     var keyType=req.body.selectType;
     var keyWord=req.body.fileName;
     var orderKey;
-    console.log('/searchtype/post ; ',userId, keyType);
+    console.log('/searchtype/post : ',userId, keyType);
     google_util.searchType(userId,keyWord,keyType,orderKey, function(filelist){
       res.json(filelist);
     });
@@ -172,10 +173,24 @@ router.get('/callback', function(req, res) {
     var accessToken = tokens.access_token;
     var refreshToken = tokens.refresh_token;
 
+    var data = {"userId" : userID , "CP_love" : accessToken};
+
+    request.post({
+      url: 'http://localhost:4000/api/google/set/',
+      body : data,
+      json : true
+    },
+      function(error, response, body){
+        console.log(body);
+        console.log("Complete register rest API Server - Google ");
+      }
+    );
+
     if(refreshToken == null){
       knex.select('refreshToken_g').from('GOOGLE_RELIEVE_TB').where('userID', userID).then(function(rows){
         if(rows != null){
           refreshToken = rows[0].refreshToken_g;
+        
           knex('GOOGLE_CONNECT_TB').insert({
             // todo: session에서 userID 추출
             userID: userID,

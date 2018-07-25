@@ -17,6 +17,7 @@ module.exports = (function() {
       json : true
     },
       function(error, response, body){
+        console.log(body);
          callback(JSON.parse(body));
       }
     );
