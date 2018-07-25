@@ -216,3 +216,40 @@ ul.contextMenu li:last-child:hover a:hover{color:#2980b9}
 .masthead {
   padding-top: 4rem;
 }
+
+
+
+
+/* dropzone */
+.dropzone {
+    border:3px dotted #8a8a8a;
+    width:100%;
+    min-height:100px !important;
+    color:#8a8a8a;
+    font-weight: 500;
+    text-align: center;
+    line-height: 100px;
+    font-size:1.1rem;
+    padding-top:12px;
+    margin-top:15px;
+    margin-bottom: 15px;
+}
+
+.dropzone span {
+
+}
+
+/*
+.table-position {
+  position:relative;
+}
+
+.dropzone-mask {
+  position:absolute;
+  left:0;
+  top:0;
+  z-index:9000;
+  background-color: rgba(2, 142, 225, 0.3);
+  display:none;
+}
+*/
