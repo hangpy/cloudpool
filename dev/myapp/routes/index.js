@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const router = express.Router();
 const knex = require('../app_modules/db/knex');
 
+
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   if (!req.isAuthenticated())
@@ -67,9 +69,6 @@ router.get('/register', function(req, res, next) {
 
 
 
-// router.get('/google', function(req, res, next) {
-//   res.render('google_list');
-// });
 
 
 // var formidable = require('formidable');

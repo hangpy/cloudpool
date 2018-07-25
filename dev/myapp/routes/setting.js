@@ -2,7 +2,18 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const knex = require('../app_modules/db/knex');
+const moment = require('moment');
+const schedule = require('node-schedule');
 
+const BoxSDK = require('box-node-sdk');
+const box_client = require('../app_modules/config/client_info').BOX;
+const box_auth = require('../app_modules/cpbox/box_auth')();
+const CLIENT_ID = box_client.getClientId();
+const CLIENT_SECRET = box_client.getClientSecret();
+var box_sdk = new BoxSDK({
+  clientID: CLIENT_ID,
+  clientSecret: CLIENT_SECRET
+});
 
 /* url for requiring user access token */
 const google_reqToken_url = require('../app_modules/cpgoogle/google_auth')();
@@ -36,6 +47,15 @@ router.get('/page-setting-drive', function(req, res, next) {
     console.log(err);
   });
 });
+
+
+
+
+router.get('/token/refresh', function(req, res) {
+  res.redirect('/');
+
+});
+
 
 
 

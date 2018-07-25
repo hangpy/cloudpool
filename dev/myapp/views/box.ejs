@@ -2,9 +2,9 @@
     <form id="uploadform" action='box/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
       <input type='file' name='userfile'>
       <button type="submit" >업로드</button>
-  
+
     </form>
-  
+
     <form name='action_box' method='post'>
         <button type="button" onClick='Submit("download")' >다운로드</button>
         <button type="button" onClick='Submit("delete")' >삭제</button>
@@ -17,7 +17,7 @@
                     <td>올린날짜</td>
                     <td>파일용량</td>
                 </tr>
-  
+
                 <!-- 이전 폴더로 이동 -->
                 <%
                 var folderList = FolderID.split("*");
@@ -31,7 +31,7 @@
                       <td></td>
                       <td></td>
                   </tr>
-  
+
                   <%
                 }
                 else{
@@ -47,7 +47,7 @@
                       beforeFolderName=beforeFolderName+"/"+folderList[i];
                     }
                   }
-  
+
                 %>
                 <tr data-id='<%=beforeFolder%>'>
                    <td></td>
@@ -58,8 +58,8 @@
                     <td></td>
                     <td></td>
                 </tr>
-  
-  
+
+
                   <%
                 }
                   <!--byte to kb,mb,gb  -->

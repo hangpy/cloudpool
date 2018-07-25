@@ -1,55 +1,34 @@
 module.exports = (function(){
   var async = require('async');
   var fs = require('fs');
+  var request = require('request');
 
-  var listFile = function(client, FolderID, callback){
-    client.folders.get(FolderID).then(items => {
-      var filelist = [];
-      if(FolderID!='0') {
-        var before={
-          'id' : items.parent.id,
-          'name' : '..',
-          'mimeType' : 'folder'
-        };
-        filelist.push(before);
-      }
-      async.map(items.item_collection.entries, function(item, callback_list){
-        client.folders.get(item.id).then(function(folder){
-          var iteminfo={
-            'id' : item.id,
-            'name' : item.name,
-            'mimeType' : item.type,
-            'modifiedTime' : folder.modified_at,
-            'size' : folder.size,
-            'parents' : FolderID
-          };
-          filelist.push(iteminfo);
-          callback_list(null, 'finish');
+  var listFileRest = function(user_id, folderId, callback){
+    var data = {
+      "user_id": user_id,
+      "folderID": folderId
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/check/',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body.list);
+    });
+  }
 
-        }, function(err){
-          client.files.get(item.id).then(file => {
-            var iteminfo={
-              'id' : item.id,
-              'name' : item.name,
-              'mimeType' : item.type,
-              'modifiedTime' : file.modified_at,
-              'size' : file.size,
-              'parents' : FolderID
-            };
-            filelist.push(iteminfo);
-            callback_list(null, 'finish');
-          })
-        })
-      },
-      function(err,result){
-        if(err) console.log(err);
-        //list 받아오기 완료
-        else {
-          console.log('Finish the File list');
-          callback(filelist);
-        }
-
-      });
+  var refreshFileRest = function(user_id, callback){
+    var data = {
+      "user_id": user_id
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/refresh/filelist',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body);
     });
   }
 
@@ -64,12 +43,40 @@ module.exports = (function(){
     });
   }
 
+  var uploadFileSplit = function(client, FilePath, FolderID, callback){
+    var splitedname = FilePath.split("\\");
+    var FileName =splitedname[(splitedname.length)-1];
+    var stream = fs.createReadStream(FilePath);
+    client.files.uploadFile(FolderID, FileName, stream, function(err ,newfile){
+      if(err) console.log(err);
+      else{
+        //파일 아이디
+        console.log(newfile.entries[0].id);
+        callback(newfile.entries[0].id);
+      }
+    });
+  }
+
+
   var downloadFile = function(client, fileId){
     client.files.getReadStream(fileId).then(stream => {
       client.files.get(fileId).then(file => {
         var fileName = file.name;
         console.log(fileName);
         var output = fs.createWriteStream('../app_modules/cpbox/download/'+fileName);
+        stream.pipe(output);
+      })
+    })
+  }
+
+
+  var downloadFileSplit = function(client, fileId, callback){
+    client.files.getReadStream(fileId).then(stream => {
+      client.files.get(fileId).then(file => {
+        var fileName = file.name;
+        console.log("box fileName : "+ fileName);
+        callback(fileName);
+        var output = fs.createWriteStream('../routes/downloads/dis/'+fileName);
         stream.pipe(output);
       })
     })
@@ -131,7 +138,8 @@ module.exports = (function(){
     client.search.query(
   	searchText,
   	{
-  		//restriction
+  		//options
+      type: 'file'
   	})
   	.then(results => {
       var filelist = [];
@@ -141,7 +149,8 @@ module.exports = (function(){
           'name' : item.name,
           'mimeType' : item.type,
           'modifiedTime' : item.modified_at,
-          'size' : item.size
+          'size' : item.size,
+          'parents' : item.parent.id
         };
         filelist.push(iteminfo);
         callback_list(null, 'finish');
@@ -160,9 +169,12 @@ module.exports = (function(){
 
 
   return {
-    listFile: listFile,
+    listFileRest: listFileRest,
+    refreshFileRest: refreshFileRest,
     uploadFile: uploadFile,
+    uploadSplit: uploadFileSplit,
     downloadFile: downloadFile,
+    downloadSplit: downloadFileSplit,
     deleteFile: deleteFile,
     renameFile: renameFile,
     renameFolder: renameFolder,

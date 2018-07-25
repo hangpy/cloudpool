@@ -1,11 +1,12 @@
 module.exports = function(passport) {
   // need passport object as parameter was set in passport.js
   const dbutil = require('../db/db_util');
-  var bkfd2Password = require("pbkdf2-password");
-  var hasher = bkfd2Password();
-  var route = require('express').Router();
-  var knex = require('../db/knex.js');
-
+  const bkfd2Password = require("pbkdf2-password");
+  const hasher = bkfd2Password();
+  const route = require('express').Router();
+  const knex = require('../db/knex.js');
+  const request = require('request');
+  const redis_client = require('../config/redis');
 
 
   route.post('/login', passport.authenticate(
@@ -65,6 +66,34 @@ module.exports = function(passport) {
     else
       return next();
   }, function(req, res, next) {
+
+    //send logout status restapi server
+    data = {
+      "user_id": req.user.userID
+    }
+    request.post({
+      url: 'http://localhost:4000/api/dropbox/logout/',
+      body: data,
+      json: true
+    }, function(error, response, body) {
+      console.log(body);
+    });
+    request.post({
+      url: 'http://localhost:4000/api/box/logout/',
+      body: data,
+      json: true
+    }, function(error, response, body) {
+      console.log(body);
+    });
+
+    redis_client.hset("USER" + req.user.userID, "isAuthenticated", 0, function(err, reply){
+      if(err){
+        console.log("REDIS ERROR: " + err);
+      } else {
+        console.log("REDIS REPLY: " + reply);
+      }
+    });
+
     req.logout();
     res.redirect('/intro');
   });
@@ -79,7 +108,7 @@ module.exports = function(passport) {
     console.log("got " + email);
     knex.select('email').from("USER_INFO_TB").where('email', email)
       .then(function(rows) {
-        if(rows.length == 0){
+        if (rows.length == 0) {
           console.log(rows[0]);
           res.send({
             result: 0
