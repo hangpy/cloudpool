@@ -15,9 +15,9 @@ $(function() {
 
   var i = function() {
     (window.innerWidth > 0 ? window.innerWidth : this.screen.width) < 1170 ? ($("body").addClass("mini-sidebar"),
-      $(".navbar-brand span").hide(), $(".scroll-sidebar, .slimScrollDiv").css("overflow-x", "visible").parent().css("overflow", "visible"),
+      $(".navbar-brand span").show(), $(".navbar-brand b").hide(), $(".scroll-sidebar, .slimScrollDiv").css("overflow-x", "visible").parent().css("overflow", "visible"),
       $(".sidebartoggler i").addClass("ti-menu")) : ($("body").removeClass("mini-sidebar"),
-      $(".navbar-brand span").show());
+      $(".navbar-brand span").hide(), $(".navbar-brand b").show());
     var i = (window.innerHeight > 0 ? window.innerHeight : this.screen.height) - 1;
     (i -= 70) < 1 && (i = 1), i > 70 && $(".page-wrapper").css("min-height", i + "px");
   };
@@ -25,9 +25,9 @@ $(function() {
 
   $(window).ready(i), $(window).on("resize", i), $(".sidebartoggler").on("click", function() {
       $("body").hasClass("mini-sidebar") ? ($("body").trigger("resize"), $(".scroll-sidebar, .slimScrollDiv").css("overflow", "hidden").parent().css("overflow", "visible"),
-        $("body").removeClass("mini-sidebar"), $(".navbar-brand span").show()) : ($("body").trigger("resize"),
+        $("body").removeClass("mini-sidebar"), $(".navbar-brand span").hide()) : ($("body").trigger("resize"),
         $(".scroll-sidebar, .slimScrollDiv").css("overflow-x", "visible").parent().css("overflow", "visible"),
-        $("body").addClass("mini-sidebar"), $(".navbar-brand span").hide());
+        $("body").addClass("mini-sidebar"), $(".navbar-brand span").show() , $(".navbar-brand b").hide());
     }),
 
 
