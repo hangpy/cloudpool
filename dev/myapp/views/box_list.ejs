@@ -12,7 +12,7 @@
 
   <form name='action_box' method='post'>
     <button type="button" onClick='Submit("download")'>다운로드</button>
-    <button type="button" onClick='Submit("delete")'>삭제</button>
+    <button type="button" onClick='Delete()'>삭제</button>
     <div class="table-responsive">
       <table class="table table-hover" id="table_box">
         <thead>
@@ -128,12 +128,8 @@
     if (index == 'download') {
       document.action_box.action = 'box/download';
     }
-    if (index == 'delete') {
-      document.action_box.action = 'box/delete';
-      // $('.replace').load("box/<%=FolderID%>");
-    }
     document.action_box.submit();
-  };
+  }
 
   function UploadSubmit() {
     // uploadform.action = 'box/upload/<%=FolderID%>';
@@ -157,7 +153,42 @@
         console.log(error);
       }
     });
-  };
+  }
+
+  function Delete() {
+    // 체크박스의 갯수를 변수에 담는다.
+    var chklen = action_box.name.length;
+    var name = '';
+    // 체크박스 갯수만큼 for 문을 돌려 체크된 놈의 value값을 가져온다.
+    for (i = 0; i < chklen; i++) {
+      if (action_box.name[i].checked == true) {
+        name = action_box.name[i].value;
+        break;
+      }
+    }
+    if (name == '') {
+      alert("삭제하실 파일이나 폴더를 체크해주세요");
+    } else {
+      var body = {
+        "name": name
+      }
+
+      $.ajax({
+        type: "POST",
+        url: "box/delete/",
+        async: true,
+        data: body,
+        dataType: "JSON",
+        success: function(json) {
+          console.log(json);
+          $('.replace').load("box/folder/<%=FolderID%>");
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
+  }
 
   function Refresh() {
     $.ajax({

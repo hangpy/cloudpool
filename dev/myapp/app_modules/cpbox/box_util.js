@@ -101,10 +101,19 @@ module.exports = (function(){
     })
   }
 
-  var deleteFile = function(client, fileId){
-    client.files.delete(fileId).then(() => {
-      console.log('deletion succeeded');
-    })
+  var deleteFileRest = function(userID, fileId, callback) {
+    var data = {
+      "user_id": userID,
+      "fileId": fileId
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/delete',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body);
+    });
   }
 
   var renameFile = function(client, fileId, newname){
@@ -196,6 +205,7 @@ module.exports = (function(){
     downloadFile: downloadFile,
     downloadSplit: downloadFileSplit,
     deleteFile: deleteFile,
+    deleteFileRest: deleteFileRest,
     renameFile: renameFile,
     renameFolder: renameFolder,
     moveFile: moveFile,

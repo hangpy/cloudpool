@@ -53,22 +53,6 @@ router.post('/folder/refresh/', (req, res) => {
   });
 });
 
-// router.post('/upload/:id', function(req, res) {
-//   box_init(req.user, function(client) {
-//     var FolderID = req.params.id;
-//     var form = new formidable.IncomingForm();
-//     form.parse(req, function(err, fields, files) {
-//
-//       var FileInfo = files.userfile;
-//
-//       res.redirect('/');
-//
-//       //비동기 필요
-//       box_util.uploadFile(client, FileInfo, FolderID);
-//     });
-//   });
-// });
-
 router.post('/upload/:id', function(req, res) {
   var userID = req.user.userID;
   var folderID = req.params.id;
@@ -99,21 +83,12 @@ router.post('/download', function(req, res) {
 });
 
 router.post('/delete', function(req, res) {
-  box_init(req.user, function(client) {
-    var backURL = req.header('Referer') || '/';
-    console.log(req.body);
-    var FileID = req.body.name;
-    if (Array.isArray(FileID)) {
-      async.map(FileID, function(id, callback) {
-        box_util.deleteFile(client, id);
-        callback(null, 'finish');
-      });
-    } else {
-      box_util.deleteFile(client, FileID);
-    }
-    res.redirect(backURL);
-  });
-});
+  var userID = req.user.userID;
+  var fileId = req.body.name;
+  box_util.deleteFileRest(userID, fileId, function(result){
+    res.json(result);
+  })
+})
 
 router.post('/rename/file', function(req, res) {
   box_init(req.user, function(client) {
