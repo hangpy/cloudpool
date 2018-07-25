@@ -206,7 +206,6 @@ const UTIL = (function() {
           },
           function(error, response, body) {
             console.log("refresh");
-            callback("refresh complete");
           }
         );
 
