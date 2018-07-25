@@ -32,6 +32,20 @@ module.exports = (function(){
     });
   }
 
+  var relieveRest = function(user_id, callback){
+    var data = {
+      "user_id": user_id
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/relieve',
+      body: data,
+      json: true
+    },
+  function(error, response, body) {
+    callback(body);
+  })
+  }
+
   var uploadFile = function(client, FileInfo, FolderID){
     var stream = fs.createReadStream(FileInfo.path);
     client.files.uploadFile(FolderID, FileInfo.name, stream, function(err ,newfile){
@@ -171,6 +185,7 @@ module.exports = (function(){
   return {
     listFileRest: listFileRest,
     refreshFileRest: refreshFileRest,
+    relieveRest: relieveRest,
     uploadFile: uploadFile,
     uploadSplit: uploadFileSplit,
     downloadFile: downloadFile,

@@ -289,11 +289,21 @@ router.get('/refresh', function(req, res) {
 router.get('/relieve', function(req, res, next) {
   var userID = req.user.userID;
   knex.delete().from('BOX_CONNECT_TB').where('userID', userID).then(function(rows) {
-    console.log("[INFO] " + userID + "\'S BOX TOKEN IS RELIEVED SUCCESSFULLY");
-    res.send({
-      msg: "Relieved box connection successfully",
-      state: 1
-    });
+    box_util.relieveRest(userID, function(result){
+      if(result=='success'){
+        console.log("[INFO] " + userID + "\'S BOX TOKEN IS RELIEVED SUCCESSFULLY");
+        res.send({
+          msg: "Relieved box connection successfully",
+          state: 1
+        });
+      } else{
+        console.log(result);
+        res.send({
+          msg: "Failed to relieved box token",
+          state: 0
+        })
+      }
+    })
   }).catch(function(err) {
     console.log(err);
     res.send({
