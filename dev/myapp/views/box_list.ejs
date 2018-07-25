@@ -1,24 +1,32 @@
-<body>
+
+<div class="card">
+  <div class="card-title">
+    <h4>Box -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4>
+  </div>
+  <div class="card-body">
   <form id="uploadform" action='box/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
     <input type='file' name='userfile'>
-    <button type="button" onclick='UploadSubmit()' >업로드</button>
+    <button type="button" onclick='UploadSubmit()'>업로드</button>
 
   </form>
 
   <form name='action_box' method='post'>
-      <button type="button" onClick='Submit("download")' >다운로드</button>
-      <button type="button" onClick='Submit("delete")' >삭제</button>
-      <table border="1" id="table_box">
-              <tr>
-                  <td> </td>
-                  <td>번   호</td>
-                  <td>파일이름</td>
-                  <td>파일형식</td>
-                  <td>올린날짜</td>
-                  <td>파일용량</td>
-              </tr>
-
-                <%
+    <button type="button" onClick='Submit("download")'>다운로드</button>
+    <button type="button" onClick='Submit("delete")'>삭제</button>
+    <div class="table-responsive">
+      <table class="table table-hover" id="table_box">
+        <thead>
+          <tr>
+            <td> </td>
+            <td>번 호</td>
+            <td>파일이름</td>
+            <td>파일형식</td>
+            <td>올린날짜</td>
+            <td>파일용량</td>
+          </tr>
+        </thead>
+        <tbody>
+        <%
                 <!--byte to kb,mb,gb  -->
                 function formatBytes(bytes,decimals) {
                    if(bytes == 0) return '0 Bytes';
@@ -29,80 +37,108 @@
                    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
                 }
                   if(filelist.length>0){
-                     for(var i=0; i<filelist.length; i++)
+                     for(var i=0; i < filelist.length; i++)
                      {
                         var oneItem = filelist[i];
                         var size = formatBytes(oneItem.size,3);
                         if(oneItem.mimeType=='folder'){
                           %>
-                          <tr>
-                             <td><input type="checkbox" name="name" value="<%=oneItem.id%>" ></td>
-                              <td><%=i%></td>
-                              <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                              <td data-id='<%=oneItem.id%>'>
-                                <a href="#" onclick ="moveFolder_box(this)" value='<%=oneItem.id%>'><%=oneItem.name%></a></td>
-                              <td><%=oneItem.mimeType%></td>
-                              <td><%=oneItem.modifiedTime%></td>
-                              <td><%=size%></td>
-                          </tr>
-                          <%
-                        }
-                        else{
-                          %>
 
-                          <tr>
-                             <td><input type="checkbox" name="name" value="<%=oneItem.id%>" ></td>
-                              <td><%=i%></td>
-                              <td><%=oneItem.name%></td>
-                              <td><%=oneItem.mimeType%></td>
-                              <td><%=oneItem.modifiedTime%></td>
-                              <td><%=size%></td>
-                          </tr>
-                          <%
+            <tr class="folder-row">
+              <td><input type="checkbox" name="name" value="<%=oneItem.id%>"></td>
+              <td>
+                <%=i%>
+              </td>
+              <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
+              <td data-id='<%=oneItem.id%>'>
+                <a href="#" onclick="moveFolder_box(this)" value='<%=oneItem.id%>'>
+                  <%=oneItem.name%>
+                </a>
+              </td>
+              <td>
+                <%=oneItem.mimeType%>
+              </td>
+              <td>
+                <%=oneItem.modifiedTime%>
+              </td>
+              <td>
+                <%=size%>
+              </td>
+            </tr>
+             <%
+                } else {
+             %>
+
+            <tr class="file-row">
+              <td><input type="checkbox" name="name" value="<%=oneItem.id%>"></td>
+              <td>
+                <%=i%>
+              </td>
+              <td>
+                <%=oneItem.name%>
+              </td>
+              <td>
+                <%=oneItem.mimeType%>
+              </td>
+              <td>
+                <%=oneItem.modifiedTime%>
+              </td>
+              <td>
+                <%=size%>
+              </td>
+            </tr>
+            <%
                       }
                     }
                   }
-                %>
+             %>
+        </tbody>
       </table>
-</form>
-<p></p>
-<button type="button" onClick='Refresh()'>파일 리스트 최신화</button>
-<p></p>
-<form action='box/rename/file' method='post' enctype="multipart/form-data">
-  <button type="submit" >파일 이름바꾸기</button>
-</form>
-<form action='box/rename/folder' method='post' enctype="multipart/form-data">
-  <button type="submit" >폴더 이름바꾸기</button>
-</form>
-<form action='box/move/file' method='post' enctype="multipart/form-data">
-  <button type="submit" >파일 이동</button>
-</form>
-<form action='box/move/folder' method='post' enctype="multipart/form-data">
-  <button type="submit" >폴더 이동</button>
-</form>
-<form action='box/thumbnail' method='post' enctype="multipart/form-data">
-  <button type="submit" >썸네일</button>
-</form>
-<form action='box/search' method='post' enctype="multipart/form-data">
-  <button type="submit" >검색</button>
-</form>
-</body>
+    </div>
+    <!-- end of table-responsive -->
+  </form>
+  <p></p>
+  <button type="button" onClick='Refresh()'>파일 리스트 최신화</button>
+  <p></p>
+  <form action='box/rename/file' method='post' enctype="multipart/form-data">
+    <button type="submit">파일 이름바꾸기</button>
+  </form>
+  <form action='box/rename/folder' method='post' enctype="multipart/form-data">
+    <button type="submit">폴더 이름바꾸기</button>
+  </form>
+  <form action='box/move/file' method='post' enctype="multipart/form-data">
+    <button type="submit">파일 이동</button>
+  </form>
+  <form action='box/move/folder' method='post' enctype="multipart/form-data">
+    <button type="submit">폴더 이동</button>
+  </form>
+  <form action='box/thumbnail' method='post' enctype="multipart/form-data">
+    <button type="submit">썸네일</button>
+  </form>
+  <form action='box/search' method='post' enctype="multipart/form-data">
+    <button type="submit">검색</button>
+  </form>
+  </div>
+  <!-- end of card-body -->
+</div>
+<!-- end of card -->
+
 <script>
-  function Submit(index){
-    if(index=='download'){
-      document.action_box.action='box/download';
+  function Submit(index) {
+    if (index == 'download') {
+      document.action_box.action = 'box/download';
     }
-    if(index=='delete'){
-      document.action_box.action='box/delete';
+    if (index == 'delete') {
+      document.action_box.action = 'box/delete';
       // $('.replace').load("box/<%=FolderID%>");
     }
     document.action_box.submit();
   };
 
-  function UploadSubmit(){
-      uploadform.action='box/upload/<%=FolderID%>';
-      uploadform.submit();
-      // $('.replace').load("box/<%=FolderID%>");
+  function UploadSubmit() {
+    uploadform.action = 'box/upload/<%=FolderID%>';
+    uploadform.submit();
+    // $('.replace').load("box/<%=FolderID%>");
   };
 
   function Refresh() {
@@ -119,6 +155,5 @@
       }
     });
   }
-
 </script>
 <script src="js/loadfolder.js"></script>
