@@ -90,6 +90,15 @@ router.post('/delete', function(req, res) {
   })
 })
 
+router.post('/create', (req, res) => {
+  var userID = req.user.userID;
+  var folderID = req.body.folderId;
+  var foldername = req.body.foldername;
+  box_util.createFolderRest(userID, folderID, foldername, function(result) {
+    res.json(result)
+  });
+});
+
 router.post('/rename/file', function(req, res) {
   box_init(req.user, function(client) {
     var FileID = '302277766633';

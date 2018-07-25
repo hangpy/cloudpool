@@ -116,6 +116,22 @@ module.exports = (function(){
     });
   }
 
+  var createFolderRest = function(userID, folderID, foldername, callback) {
+    var data = {
+      "user_id": userID,
+      "folderID": folderID,
+      "foldername": foldername
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/create',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body);
+    });
+  }
+
   var renameFile = function(client, fileId, newname){
     client.files.update(fileId, {name : newname})
   	.then(updatedFile => {
@@ -205,6 +221,7 @@ module.exports = (function(){
     downloadFile: downloadFile,
     downloadSplit: downloadFileSplit,
     deleteFileRest: deleteFileRest,
+    createFolderRest: createFolderRest,
     renameFile: renameFile,
     renameFolder: renameFolder,
     moveFile: moveFile,

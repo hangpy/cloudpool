@@ -4,15 +4,26 @@
     <h4>Box -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4>
   </div>
   <div class="card-body">
+  <button type="button" onClick='Refresh()'>파일 리스트 최신화</button>
+  <p></p>
   <form id="uploadform" method='post' enctype="multipart/form-data">
+    현재폴더에 :&nbsp;
     <input type='file' id='uploadfile' name='uploadfile'>
     <button type="button" onclick='UploadSubmit()'>업로드</button>
-
+    &nbsp;&nbsp;
+    <input type="text" name="foldername" placeholder="새폴더 이름">
+    <button type="button" onClick='CreateFolder()'>새폴더 만들기</button>
   </form>
-
+  <p></p>
   <form name='action_box' method='post'>
-    <button type="button" onClick='Submit("download")'>다운로드</button>
-    <button type="button" onClick='Delete()'>삭제</button>
+    체크박스 :&nbsp;
+    <button type="button" onClick='Submit("download")'>다운로드(개발중,파일만)</button>&nbsp;&nbsp;
+    <button type="button" onClick='Delete()'>삭제(파일만, 폴더도추가해야)</button>&nbsp;&nbsp;
+    <input type="text" name="filename" placeholder="새이름">
+    <button type="button" onClick='Rename()'>이름 바꾸기(개발중)</button>&nbsp;&nbsp;
+    <input type="text" name="pathid" placeholder="폴더 ID">
+    <button type="button" onClick='MovePath()'>경로 이동(개발중)</button>
+    <p></p>
     <div class="table-responsive">
       <table class="table table-hover" id="table_box">
         <thead>
@@ -97,8 +108,6 @@
     </div>
     <!-- end of table-responsive -->
   </form>
-  <p></p>
-  <button type="button" onClick='Refresh()'>파일 리스트 최신화</button>
   <p></p>
   <form action='box/rename/file' method='post' enctype="multipart/form-data">
     <button type="submit">파일 이름바꾸기</button>
@@ -195,6 +204,27 @@
       type: "POST",
       url: "box/folder/refresh/",
       async: false,
+      success: function(json) {
+        console.log(json);
+        $('.replace').load("box/folder/<%=FolderID%>");
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  }
+
+  function CreateFolder() {
+    var body = {
+      "foldername": uploadform.foldername.value,
+      "folderId": "<%=FolderID%>"
+    }
+    $.ajax({
+      type: "POST",
+      url: "box/create",
+      async: true,
+      data: body,
+      dataType: "JSON",
       success: function(json) {
         console.log(json);
         $('.replace').load("box/folder/<%=FolderID%>");
