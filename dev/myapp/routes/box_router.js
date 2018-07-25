@@ -53,21 +53,33 @@ router.post('/folder/refresh/', (req, res) => {
   });
 });
 
+// router.post('/upload/:id', function(req, res) {
+//   box_init(req.user, function(client) {
+//     var FolderID = req.params.id;
+//     var form = new formidable.IncomingForm();
+//     form.parse(req, function(err, fields, files) {
+//
+//       var FileInfo = files.userfile;
+//
+//       res.redirect('/');
+//
+//       //비동기 필요
+//       box_util.uploadFile(client, FileInfo, FolderID);
+//     });
+//   });
+// });
+
 router.post('/upload/:id', function(req, res) {
-  box_init(req.user, function(client) {
-    var FolderID = req.params.id;
-    var form = new formidable.IncomingForm();
-    form.parse(req, function(err, fields, files) {
-
-      var FileInfo = files.userfile;
-
-      res.redirect('/');
-
-      //비동기 필요
-      box_util.uploadFile(client, FileInfo, FolderID);
+  var userID = req.user.userID;
+  var folderID = req.params.id;
+  var form = new formidable.IncomingForm();
+  form.parse(req, function(err, fields, files) {
+    var FileInfo = files.uploadfile;
+    box_util.uploadFileRest(userID, folderID, FileInfo, function(result) {
+      res.json(result);
     });
   });
-});
+})
 
 router.post('/download', function(req, res) {
   box_init(req.user, function(clinet) {

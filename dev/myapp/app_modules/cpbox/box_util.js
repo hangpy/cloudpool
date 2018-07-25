@@ -46,14 +46,19 @@ module.exports = (function(){
   })
   }
 
-  var uploadFile = function(client, FileInfo, FolderID){
-    var stream = fs.createReadStream(FileInfo.path);
-    client.files.uploadFile(FolderID, FileInfo.name, stream, function(err ,newfile){
-      if(err) console.log(err);
-      else{
-        //파일 아이디
-        console.log(newfile.entries[0].id);
-      }
+  var uploadFileRest = function(user_id, folderId, FileInfo, callback) {
+    var data = {
+      "user_id": user_id,
+      "folderId": folderId,
+      "FileInfo": FileInfo
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/upload',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body);
     });
   }
 
@@ -186,7 +191,7 @@ module.exports = (function(){
     listFileRest: listFileRest,
     refreshFileRest: refreshFileRest,
     relieveRest: relieveRest,
-    uploadFile: uploadFile,
+    uploadFileRest: uploadFileRest,
     uploadSplit: uploadFileSplit,
     downloadFile: downloadFile,
     downloadSplit: downloadFileSplit,

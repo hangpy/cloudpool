@@ -4,8 +4,8 @@
     <h4>Box -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4>
   </div>
   <div class="card-body">
-  <form id="uploadform" action='box/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
-    <input type='file' name='userfile'>
+  <form id="uploadform" method='post' enctype="multipart/form-data">
+    <input type='file' id='uploadfile' name='uploadfile'>
     <button type="button" onclick='UploadSubmit()'>업로드</button>
 
   </form>
@@ -136,9 +136,27 @@
   };
 
   function UploadSubmit() {
-    uploadform.action = 'box/upload/<%=FolderID%>';
-    uploadform.submit();
+    // uploadform.action = 'box/upload/<%=FolderID%>';
+    // uploadform.submit();
     // $('.replace').load("box/<%=FolderID%>");
+    var form = $('#uploadform')[0];
+    var formData = new FormData(form);
+    // formData.append("uploadfile", $("#uploadfile")[0].files[0]);
+    $.ajax({
+      type: "POST",
+      url: "box/upload/<%=FolderID%>",
+      async: false,
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(json) {
+        console.log(json);
+        $('.replace').load("box/folder/<%=FolderID%>");
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
   };
 
   function Refresh() {
