@@ -204,7 +204,6 @@ module.exports = (function(){
     uploadSplit: uploadFileSplit,
     downloadFile: downloadFile,
     downloadSplit: downloadFileSplit,
-    deleteFile: deleteFile,
     deleteFileRest: deleteFileRest,
     renameFile: renameFile,
     renameFolder: renameFolder,
