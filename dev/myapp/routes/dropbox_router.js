@@ -112,7 +112,8 @@ module.exports = function(){
   router.post('/rename/',function(req,res){
     var FolderID = '';
     var originName = req.body.originname;
-    var type = originName.split(".")[1];
+    var typelist = originName.split(".");
+    var type = typelist[typelist.length-1]
     var newName = req.body.newname+"."+type;
     console.log("rename name : " +req.user.userID);
     dbxutil.sendrenameRest(req.user.userID, newName, originName, FolderID, function(result){
@@ -130,7 +131,8 @@ module.exports = function(){
   router.post('/rename/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
     var originName = req.body.originname;
-    var type = originName.split(".")[1];
+    var typelist = originName.split(".");
+    var type = typelist[typelist.length-1]
     var newName = req.body.newname+"."+type;
     dbxutil.sendrenameRest(req.user.userID, newName, originName, FolderID, function(result){
       if(result =="finish_rename_the_file"){
@@ -214,7 +216,6 @@ module.exports = function(){
   router.post('/download/',function(req,res){
     // var FolderID = '';
     var Splitname = req.body.name.split("*");
-    console.log(Splitname);
     var FileID = Splitname[Splitname.length-1];
     for(var i = 0; i < Splitname.length-1 ; i++){
       if(i==0){
@@ -371,7 +372,7 @@ module.exports = function(){
 
 
   //send for refresh the user file list
-  router.get('/refresh', function(req, res) {
+  router.get('/refresh/', function(req, res) {
     var user_id = req.user.userID;
     console.log("Get in the refresh router");
     var FolderDir = '';
@@ -418,6 +419,9 @@ module.exports = function(){
        res.json(result);
     })
   });
+
+
+
 
   return router;
 }

@@ -64,6 +64,14 @@ module.exports = function(passport) {
                   console.log('========================localhost:4000=========================');
                   console.log(body);
                 });
+                request.post({
+                  url: 'http://localhost:4000/api/box/login/',
+                  body: data,
+                  json: true
+                }, function(error, response, body) {
+                  console.log('========================localhost:4000=========================');
+                  console.log(body);
+                });
 
                 redis_client.hmset("USER" + userID, {
                   "isAuthenticated": 1,

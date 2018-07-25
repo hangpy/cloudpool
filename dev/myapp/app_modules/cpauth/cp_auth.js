@@ -78,6 +78,13 @@ module.exports = function(passport) {
     }, function(error, response, body) {
       console.log(body);
     });
+    request.post({
+      url: 'http://localhost:4000/api/box/logout/',
+      body: data,
+      json: true
+    }, function(error, response, body) {
+      console.log(body);
+    });
 
     redis_client.hset("USER" + req.user.userID, "isAuthenticated", 0, function(err, reply){
       if(err){

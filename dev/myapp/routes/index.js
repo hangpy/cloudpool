@@ -69,9 +69,6 @@ router.get('/register', function(req, res, next) {
 
 
 
-// router.get('/google', function(req, res, next) {
-//   res.render('google_list');
-// });
 
 
 // var formidable = require('formidable');

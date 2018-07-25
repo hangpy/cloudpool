@@ -1,140 +1,174 @@
-<body>
-
-
-  <h4 class="card-title">Dropzone</h4>
-  <h6 class="card-subtitle">For multiple file upload put class <code>.dropzone</code> to form.</h6>
-  <!-- <form id="uploadform" action='google/upload/<%=FolderID%>' method='post' enctype="multipart/form-data" class="dropzone">
+<h4 class="card-title">Dropzone</h4>
+<h6 class="card-subtitle">For multiple file upload put class <code>.dropzone</code> to form.</h6>
+<!-- <form id="uploadform" action='google/upload/<%=FolderID%>' method='post' enctype="multipart/form-data" class="dropzone">
       <div class="fallback">
           <input name="userfile" type="file" multiple />
       </div> -->
-  <form name="uploadform" id="uploadform" action='google/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
-    <input type='file' name='userfile'>
-    <button type="button" onclick='UploadSubmit()' >업로드</button>
 
-  </form>
+<div class="card">
+  <div class="card-title">
+    <h4>Google -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4>
+  </div>
+  <div class="card-body">
+    <form name="uploadform" id="uploadform" action='google/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
+      <input type='file' name='userfile'>
+      <button type="button" onclick='UploadSubmit()'>업로드</button>
 
-<form name='action_google' method='post'>
-  <button type="button" onClick='Submit(1)' >다운로드</button>
-  <button type="button" onClick='Submit(2)' >삭제</button>
-  <td><input type="text" name="filename" placeholder="newname"></td>
-  <button type="submit" onClick='Submit(3)' >변경</button>
-  <tr></tr>
-  <select name="type">
-    <option value="application/vnd.google-apps.folder">folder</option>
-    <option value="application/pdf">document-pdf</option>
-    <option value="application/vnd.google-apps.document">document-docx</option>
-    <option value="image/jpeg">image</option>
-  </select>
-  <button  type="submit" onClick='Submit(4)' >골라보기</button>
+    </form>
 
-  <table border="1" id="table_google">
-          <tr>
+    <form name='action_google' method='post'>
+      <button type="button" onClick='Submit(1)'>다운로드</button>
+      <button type="button" onClick='Submit(2)'>삭제</button>
+      <td><input type="text" name="filename" placeholder="newname"></td>
+      <button type="submit" onClick='Submit(3)'>변경</button>
+      <tr></tr>
+      <select name="type">
+        <option value="application/vnd.google-apps.folder">folder</option>
+        <option value="application/pdf">document-pdf</option>
+        <option value="application/vnd.google-apps.document">document-docx</option>
+        <option value="image/jpeg">image</option>
+      </select>
+      <button type="submit" onClick='Submit(4)'>골라보기</button>
+      <div class="table-responsive">
+        <table class="table table-hover" id="table_google">
+          <thead>
+            <tr>
               <td> </td>
-              <td>번   호</td>
+              <td>번 호</td>
               <td>파일이름</td>
               <td>파일형식</td>
               <td>올린날짜</td>
               <td>파일용량</td>
-          </tr>
+            </tr>
+          </thead>
           <!-- 이전 폴더로 이동 -->
-
-            <%
-            <!--byte to kb,mb,gb  -->
-            function formatBytes(bytes,decimals) {
-               if(bytes == 0) return '0 Bytes';
-               var k = 1024,
-                   dm = decimals || 2,
-                   sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-                   i = Math.floor(Math.log(bytes) / Math.log(k));
-               return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-            }
-              if(filelist.length>0){
-                 for(var i=0; i< filelist.length; i++)
-                 {
-                      if(i==0){
-                        var oneItem = filelist[0];
-                        %>
-                        <tr>
-
-                            <td></td>
-                            <td>/</td>
-                            <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                            <td data-id=<%=oneItem%>><a href="#" onclick="moveFolder_google(this);" value ='<%=oneItem%>'>..</a></td>
-                            <!-- <td><a href="http://localhost:3000/google/<%=oneItem%>">..</a></td> -->
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <%
-                        }
-                        else{
-                              var oneItem = filelist[i];
-                              var size = formatBytes(oneItem.size,3);
-                              if(oneItem.mimeType=="application/vnd.google-apps.folder"){
-                                %>
-                                <tr>
-                                  <td><input type="checkbox" name="id" value="<%=oneItem.id%>" ></td>
-                                    <td><%=i%></td>
-                                    <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                                    <td data-id='<%=oneItem.id%>'><a href="#" onclick="moveFolder_google(this);" value ='<%=oneItem.id%>'><%=oneItem.name%></a></td>
-                                    <!-- <a href="#"><%=oneItem.name%></a> -->
-                                    <!-- <td><a href="http://localhost:3000/google/<%=oneItem.id%>"><%=oneItem.name%></a></td> -->
-                                    <td><%=oneItem.mimeType%></td>
-                                    <td><%=oneItem.modifiedTime%></td>
-                                    <td><%=size%></td>
-                                </tr>
-                                <%
-
-                              }
-                        else{
-                          %>
-                        <tr>
-                          <td><input type="checkbox" name="name" value="<%=oneItem.id%>" ></td>
-                            <td><%=i%></td>
-                            <td><%=oneItem.name%></td>
-                            <td><%=oneItem.mimeType%></td>
-                            <td><%=oneItem.modifiedTime%></td>
-                            <td><%=size%></td>
-                        </tr>
-                          <%
-                      }
+          <tbody>
+          <%
+                  <!--byte to kb,mb,gb  -->
+                  function formatBytes(bytes,decimals) {
+                     if(bytes == 0) return '0 Bytes';
+                     var k = 1024,
+                         dm = decimals || 2,
+                         sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+                         i = Math.floor(Math.log(bytes) / Math.log(k));
+                     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
                   }
-                }
-              }
-            %>
-  </table>
-</form>
-</body>
+                    if(filelist.length>0){
+                       for(var i=0; i< filelist.length; i++)
+                       {
+                            if(i==0){
+                              var oneItem = filelist[0];
+                              %>
+            <tr>
+
+              <td></td>
+              <td>/</td>
+              <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
+              <td data-id=<%=oneItem%>><a href="#" onclick="moveFolder_google(this);" value='<%=oneItem%>'>..</a></td>
+              <!-- <td><a href="http://localhost:3000/google/<%=oneItem%>">..</a></td> -->
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <%
+                              }
+                              else{
+                                    var oneItem = filelist[i];
+                                    var size = formatBytes(oneItem.size,3);
+                                    if(oneItem.mimeType=="application/vnd.google-apps.folder"){
+                                      %>
+              <tr class="folder-row">
+                <td><input type="checkbox" name="id" value="<%=oneItem.id%>"></td>
+                <td>
+                  <%=i%>
+                </td>
+                <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
+                <td data-id='<%=oneItem.id%>'>
+                  <a href="#" onclick="moveFolder_google(this);" value='<%=oneItem.id%>'>
+                    <%=oneItem.name%>
+                  </a>
+                </td>
+                <!-- <a href="#"><%=oneItem.name%></a> -->
+                <!-- <td><a href="http://localhost:3000/google/<%=oneItem.id%>"><%=oneItem.name%></a></td> -->
+                <td>
+                  <%=oneItem.mimeType%>
+                </td>
+                <td>
+                  <%=oneItem.modifiedTime%>
+                </td>
+                <td>
+                  <%=size%>
+                </td>
+              </tr>
+              <%
+
+                                    }
+                              else{
+                                %>
+                <tr class="file-row">
+                  <td><input type="checkbox" name="name" value="<%=oneItem.id%>"></td>
+                  <td>
+                    <%=i%>
+                  </td>
+                  <td>
+                    <%=oneItem.name%>
+                  </td>
+                  <td>
+                    <%=oneItem.mimeType%>
+                  </td>
+                  <td>
+                    <%=oneItem.modifiedTime%>
+                  </td>
+                  <td>
+                    <%=size%>
+                  </td>
+                </tr>
+                <%
+                            }
+                        }
+                      }
+                    }
+                  %>
+          </tbody>
+        </table>
+      </div>
+      <!-- end of table-responsive -->
+    </form>
+  </div>
+  <!-- end of card-body -->
+</div>
+<!-- end of card -->
+
 <script language=javascript>
-function Submit(index){
-if(index===1){
-  action_google.action='google/download';
-}
-if(index===2){
-  action_google.action='google/delete';
-  $('.replace').load("google/<%=FolderID%>");
-}
+  function Submit(index) {
+    if (index === 1) {
+      action_google.action = 'google/download';
+    }
+    if (index === 2) {
+      action_google.action = 'google/delete';
+      $('.replace').load("google/<%=FolderID%>");
+    }
 
-if(index===3){
-  action_google.action='google/rename';
-}
+    if (index === 3) {
+      action_google.action = 'google/rename';
+    }
 
-if(index===4){
+    if (index === 4) {
 
-  action_google.action='google/searchtype';
-  // $('.replace').load("google/searchtype",{post});
+      action_google.action = 'google/searchtype';
+      // $('.replace').load("google/searchtype",{post});
 
-}
+    }
 
-action_google.submit();
-};
+    action_google.submit();
+  };
 
 
-function UploadSubmit(){
-  uploadform.action='google/upload/<%=FolderID%>';
-  uploadform.submit();
-  $('.replace').load("google/<%=FolderID%>");
-};
+  function UploadSubmit() {
+    uploadform.action = 'google/upload/<%=FolderID%>';
+    uploadform.submit();
+    $('.replace').load("google/<%=FolderID%>");
+  };
 </script>
 
 <script src="js/loadfolder.js"></script>
