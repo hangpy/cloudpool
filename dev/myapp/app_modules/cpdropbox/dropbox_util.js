@@ -431,7 +431,7 @@ const UTIL = (function() {
         json: true
       },
       function(error, body) {
-      
+
         callback(body.body.entries[0].thumbnail);
       }
     );
@@ -446,6 +446,7 @@ const UTIL = (function() {
       sendrenameRest: sendrenameRest,
       list: listfile,
       delete: deletefile,
+      upload: uploadfile,
       uploadSplit: uploadfileSplit,
       download: downloadfile,
       downloadSplit: downloadfileSplit,

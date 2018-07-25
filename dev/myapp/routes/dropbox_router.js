@@ -112,7 +112,8 @@ module.exports = function(){
   router.post('/rename/',function(req,res){
     var FolderID = '';
     var originName = req.body.originname;
-    var type = originName.split(".")[1];
+    var typelist = originName.split(".");
+    var type = typelist[typelist.length-1]
     var newName = req.body.newname+"."+type;
     console.log("rename name : " +req.user.userID);
     dbxutil.sendrenameRest(req.user.userID, newName, originName, FolderID, function(result){
@@ -130,7 +131,8 @@ module.exports = function(){
   router.post('/rename/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
     var originName = req.body.originname;
-    var type = originName.split(".")[1];
+    var typelist = originName.split(".");
+    var type = typelist[typelist.length-1]
     var newName = req.body.newname+"."+type;
     dbxutil.sendrenameRest(req.user.userID, newName, originName, FolderID, function(result){
       if(result =="finish_rename_the_file"){
@@ -400,6 +402,34 @@ module.exports = function(){
 
        res.json(result);
     })
+  });
+
+
+  router.post('/getPreview/', function(req, res){
+    console.log("======getPreview route===========");
+    var query = {
+            "path": '/test.ppt'
+      };
+      var data = JSON.stringify(query);
+      var headers = {
+        'Authorization': 'Bearer kFb_ENWtmyUAAAAAAAABe1Megz31l_Y8uYpKU5MVb5A7fPH76XRzzpfhj-gPwHVz',
+        'Dropbox-API-Arg': data
+      };
+      request.post({
+          url: 'https://content.dropboxapi.com/2/files/get_preview',
+          headers: headers
+        },
+        function(error, response, body) {
+          if (error) {
+
+          } else {
+            console.log("====================================================");
+            // Buffer.from(response.body).toString('base64')
+            res.json(Buffer.from(response.body).toString('base64'));
+          }
+        }
+      );
+
   });
 
   return router;

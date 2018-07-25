@@ -16,9 +16,7 @@
 
 $(function(){
   // 버튼을 누를 때 해당 ejs 파일만 로드할 수 있게
-  $('#graph').click( function() {
-      $('.graph').load("graph");
-  });
+
 
   $('#card1').click( function() {
       $('.graph').load("card");
