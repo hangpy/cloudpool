@@ -23,7 +23,7 @@
     <link href="css/lib/calendar2/pignose.calendar.min.css" rel="stylesheet">
     <link href="css/lib/owl.carousel.min.css" rel="stylesheet" />
     <link href="css/lib/owl.theme.default.min.css" rel="stylesheet" />
-
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:** -->
@@ -33,7 +33,7 @@
 <![endif]-->
 </head>
 
-<body class="fix-header fix-sidebar">
+<body class="fix-header fix-sidebar dashbord-body">
     <!-- Preloader - style you can find in spinners.css -->
     <div class="preloader">
         <svg class="circular" viewBox="25 25 50 50">
@@ -46,17 +46,22 @@
             <nav class="navbar top-navbar navbar-expand-md navbar-light">
                 <!-- Logo -->
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="index.html">
+                    <a class="navbar-brand" href="/">
                         <!-- Logo icon -->
-                        <b><img src="images/logo.png" alt="homepage" class="dark-logo" /></b>
+                        <b><!--<img src="images/logo.png" alt="homepage" class="dark-logo" />-->
+                          CloudPool
+                        </b>
                         <!--End Logo icon -->
                         <!-- Logo text -->
-                        <span><img src="images/logo-text.png" alt="homepage" class="dark-logo" /></span>
+                        <span><!--<img src="images/logo-text.png" alt="homepage" class="dark-logo" />-->
+                          CP
+                        </span>
                     </a>
                 </div>
                 <!-- End Logo -->
                 <div class="navbar-collapse">
                     <!-- toggle and nav items -->
+
                     <ul class="navbar-nav mr-auto mt-md-0">
                         <!-- This is  -->
                         <li class="nav-item"> <a class="nav-link nav-toggler hidden-md-up text-muted  " href="javascript:void(0)"><i class="mdi mdi-menu"></i></a> </li>
@@ -132,45 +137,46 @@
         <!-- End Left Sidebar  -->
         <!-- Page wrapper  -->
         <div class="page-wrapper">
-            <!-- Bread crumb -->
-            <div class="row page-titles">
-                <div class="col-md-5 align-self-center">
-                    <h3 class="text-primary">Dashboard</h3> </div>
-                <div class="col-md-7 align-self-center">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-                        <li class="breadcrumb-item active">Dashboard</li>
-                    </ol>
-                </div>
-            </div>
-            <!-- End Bread crumb -->
-            <!-- Container fluid  -->
-            <div class="container-fluid">
-              <!-- Start Page Content -->
+          <!-- Bread crumb -->
+          <div class="row page-titles">
+              <div class="col-md-5 align-self-center">
+                  <h3 class="text-primary">Dashboard</h3> </div>
+              <div class="col-md-7 align-self-center">
+                  <ol class="breadcrumb">
+                      <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+                      <li class="breadcrumb-item active">Dashboard</li>
+                  </ol>
+              </div>
+          </div>
+          <!-- End Bread crumb -->
+          <!-- Container fluid  -->
+          <div class="container-fluid">
+            <!-- Start Page Content -->
 
-              <!-- 동적으로 페이지가 바뀌는 부분 -->
-              <div class="replace"></div>
+            <!-- part to be loaded dynamically -->
+            <div class="replace"></div>
 
-
-
-
-                <!-- End Page Content -->
-            </div>
-            <!-- End Container fluid  -->
-            <!-- footer -->
-            <footer class="footer"> © 2018 All rights reserved. Template designed by <a href="https://colorlib.com">Colorlib</a></footer>
-            <!-- End footer -->
+          </div>
+          <!-- End Container fluid  -->
+          <!-- footer -->
+          <footer class="footer"> © 2018 All rights reserved. Template designed by <a href="https://colorlib.com">Colorlib</a></footer>
+          <!-- End footer -->
         </div>
-          <div id="toast"><div id="img">파일 관리</div><div id="desc">업로드 중입니다.
+
+        <div id="toast" style="display: none">
+          <div id="img">파일 관리</div>
+          <div id="desc">업로드 중입니다.
             <div class="progress">
               <div class="progress-bar" role="progressbar"></div>
-            </div></div></div>
+            </div>
+          </div>
+        </div>
         <!-- End Page wrapper  -->
     </div>
     <!-- End Wrapper -->
 
     <!-- Right Click ContextMenu -->
-    <ul class="contextMenu" display="none">
+    <ul class="contextMenu">
       <li><a href="#"><i class="fa fa-download"></i> 다운로드</a></li>
       <li><a href="#"><i class="fa fa-plus"></i> 폴더 만들기</a></li>
       <li><a href="#"><i class="fa fa-edit"></i> 이름 바꾸기</a></li>

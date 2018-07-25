@@ -16,148 +16,239 @@
   1.
   2.
 
-
 */
 
-/*toast CSS*/
+/* footer override */
+.dashbord-body .footer {
+  background: #ffffff none repeat scroll 0 0;
+  border-top: 1px solid rgba(120, 130, 140, 0.13);
+  color: #67757c;
+  right: 0px;
+  position: fixed;
+  bottom: 0px;
+  padding: 3px 10% 3px 3px;
+  margin: 0px;
+  text-align: right;
+}
+
+/* header override */
+
+.header {
+  background: #3373af;
+}
+
+.header .top-navbar .navbar-header {
+  background: #3373af;
+}
+
+.header .top-navbar .navbar-header .navbar-brand span{
+  color: #fff;
+  font-weight: 700;
+  font-family: 'Source Sans Pro';
+  font-size: 2rem;
+}
+
+.header .top-navbar .navbar-header .navbar-brand b{
+  color: #fff;
+  font-weight: 700;
+  font-family: 'Source Sans Pro';
+  font-size: 2rem;
+}
+
+.header .top-navbar .ti-menu, .header .top-navbar .ti-search {
+  font-size: 20px;
+  color: #fff;
+}
+
+/* left sidbar */
+.left-sidebar {
+    padding-top: 54px;
+}
+
+/* toast CSS */
+
 #toast {
-    visibility: hidden;
-    max-width: 50px;
-    height: 50px;
-    /*margin-left: -125px;*/
-    margin: auto;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    border-radius: 2px;
-
-    position: fixed;
-    z-index: 1;
-    left: 0;right:0;
-    bottom: 30px;
-    font-size: 17px;
-    white-space: nowrap;
+  display: none;
+  max-width: 50px;
+  height: 50px;
+  /*margin-left: -125px;*/
+  margin: auto;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 2px;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  font-size: 17px;
+  white-space: nowrap;
 }
-#toast #img{
-	width: 50px;
-	height: 50px;
 
-    float: left;
-
-    padding-top: 16px;
-    padding-bottom: 16px;
-
-    box-sizing: border-box;
-
-
-    background-color: #111;
-    color: #fff;
+#toast #img {
+  width: 50px;
+  height: 50px;
+  float: left;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  box-sizing: border-box;
+  background-color: #111;
+  color: #fff;
 }
-#toast #desc{
 
-
-    color: #fff;
-
-    padding: 16px;
-
-    overflow: hidden;
-	white-space: nowrap;
+#toast #desc {
+  color: #fff;
+  padding: 16px;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 #toast.show {
-    visibility: visible;
-    -webkit-animation: fadein 0.5s, expand 0.5s 0.5s,stay 3s 1s, shrink 0.5s 2s, fadeout 0.5s 2.5s;
-    animation: fadein 0.5s, expand 0.5s 0.5s,stay 3s 1s, shrink 0.5s 4s, fadeout 0.5s 4.5s;
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, expand 0.5s 0.5s, stay 3s 1s, shrink 0.5s 2s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, expand 0.5s 0.5s, stay 3s 1s, shrink 0.5s 4s, fadeout 0.5s 4.5s;
 }
 
 @-webkit-keyframes fadein {
-    from {bottom: 0; opacity: 0;}
-    to {bottom: 30px; opacity: 1;}
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
 }
 
 @keyframes fadein {
-    from {bottom: 0; opacity: 0;}
-    to {bottom: 30px; opacity: 1;}
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
 }
 
 @-webkit-keyframes expand {
-    from {min-width: 50px}
-    to {min-width: 350px}
+  from {
+    min-width: 50px
+  }
+  to {
+    min-width: 350px
+  }
 }
 
 @keyframes expand {
-    from {min-width: 50px}
-    to {min-width: 350px}
+  from {
+    min-width: 50px
+  }
+  to {
+    min-width: 350px
+  }
 }
+
 @-webkit-keyframes stay {
-    from {min-width: 350px}
-    to {min-width: 350px}
+  from {
+    min-width: 350px
+  }
+  to {
+    min-width: 350px
+  }
 }
 
 @keyframes stay {
-    from {min-width: 350px}
-    to {min-width: 350px}
+  from {
+    min-width: 350px
+  }
+  to {
+    min-width: 350px
+  }
 }
+
 @-webkit-keyframes shrink {
-    from {min-width: 350px;}
-    to {min-width: 50px;}
+  from {
+    min-width: 350px;
+  }
+  to {
+    min-width: 50px;
+  }
 }
 
 @keyframes shrink {
-    from {min-width: 350px;}
-    to {min-width: 50px;}
+  from {
+    min-width: 350px;
+  }
+  to {
+    min-width: 50px;
+  }
 }
 
 @-webkit-keyframes fadeout {
-    from {bottom: 30px; opacity: 1;}
-    to {bottom: 60px; opacity: 0;}
+  from {
+    bottom: 30px;
+    opacity: 1;
+  }
+  to {
+    bottom: 60px;
+    opacity: 0;
+  }
 }
 
 @keyframes fadeout {
-    from {bottom: 30px; opacity: 1;}
-    to {bottom: 60px; opacity: 0;}
+  from {
+    bottom: 30px;
+    opacity: 1;
+  }
+  to {
+    bottom: 60px;
+    opacity: 0;
+  }
 }
 
-
 /* Right Click Menu */
-@import url(https://fonts.googleapis.com/css?family=Roboto:400,300&subset=latin,latin-ext);
 
-ul.contextMenu{
-  list-style:none;
-  margin:0;padding:0;
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300&subset=latin,latin-ext);
+ul.contextMenu {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
   font: 300 12px 'Roboto', sans-serif;
   position: absolute;
   color: #333;
   box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.2);
 }
 
-ul.contextMenu *{
-    transition:color .4s, background .4s;
+ul.contextMenu * {
+  transition: color .4s, background .4s;
 }
 
-ul.contextMenu li{
-  min-width:250px;
+ul.contextMenu li {
+  min-width: 250px;
   overflow: hidden;
   white-space: nowrap;
   padding: 12px 15px;
   background-color: #fff;
-  border-bottom:1px solid #ecf0f1;
+  border-bottom: 1px solid #ecf0f1;
 }
 
-ul.contextMenu li i{
+ul.contextMenu li i {
   margin-right: 15px;
 }
 
-ul.contextMenu li a{
-  color:#333;
-  text-decoration:none;
+ul.contextMenu li a {
+  color: #333;
+  text-decoration: none;
 }
 
-ul.contextMenu li:hover{
+ul.contextMenu li:hover {
   background-color: #ecf0f1;
 }
 
-ul.contextMenu li:first-child{
+ul.contextMenu li:first-child {
   border-radius: 5px 5px 0 0;
 }
 
@@ -169,12 +260,20 @@ ul.contextMenu li:last-child{
 }
 */
 
-ul.contextMenu li:last-child a{width:26%;}
-ul.contextMenu li:last-child:hover a{color:#2c3e50}
-ul.contextMenu li:last-child:hover a:hover{color:#2980b9}
+ul.contextMenu li:last-child a {
+  width: 26%;
+}
 
+ul.contextMenu li:last-child:hover a {
+  color: #2c3e50
+}
+
+ul.contextMenu li:last-child:hover a:hover {
+  color: #2980b9
+}
 
 /* Intro Page */
+
 .masthead h1 {
   font-size: 4rem;
   margin: 0;
@@ -193,20 +292,21 @@ ul.contextMenu li:last-child:hover a:hover{color:#2980b9}
 }
 
 .text-center {
-    text-align: center!important;
-    margin-top: 50px !important;
-    margin-bottom: 100px !important;
+  text-align: center !important;
+  margin-top: 50px !important;
+  margin-bottom: 100px !important;
 }
 
 .masthead .text-center .mb-5, .my-5 {
-    color: #f8f9fa;
-    font-size: 3.5rem;
-    font-weight: lighter;
+  color: #f8f9fa;
+  font-size: 3.5rem;
+  font-weight: lighter;
 }
 
 .mb-5 em {
-  font-style:normal !important;
+  font-style: normal !important;
 }
+
 .intro-button-group .btn {
   font-weight: 700;
   margin: 2rem;
@@ -217,27 +317,23 @@ ul.contextMenu li:last-child:hover a:hover{color:#2980b9}
   padding-top: 4rem;
 }
 
-
-
-
 /* dropzone */
+
 .dropzone {
-    border:3px dotted #8a8a8a;
-    width:100%;
-    min-height:100px !important;
-    color:#8a8a8a;
-    font-weight: 500;
-    text-align: center;
-    line-height: 100px;
-    font-size:1.1rem;
-    padding-top:12px;
-    margin-top:15px;
-    margin-bottom: 15px;
+  border: 3px dotted #8a8a8a;
+  width: 100%;
+  min-height: 100px !important;
+  color: #8a8a8a;
+  font-weight: 500;
+  text-align: center;
+  line-height: 100px;
+  font-size: 1.1rem;
+  padding-top: 12px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
-.dropzone span {
-
-}
+.dropzone span {}
 
 /*
 .table-position {
