@@ -389,7 +389,7 @@ function Delete() {
       data: body,
       dataType: "JSON",
       success: function(result) {
-        console.log(json);
+        console.log(result);
         var PresentFolderID = removeSpace("<%=FolderID%>");
         Refresh();
       },

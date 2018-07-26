@@ -204,6 +204,7 @@ module.exports = function(){
     }
     dbx_init(req.user, function(client){
         dbxutil.delete(client, FileID,FolderID, req.user.userID, function(result){
+          console.log(result);
           res.json(result);
         });
     })
