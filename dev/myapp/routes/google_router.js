@@ -8,6 +8,7 @@ const google_init = require('../app_modules/cpgoogle/google_init');
 const moment = require('moment');
 const schedule = require('node-schedule');
 const redis_client = require('../app_modules/config/redis')
+const request = require('request');
 
 /* modules for getting user access token 지우지마!*/
 const knex = require('../app_modules/db/knex');
@@ -32,44 +33,81 @@ router.use(bodyParser.urlencoded({
 
 
 router.get('/folder/', (req, res) => {
-  google_init(req.user, function(client) {
-    var folderID = 'root';
-    var orderkey = 'folder'; // check
-    google_util.list(folderID,orderkey,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
-      console.log("return - 2");
-      res.render('google_list', {
-        FolderID: folderID,
-        filelist: filelist
-      });
+  var userId=req.user.userID;
+  var folderId= 'root';
+  var orderkey;
+  console.log("folder");
+  google_util.list(userId,folderId, orderkey, function(fileList){
+    res.render('google_list', {
+      FolderID: folderId,
+      filelist: fileList
     });
   });
 });
 
 router.get('/folder/:id', (req, res) => {
-  google_init(req.user, function(client) {
-    var folderID;
-    if (req.params.id == '\'root\'') folderID = req.params.id;
-    else {folderID = req.params.id ;}
-    var orderkey = 'folder'; // check
-
-    google_util.list(folderID,orderkey,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
-      console.log("return - 3");
-      res.render('google_list', {
-        FolderID: folderID,
-        filelist: filelist
-      });
+  var userId=req.user.userID;
+  var folderId = req.params.id;
+  var orderkey;
+  google_util.list(userId,folderId, orderkey, function(filelist){
+    res.render('google_list', {
+      FolderID: folderId,
+      filelist: filelist
     });
   });
 });
 
+router.post('/search/',function(req,res){
+  var filelist=JSON.parse(req.body.list);
+  
+  console.log(filelist);
+  var folderId= 'root';
+
+  res.render('google_list', {
+    FolderID: folderId,
+    filelist: filelist
+  });
+});
+
+router.post('/searchtype/',function(req,res){
+    var userId=req.user.userID;
+    var keyType=req.body.selectType;
+    var keyWord=req.body.fileName;
+    var orderKey;
+
+    console.log('/searchtype/post : ',userId, keyType);
+    google_util.searchType(userId,keyWord,keyType,orderKey, function(filelist){
+      res.json(filelist);
+    });
+});
+
+router.post('/rename/:id',function(req,res){
+  console.log('rename 라우터 진입 ');
+  google_util.reName(req.user.userID,req.body.fileId,req.params.id,req.body.newname, function(result){
+    res.json(result);
+  });
+});
+
+
+router.post('/delete/', function(req, res) {
+  console.log('rename 라우터 진입 ');
+  google_util.deleteFile(req.user.userID,req.body.fileId, function(result){
+    res.json(result);
+  });
+});
+
+
 router.post('/upload/:id',function(req,res){
   google_init(req.user, function(client) {
+    console.log('upload router 진입');
     var folderID = req.params.id;
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
       var FileInfo = files.userfile;
-      google_util.uploadSplit(FileInfo, folderID, client);
-      res.redirect('/google/' + folderID);
+      console.log(FileInfo);
+      google_util.uploadFile(req.user.userID,FileInfo, folderID, client,function(result){
+        res.json(result);
+      });
     });
   });
 });
@@ -82,25 +120,6 @@ router.post('/download', function(req, res) {
     var fileId = req.body.name;
     google_util.downloadFile(res,fileId,client);
     res.redirect(backURL);
-  });
-});
-
-router.post('/delete', function(req, res) {
-
-  google_init(req.user, function(client) {
-    var backURL = req.header('Referer') || '/';
-    var fileId = req.body.name;
-    google_util.deleteFile(fileId,client);
-    res.redirect(backURL);
-  });
-});
-
-router.post('/rename',function(req,res){
-  google_init(req.user, function(client) {
-    var Newname = req.body.filename;
-    var fileId = req.body.name;
-    console.log(req.params, req.body);
-    google_util.updateFile(Newname,fileId,client);
   });
 });
 
@@ -135,21 +154,6 @@ router.post('/copy/:id',function(req,res){
   });
 });
 
-router.post('/searchtype',function(req,res){
-  google_init(req.user, function(client) {
-    var Filetype=req.body.type;
-    google_util.searchType(Filetype,client, function(filelist) { //callback 함수를 통해 정보를 받아온다.
-      console.log("return - 4");
-      res.render('google_list',{
-        FolderID : 'root',
-        filelist : filelist
-      });
-      // $( "#objectID" ).load( "test.php", { "choices[]": [ "Jon", "Susan" ] } );
-      // $('.graph').load("../../views/google_list.ejs");
-    });
-  });
-});
-
 router.post('/searchname/:id',function(req,res){
   google_init(req.user, function(client) {
     var Filename;
@@ -170,10 +174,24 @@ router.get('/callback', function(req, res) {
     var accessToken = tokens.access_token;
     var refreshToken = tokens.refresh_token;
 
+    var data = {"userId" : userID , "CP_love" : accessToken};
+
+    request.post({
+      url: 'http://localhost:4000/api/google/set/',
+      body : data,
+      json : true
+    },
+      function(error, response, body){
+        console.log(body);
+        console.log("Complete register rest API Server - Google ");
+      }
+    );
+
     if(refreshToken == null){
       knex.select('refreshToken_g').from('GOOGLE_RELIEVE_TB').where('userID', userID).then(function(rows){
         if(rows != null){
           refreshToken = rows[0].refreshToken_g;
+        
           knex('GOOGLE_CONNECT_TB').insert({
             // todo: session에서 userID 추출
             userID: userID,
@@ -344,6 +362,19 @@ var refreshGoogleToken = function(userID) {
             console.log('[INFO] ' + userID + ' USER\'S GOOGLE ACCESS TOKEN IS REFRESHED SUCCESSFULLY!');
             knex.select('recentRefreshTime_g').from('GOOGLE_CONNECT_TB').where('userID', userID)
             .then(function(rows){
+              
+              var data = {
+                "user_id": userID,
+                "accesstoken": new_accessToken_b
+              };
+              request.post({
+                url: 'http://localhost:4000/api/google/refresh/token/',
+                body: data,
+                json: true
+              }, function(error, response, body){
+                console.log('[INFO] ' + userID + '\'S GOOGLE REFERSH TOKEN RESULT: ' + body);
+              });
+
                 resolve(moment(rows[0].recentRefreshTime_g));
             }).catch(function(err){
               console.log(err)

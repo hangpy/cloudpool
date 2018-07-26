@@ -1,31 +1,3 @@
-// $(document).on('click', '#table_google tr', function (e) {
-//   e.stopPropagation();
-//    e.preventDefault();
-//   var $this = $(this);
-//   if($this.closest('tr').data('id')==undefined){
-//     var tdid = $this.find('td[data-id]').data('id');
-//     e.stopPropagation();
-//     e.preventDefault();
-//     $('.replace').load("google/"+tdid);
-//     e.stopPropagation();
-//     e.preventDefault();
-//   }
-//   else{
-//     var trid = $this.closest('tr').data('id');
-//     $('.replace').load("google/"+trid);
-//   }
-//   e.stopPropagation();
-//   e.preventDefault();
-//   return false;
-// }).preventDefault();
-
-// // $(document).on('click', '#table_google tr', function (e) {
-// //   e.stopPropagation();
-// //   var $this = $(this);
-// //   var trid = $this.find('tr[data-id]').data('id');
-// //   $('.replace').load("google/"+trid);
-// // });
-// <!-- 한글 -> 유니코드 -->
 function replaceAll(strTemp, strValue1, strValue2){
         while(1){
             if( strTemp.indexOf(strValue1) != -1 )
