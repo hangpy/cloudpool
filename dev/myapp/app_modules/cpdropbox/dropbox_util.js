@@ -199,16 +199,7 @@ const UTIL = (function() {
       .then(function(response) {
         //삭제후 알림 필요
         console.log(response);
-        request.post({
-            url: 'http://localhost:4000/api/dropbox/refresh/',
-            body: data,
-            json: true
-          },
-          function(error, response, body) {
-            console.log("refresh");
-          }
-        );
-
+        callback("refresh");
       })
       .catch(function(err) {
         console.log(err);

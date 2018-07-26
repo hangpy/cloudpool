@@ -56,6 +56,7 @@ module.exports = function(passport) {
                 data = {
                   "user_id": userID
                 }
+                // 연동 되었을 때만 post보내게 바꾸기
                 request.post({
                   url: 'http://localhost:4000/api/dropbox/login/',
                   body: data,

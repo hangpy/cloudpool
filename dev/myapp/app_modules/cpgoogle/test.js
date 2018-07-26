@@ -19,10 +19,10 @@ var request=require('request');
   const google_client = client_info.GOOGLE;
   var OAuth2 = google.auth.OAuth2;
 
-  var CLIENT_ID = '714692765966-s4j4lg93biif9dthfesu8u4udtet85dt.apps.googleusercontent.com',
-      CLIENT_SECRET = 'yy32K0r5Y0h6JUfcyHWq4RtE',
+  var CLIENT_ID = google_client.getClientId(),
+      CLIENT_SECRET = google_client.getClientSecret(),
       REDIRECT_URL = google_client.getRedirectUrl();
-
+ 
   function sleep(milliseconds) {
     var start = new Date().getTime();
     for (var i = 0; i < 1e7; i++) {
@@ -39,7 +39,7 @@ var request=require('request');
   );
 
   oauth2Client.credentials = {
-    access_token: 'ya29.Glz8BSyrztxGnEPDq3BKPGWPysA7jT6OZJ7FK-Y5mXGDdIS-ctlSR_8VbT7MlkMGJBI0W74seVABeDz0ccd2W7N3MC0n4T7yYpwKChR1OdGKrrg9TAwwPPfxd2mE4Q'
+    access_token: 'ya29.Glz8BRzz4uq8wzY3xiLwTzZ5MUJq4NKzUYC3i_3O4qp5WstAnZogj-fAFpx6H6lX-CGsd0e9m12FX6An5J9ydDsj0ESFYFWngJ8QtjMkEfy9eXxGvXtJ-aYBt778yg'
     ,refresh_token: '1/QZnltKi5QGjNVKUltA7W4t0_yvzTmsisN0D1bOV30hI'};
 
   var fileId = '1wi6vB5fWXer4T2ULA_0bNNGsl2Ff675g';
@@ -50,67 +50,12 @@ var request=require('request');
   var pageToken = null;
 // Using the NPM module 'async'
 
-
-// var data = {
-//   q: "mimeType='application/vnd.google-apps.folder'",
-//   fields: "nextPageToken, files(id,name,mimeType,createdTime,modifiedTime,size,parents)",
-//   pageSize: 400,
-//   // spaces: 'drive',
-//   pageToken: pageToken
-// };
-// request.post({
-//   url: 'http://localhost:4000/api/google/check/',
-//   body : data,
-//   json : true
-// },
-//   function(error, response, body){
-//      console.log());
-//   }
-// );
-
-
-
-  // async.doWhilst(function (callback) {
-  //   drive.files.list({
-  //     q: "name contains '남미' and trashed = false",
-  //     fields: "nextPageToken, files(kind,id,name,mimeType,createdTime,modifiedTime,size,parents,owners,viewedByMeTime)",
-  //     pageSize: 100,
-  //     spaces: 'drive',
-  //     pageToken: pageToken
-  //   }, function (err, res) {
-  //     if (err) {
-  //       // Handle error
-  //       console.error(err);
-  //       callback(err)
-  //     } else {
-
-  //       ll=ll.concat(res.data.files);
-  //       console.log(ll[0]);
-  //       pageToken = res.data.nextPageToken;
-  //       callback();
-  //     }
-  //   });
-  // }, function () {
-  //   return !!pageToken;
-  // }, function (err) {
-  //   if (err) {
-  //     // Handle error
-  //     console.error(err);
-  //   } else {
-  //     console.log('finished');
-  //     console.timeEnd('alpha');
-
-  //     // All pages fetched
-  //   }
-  // });
-  var i=0;
-  var error=0;
-  var recurApi=function(folderId,CallBack){
+  var recurApi=function(folderId,Fdepth){//,CallBack){
     var FileList=[];
     var filelist =[];
     var query = "parents in '"+folderId+"' and trashed =false";
 
-    async.doWhilst(function (callback) {
+    async.doWhilst(function (callback1) {
       drive.files.list({
         q: query,
         fields: "nextPageToken, files(id,name,mimeType,createdTime,modifiedTime,size,parents)",
@@ -119,100 +64,55 @@ var request=require('request');
         pageToken: pageToken
       }, function (err, res) {
         if (err) {
-          // Handle error
-          error=error+1;
-          console.log('==============================================================================error list:',i);
-
+          console.log('async.doWhilst err : ',err);
           callback(err)
-        }
+        } 
         else {
-          i=i+1;
-          if(i<300){
-            // console.log('============================Sleep 1! at the' + i)
-            sleep(200);
-            // console.log('============================Sleep 1! finish at the' + i)
-            console.log('query:',i);
+          async.map(res.data.files, function(file, callback2){
+            var fileinfo = {
+              'id' : file.id,
+              'name' : file.name,
+              'mimeType' : file.mimeType,
+              'modifiedTime' : file.modifiedTime,
+              'size' : file.size,
+              'parents' : folderId,
+              'depth' : Fdepth
+            };
+            filelist.push(fileinfo);
+          }, function(err, result){
+            if(err) console.log(err);
+            else {
+              console.log('Finish the File list:'+folderId);
+              callback(filelist);
+            }
+          });
+
             filelist=filelist.concat(res.data.files);
-            // console.log(filelist.length);
             pageToken = res.data.nextPageToken;
             callback();
-          }
-          else{
-            console.log('query:',i);
-            filelist=filelist.concat(res.data.files);
-            // console.log(filelist.length);
-            pageToken = res.data.nextPageToken;
-            callback();
-          }
         }
       });
-    }, function () {
+      }, function () {
       return !!pageToken;
     }, function (err) {
       if (err) {
-        error=error+1;
-        console.log('================================================================================error ========second list:',i);
-
+        console.log('async.doWhilst Final err : ',err);
       }
       else{
-        console.log('1st depth file length:',filelist.length);
-        async.map(filelist,function(file,callback2){
-          i=i+1;
-
-          console.log('query:',i);
-          if(i<600){
-              // console.log('============================Sleep 2! at the' + i)
-              sleep(200);
-              // console.log('============================Sleep 2! finish at the' + i)
-              FileList.push(file);
-              if(file.mimeType=='application/vnd.google-apps.folder'){
-                // console.log('file is folder!');
-                recurApi(file.id,function(filesInfolder){
-                  FileList=FileList.concat(filesInfolder);
-                  callback2(null,'finished');
-                })
-              }
-            else{
-              callback2(null,'finished');
-            }
-          }
-          else{
-            FileList.push(file);
-            if(file.mimeType=='application/vnd.google-apps.folder'){
-              // console.log('file is folder!');
-              recurApi(file.id,function(filesInfolder){
-                FileList=FileList.concat(filesInfolder);
-                callback2(null,'finished');
-              })
-            }
-            else{
-              callback2(null,'finished');
-            }
-          }
-
-        },function(err,result){
-          if(err){
-            error=error+1;
-            console.log('====================================================================================error list:',i);
-
-          }
-
-
-
-            CallBack(FileList);
-
-        });
+        console.log(filelist);
       }
     });
   }
 
-console.time('alpha');
-recurApi('root',function(FileList){
-  console.log('final list length :',FileList.length);
-  console.timeEnd('alpha');
-  console.log(error);
-})
+// console.time('alpha');
+recurApi('root',1);
 
+// { id: '1gd2kkvnSjz95WUM9KWePmhDc_BrAdlqq',
+// name: 'dir1',
+// mimeType: 'application/vnd.google-apps.folder',
+// parents: [ '0AGCP8EhCswtnUk9PVA' ],
+// createdTime: '2018-05-03T06:49:40.133Z',
+// modifiedTime: '2018-05-03T06:49:40.133Z' },
 
   // drive.files.list({
   //   q: "parents in 'root' and trashed = false",
@@ -225,9 +125,12 @@ recurApi('root',function(FileList){
   //     // Handle error
   //     console.log('first api call error : ',err);
   //     callback(err)
-  //   }
+  //   } 
   //   else {
   //     console.log(res.data.files[0].parents[0]);
   //     callback();
   //   }
   // });
+  
+ 
+
