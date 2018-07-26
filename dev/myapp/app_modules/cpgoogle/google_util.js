@@ -80,60 +80,82 @@ var deleteFile =function(userId,fileId,callback){
 // }
 
 
-//   var uploadFile = function(FileInfo, Folder,oauth2Client) {
-//       var drive = google.drive({
-//         version: 'v3',
-//         auth: oauth2Client
-//       });
+  var uploadFile = function(userId,FileInfo, Folder,oauth2Client,callback) {
+    console.log('upload 함수 시작 ');
+      var drive = google.drive({
+        version: 'v3',
+        auth: oauth2Client
+      });
 
-//       if (Folder == '\'root\'') {
-//         var fileMetadata = {
-//           'name': FileInfo.name
-//         };
-//         var media = {
-//           mimeType: FileInfo.type,
-//           body: fs.createReadStream(FileInfo.path)
-//         };
+      if (Folder == '\'root\'') {
+        var fileMetadata = {
+          'name': FileInfo.name
+        };
+        var media = {
+          mimeType: FileInfo.type,
+          body: fs.createReadStream(FileInfo.path)
+        };
 
-//         drive.files.create({
-//           resource: fileMetadata,
-//           media: media,
-//           fields: 'id'
-//         }, function(err, file) {
-//           if (err) {
-//             console.error(err);
-//           } else {
-//             console.log('Uploaded!');
-//           }
-//         });
-//       } else {
-//         var FolderID = Folder;
-//         // 디렉토리 내에서 업로
-//         var fileMetadata = {
-//           'name': FileInfo.name,
-//           parents: [FolderID]
-//         };
+        drive.files.create({
+          resource: fileMetadata,
+          media: media,
+          fields: 'id,name,mimeType,createdTime,modifiedTime,size,parents'
+        }, function(err, file) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('Uploaded!');
+            var data = { "userId" : userId , "newFile": file.data};
+            console.log(data);
 
-//         var media = {
-//           mimeType: FileInfo.type,
-//           body: fs.createReadStream(FileInfo.path)
-//         };
+            request.post({
+              url: 'http://localhost:4000/api/google/upload/',
+              body : data,
+              json : true
+            },
+              function(error, response, body){
+                callback(body);
+              });
+          }
+        });
+      } else {
+        var FolderID = Folder;
+        // 디렉토리 내에서 업로
+        var fileMetadata = {
+          'name': FileInfo.name,
+          parents: [FolderID]
+        };
 
-//         drive.files.create({
-//           resource: fileMetadata,
-//           media: media,
-//           fields: 'id'
-//         }, function(err, file) {
-//           if (err) {
-//             console.error(err);
-//           } else {
-//             console.log('Uploaded!');
+        var media = {
+          mimeType: FileInfo.type,
+          body: fs.createReadStream(FileInfo.path)
+        };
 
-//           }
-//         });
-//       }
+        drive.files.create({
+          resource: fileMetadata,
+          media: media,
+          fields: "id,name,mimeType,createdTime,modifiedTime,size,parents",
+        }, function(err, file) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('Uploaded!');
+            var data = { "userId" : userId , "newFile": file.data};
+            console.log(data);
 
-//   }
+            request.post({
+              url: 'http://localhost:4000/api/google/upload/',
+              body : data,
+              json : true
+            },
+              function(error, response, body){
+                callback(body);
+              });
+          }
+        });
+      }
+
+  }
 
 //   var deleteFile = function(fileId,oauth2Client) {
 //     var drive = google.drive({
@@ -363,7 +385,7 @@ var deleteFile =function(userId,fileId,callback){
     reName:reName,
     deleteFile:deleteFile,
     // downloadFile: downloadFile,
-    // uploadFile: uploadFile,
+    uploadFile: uploadFile,
     // deleteFile: deleteFile,
     // updateFile: updateFile,
     // updateDir: updateDir,

@@ -12,7 +12,7 @@
   <div class="card-body">
     <form name="uploadform" id="uploadform" action='google/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
       <input type='file' name='userfile'>
-      <button type="button" onclick='UploadSubmit()'>업로드</button>
+      <button type="button" onclick='Upload()'>업로드</button>
 
     </form>
 
@@ -279,11 +279,61 @@ function Select(){
       });
 }
 
-  function UploadSubmit() {
-    uploadform.action = 'google/upload/<%=FolderID%>';
-    uploadform.submit();
-    $('.replace').load("google/<%=FolderID%>");
-  };
+  function Upload() {
+   var form = $('#uploadform')[0];
+   var formData = new FormData(form);
+
+   $.ajax({
+     type: "POST",
+     url: "google/upload/<%=FolderID%>",
+     async: true,
+     data: formData,
+     processData: false,
+     contentType: false,
+     success: function(json) {
+       console.log(json);
+       $('.replace').load("google/folder/<%=FolderID%>");
+     },
+      beforeSend: function() {
+        // (이미지 보여주기 처리)
+        $('.wrap-loading').removeClass('display-none');
+      },
+      complete: function() {
+        // (이미지 감추기 처리)
+        $('.wrap-loading').addClass('display-none');
+      },
+      error: function(error) {
+        console.log(error);
+      }
+   });
+ }
+
+
+  // function Upload() {
+  //   $.ajax({
+  //     type: "POST",
+  //     url: "google/upload/",
+  //     async: true,
+  //     data: body,
+  //     dataType: "JSON",
+  //     success: function(json) {
+  //       console.log(json);
+    
+  //       $('.replace').load("google/folder/<%=FolderID%>");
+  //     },
+  //     beforeSend: function() {
+  //       // (이미지 보여주기 처리)
+  //       $('.wrap-loading').removeClass('display-none');
+  //     },
+  //     complete: function() {
+  //       // (이미지 감추기 처리)
+  //       $('.wrap-loading').addClass('display-none');
+  //     },
+  //     error: function(error) {
+  //       console.log(error);
+  //     }
+  //   });
+  // }
 </script>
 
 <script src="js/loadfolder.js"></script>

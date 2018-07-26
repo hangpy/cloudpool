@@ -86,15 +86,6 @@ router.post('/rename/:id',function(req,res){
   google_util.reName(req.user.userID,req.body.fileId,req.params.id,req.body.newname, function(result){
     res.json(result);
   });
-  // google_util.reName(userId,keyWord,keyType,orderKey, function(filelist){
-  //   res.json(filelist);
-  // });
-  // google_init(req.user, function(client) {
-  //   var Newname = req.body.filename;
-  //   var fileId = req.body.name;
-  //   console.log(req.params, req.body);
-  //   google_util.updateFile(Newname,fileId,client);
-  // });
 });
 
 
@@ -108,12 +99,15 @@ router.post('/delete/', function(req, res) {
 
 router.post('/upload/:id',function(req,res){
   google_init(req.user, function(client) {
+    console.log('upload router 진입');
     var folderID = req.params.id;
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
       var FileInfo = files.userfile;
-      google_util.uploadSplit(FileInfo, folderID, client);
-      res.redirect('/google/' + folderID);
+      console.log(FileInfo);
+      google_util.uploadFile(req.user.userID,FileInfo, folderID, client,function(result){
+        res.json(result);
+      });
     });
   });
 });
