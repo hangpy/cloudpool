@@ -11,7 +11,7 @@
     <input type='file' id='uploadfile' name='uploadfile'>
     <button type="button" onclick='UploadSubmit()'>업로드</button>
     &nbsp;&nbsp;
-    <input type="text" name="foldername" placeholder="새폴더 이름">
+    <input type="text" id="foldername" placeholder="새폴더 이름">
     <button type="button" onClick='CreateFolder()'>새폴더 만들기</button>
   </form>
   <p></p>
@@ -19,9 +19,9 @@
     체크박스 :&nbsp;
     <button type="button" onClick='Submit("download")'>다운로드(개발중,파일만)</button>&nbsp;&nbsp;
     <button type="button" onClick='Delete()'>삭제</button>&nbsp;&nbsp;
-    <input type="text" name="filename" placeholder="새이름">
+    <input type="text" id="filename" placeholder="새이름">
     <button type="button" onClick='Rename()'>이름 바꾸기</button>&nbsp;&nbsp;
-    <input type="text" name="pathId" placeholder="폴더 ID">
+    <input type="text" id="pathId" placeholder="폴더 ID">
     <button type="button" onClick='MovePath()'>경로 이동</button>
     <p></p>
     <div class="table-responsive">
@@ -131,27 +131,30 @@
   }
 
   function UploadSubmit() {
-    // uploadform.action = 'box/upload/<%=FolderID%>';
-    // uploadform.submit();
-    // $('.replace').load("box/<%=FolderID%>");
-    var form = $('#uploadform')[0];
-    var formData = new FormData(form);
-    // formData.append("uploadfile", $("#uploadfile")[0].files[0]);
-    $.ajax({
-      type: "POST",
-      url: "box/upload/<%=FolderID%>",
-      async: false,
-      data: formData,
-      processData: false,
-      contentType: false,
-      success: function(json) {
-        console.log(json);
-        $('.replace').load("box/folder/<%=FolderID%>");
-      },
-      error: function(error) {
-        console.log(error);
-      }
-    });
+    if(!$('#uploadfile').val()){
+      alert('업로드할 파일을 선택해주세요');
+    } else {
+      // var form = $('#uploadform')[0];
+      // var formData = new FormData(form);
+      var formData = new FormData();
+      formData.append("uploadfile", $("#uploadfile")[0].files[0]);
+      $.ajax({
+        type: "POST",
+        url: "box/upload/<%=FolderID%>",
+        async: false,
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(json) {
+          console.log(json);
+          alert(json);
+          $('.replace').load("box/folder/<%=FolderID%>");
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
   }
 
   function Delete() {
@@ -205,24 +208,31 @@
   }
 
   function CreateFolder() {
-    var body = {
-      "foldername": uploadform.foldername.value,
-      "folderId": "<%=FolderID%>"
-    }
-    $.ajax({
-      type: "POST",
-      url: "box/create",
-      async: true,
-      data: body,
-      dataType: "JSON",
-      success: function(json) {
-        console.log(json);
-        $('.replace').load("box/folder/<%=FolderID%>");
-      },
-      error: function(error) {
-        console.log(error);
+    if(!$('#foldername').val()){
+      alert('새폴더 이름을 입력해주세요');
+    } else {
+      var body = {
+        "foldername": uploadform.foldername.value,
+        "folderId": "<%=FolderID%>"
       }
-    });
+      $.ajax({
+        type: "POST",
+        url: "box/create",
+        async: true,
+        data: body,
+        dataType: "JSON",
+        success: function(json) {
+          console.log(json);
+          if(json!='success') {
+            alert(json);
+          }
+          $('.replace').load("box/folder/<%=FolderID%>");
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+    }
   }
 
   function Rename() {
@@ -238,6 +248,8 @@
     }
     if (name == '') {
       alert("이름을 변경할 파일이나 폴더를 체크해주세요");
+    } else if(!$('#filename').val()) {
+      alert('새이름을 입력해주세요');
     } else {
       var body = {
         "name": name,
@@ -252,6 +264,9 @@
         dataType: "JSON",
         success: function(json) {
           console.log(json);
+          if(json!='success'){
+            alert(json);
+          }
           $('.replace').load("box/folder/<%=FolderID%>");
         },
         error: function(error) {
@@ -274,6 +289,8 @@
     }
     if (name == '') {
       alert("경로를 변경할 파일이나 폴더를 체크해주세요");
+    } else if(!$('#pathId').val()) {
+      alert('이동할 폴더 ID를 입력해주세요');
     } else {
       var body = {
         "name": name,
@@ -288,6 +305,9 @@
         dataType: "JSON",
         success: function(json) {
           console.log(json);
+          if(json!='success'){
+            alert(json);
+          }
           $('.replace').load("box/folder/<%=FolderID%>");
         },
         error: function(error) {
