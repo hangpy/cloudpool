@@ -61,28 +61,30 @@ module.exports = function(){
     var orgFile = splitUtil.orgFile(__dirname, req.file.path);
     var filesToAdd = splitUtil.filesToAdd;
     filesToAdd.addSync(orgFile);
-    var size = splitUtil.sizeSplit(req.file.size);
-    console.log("Split size : "+size);
-    //분리될 파일이 저장될곳
-    var zipFile = splitUtil.zipFileU(__dirname, req.file.filename);
-    var parameters = splitUtil.parameters();
-    var target = [];
-    //원래 파일 저장
-    zipFile.createZipFile(filesToAdd, parameters, true, size ,function(err, result){
-      if(err){
-        console.log(err);
-      }else {
-        zipFile.getSplitZipFiles(function(err, results){
-          if(err){
-            console. log("Split error : "+err);
-          }
-          else{
-            console.log("Complete Zip4J from " +req.file.filename);
-            splitUtil.upload(results, req.file.size, req, res);
-            //파일 삭제 추가
-          }
-        });
-      }
+    splitUtil.checkDrive(req.user.userID, function(driveState) {
+      var size = splitUtil.sizeSplit(req.file.size, driveState);
+      console.log("Split size : "+size);
+      //분리될 파일이 저장될곳
+      var zipFile = splitUtil.zipFileU(__dirname, req.file.filename);
+      var parameters = splitUtil.parameters();
+      var target = [];
+      //원래 파일 저장
+      zipFile.createZipFile(filesToAdd, parameters, true, size ,function(err, result){
+        if(err){
+          console.log(err);
+        } else {
+          zipFile.getSplitZipFiles(function(err, results){
+            if(err){
+              console. log("Split error : "+err);
+            }
+            else{
+              console.log("Complete Zip4J from " +req.file.filename);
+              splitUtil.upload(results, req.file.size, driveState, req, res);
+              //파일 삭제 추가
+            }
+          });
+        }
+      });
     });
   });
 
@@ -104,7 +106,6 @@ module.exports = function(){
     var newName =req.body.filename;
     var splitFileID= req.body.name;
     splitUtil.rename(splitFileID,newName);
-
   });
 
     return router;
