@@ -37,8 +37,9 @@
       <div class="table-position">
         <!-- <div class='dropzone-mask'></div> -->
         <div class="table-responsive">
-        <div class="dropzone">여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
-          <table class="table table-hover" data-id='<%=FolderID%>'>
+          <div class="dropzone" name='dropbox-area'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
+          <div class='current-folder' name="<%= FolderID %>"></div>
+          <table class="table table-hover">
 
             <thead>
               <tr>
@@ -428,74 +429,7 @@ function UploadSubmit() {
 };
 
 
-$(function() {
- var obj = $(".dropzone");
 
- obj.on('dragenter', function(e) {
-   e.stopPropagation();
-   e.preventDefault();
-   $(this).css({
-     'border': '3px solid #028ee1',
-     'background-color': 'rgba(2, 142, 225, 0.3)',
-   });
- });
-
- obj.on('dragleave', function(e) {
-   e.stopPropagation();
-   e.preventDefault();
-   $(this).css({
-     'border': '3px dotted #8a8a8a',
-     'background-color': 'rgb(255, 255, 255)'
-   });
- });
-
- obj.on('dragover', function(e) {
-   e.stopPropagation();
-   e.preventDefault();
- });
-
- obj.on('drop', function(e) {
-   e.preventDefault();
-   $(this).css({
-     'border': '3px dotted #8a8a8a',
-     'background-color': 'rgb(255, 255, 255)'
-   });
-
-   var files = e.originalEvent.dataTransfer.files;
-   if (files.length < 1)
-     return;
-
-   F_FileMultiUpload(files, obj);
- });
-
-});
-
-
-function F_FileMultiUpload(files, obj) {
-  if (confirm(files.length + "개의 파일을 업로드 하시겠습니까?")) {
-    var data = new FormData();
-    for (var i = 0; i < files.length; i++) {
-      data.append('uploads_list', files[i]);
-    }
-    $.ajax({
-      url: 'dropbox/upload/<%=FolderID%>',
-      type: 'POST',
-      data: data,
-      async: true,
-      processData: false,
-      contentType: false,
-      success: function(response) {
-        console.log("success");
-        Refresh();
-      },
-      complete: function(response) {
-        console.log("complete");
-        Refresh();
-      }
-
-    });
-  }
-}
 
 function launch_toast() {
   var x = document.getElementById("toast")
@@ -720,6 +654,9 @@ $(function() {
 
   //}
 });
+
+
+
 </script>
 <style type="text/css">
   .wrap-loading {

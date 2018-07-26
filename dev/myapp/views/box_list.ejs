@@ -25,6 +25,8 @@
     <button type="button" onClick='MovePath()'>경로 이동(개발중)</button>
     <p></p>
     <div class="table-responsive">
+      <div class="dropzone" name='box-area'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
+      <div class='current-folder' name="<%= FolderID %>"></div>
       <table class="table table-hover" id="table_box">
         <thead>
           <tr>
@@ -234,5 +236,7 @@
       }
     });
   }
+
+
 </script>
 <script src="js/loadfolder.js"></script>

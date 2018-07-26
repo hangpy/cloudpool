@@ -19,7 +19,7 @@
 */
 
 /* footer override */
-.dashbord-body .footer {
+.board-body .footer {
   background: #ffffff none repeat scroll 0 0;
   border-top: 1px solid rgba(120, 130, 140, 0.13);
   color: #67757c;
@@ -33,32 +33,38 @@
 
 /* header override */
 
-.header {
+.board-body .header {
   background: #3373af;
 }
 
-.header .top-navbar .navbar-header {
+.board-body .header .top-navbar .navbar-header {
   background: #3373af;
 }
 
-.header .top-navbar .navbar-header .navbar-brand span{
+.board-body .header .top-navbar .navbar-header .navbar-brand span{
   color: #fff;
   font-weight: 700;
   font-family: 'Source Sans Pro';
   font-size: 2rem;
 }
 
-.header .top-navbar .navbar-header .navbar-brand b{
+.board-body .header .top-navbar .navbar-header .navbar-brand b{
   color: #fff;
   font-weight: 700;
   font-family: 'Source Sans Pro';
   font-size: 2rem;
 }
 
-.header .top-navbar .ti-menu, .header .top-navbar .ti-search {
+.board-body .header .top-navbar .ti-menu, .header .top-navbar .ti-search {
   font-size: 20px;
   color: #fff;
 }
+
+.board-body .header .navbar-collapse .nav-toogler,
+.board-body .header .navbar-collapse .sidebartoggler {
+  display: none;
+}
+
 
 /* left sidbar */
 .left-sidebar {
@@ -333,7 +339,9 @@ ul.contextMenu li:last-child:hover a:hover {
   margin-bottom: 15px;
 }
 
-.dropzone span {}
+.dash-board .current-folder {
+  display: none;
+}
 
 /*
 .table-position {
