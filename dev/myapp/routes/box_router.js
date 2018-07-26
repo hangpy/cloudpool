@@ -27,7 +27,7 @@ var sdk = new BoxSDK({
   clientSecret: CLIENT_SECRET
 });
 
-router.get('/folder', (req, res) => {
+router.get('/folder', function(req, res) {
   var folderID = 0;
   box_util.listFileRest(req.user.userID, folderID, function(filelist) {
     res.render('box_list', {
@@ -37,7 +37,7 @@ router.get('/folder', (req, res) => {
   });
 });
 
-router.get('/folder/:id', (req, res) => {
+router.get('/folder/:id', function(req, res) {
   var folderID = req.params.id;
   box_util.listFileRest(req.user.userID, folderID, function(filelist) {
     res.render('box_list', {
@@ -47,7 +47,7 @@ router.get('/folder/:id', (req, res) => {
   });
 });
 
-router.post('/folder/refresh/', (req, res) => {
+router.post('/folder/refresh/', function(req, res) {
   box_util.refreshFileRest(req.user.userID, function(result) {
     res.json(result)
   });
@@ -90,48 +90,30 @@ router.post('/delete', function(req, res) {
   })
 })
 
-router.post('/create', (req, res) => {
+router.post('/create', function(req, res) {
   var userID = req.user.userID;
   var folderID = req.body.folderId;
   var foldername = req.body.foldername;
   box_util.createFolderRest(userID, folderID, foldername, function(result) {
-    res.json(result)
+    res.json(result);
   });
 });
 
-router.post('/rename/file', function(req, res) {
-  box_init(req.user, function(client) {
-    var FileID = '302277766633';
-    var newname = 'newname.txt';
-    box_util.renameFile(client, FileID, newname);
-    res.redirect('/');
+router.post('/rename', function(req, res) {
+  var userID = req.user.userID;
+  var fileId = req.body.name;
+  var filename = req.body.filename;
+  box_util.renameFileRest(userID, fileId, filename, function(result) {
+    res.json(result);
   });
 });
 
-router.post('/rename/folder', function(req, res) {
-  box_init(req.user, function(client) {
-    var FolderID = '50984438480';
-    var newname = 'newname';
-    box_util.renameFolder(client, FolderID, newname);
-    res.redirect('/');
-  });
-});
-
-router.post('/move/file', function(req, res) {
-  box_init(req.user, function(client) {
-    var FileID = '302277766633';
-    var parentId = '50984438480';
-    box_util.moveFile(client, FileID, parentId);
-    res.redirect('/');
-  });
-});
-
-router.post('/move/folder', function(req, res) {
-  box_init(req.user, function(client) {
-    var FolderID = '49716412865';
-    var parentId = '50984438480';
-    box_util.moveFolder(client, FolderID, parentId);
-    res.redirect('/');
+router.post('/movepath', function(req, res) {
+  var userID = req.user.userID;
+  var fileId = req.body.name;
+  var pathId = req.body.pathId;
+  box_util.movePathRest(userID, fileId, pathId, function(result) {
+    res.json(result);
   });
 });
 

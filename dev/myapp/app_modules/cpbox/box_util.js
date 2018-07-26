@@ -132,32 +132,36 @@ module.exports = (function(){
     });
   }
 
-  var renameFile = function(client, fileId, newname){
-    client.files.update(fileId, {name : newname})
-  	.then(updatedFile => {
-  		console.log('renaming file completed');
-  	});
+  var renameFileRest = function(userID, fileId, filename, callback) {
+    var data = {
+      "user_id": userID,
+      "fileId": fileId,
+      "filename": filename
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/rename',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body);
+    });
   }
 
-  var renameFolder = function(client, folderId, newname){
-    client.folders.update(folderId, {name : newname})
-  	.then(updatedFolder  => {
-  		console.log('renaming folder completed');
-  	});
-  }
-
-  var moveFile = function(client, fileId, parentId){
-    client.files.update(fileId, {parent : {id : parentId}})
-  	.then(updatedFile => {
-  		console.log('moving file completed');
-  	});
-  }
-
-  var moveFolder = function(client, folderId, parentId){
-    client.folders.update(folderId, {parent : {id : parentId}})
-  	.then(updatedFolder => {
-  		console.log('moving folder completed');
-  	});
+  var movePathRest = function(userID, fileId, pathId, callback) {
+    var data = {
+      "user_id": userID,
+      "fileId": fileId,
+      "pathId": pathId
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/movepath',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body);
+    });
   }
 
   var thumbnail = function(client, fileId){
@@ -222,10 +226,8 @@ module.exports = (function(){
     downloadSplit: downloadFileSplit,
     deleteFileRest: deleteFileRest,
     createFolderRest: createFolderRest,
-    renameFile: renameFile,
-    renameFolder: renameFolder,
-    moveFile: moveFile,
-    moveFolder: moveFolder,
+    renameFileRest: renameFileRest,
+    movePathRest: movePathRest,
     thumbnail: thumbnail,
     search: search
   }
