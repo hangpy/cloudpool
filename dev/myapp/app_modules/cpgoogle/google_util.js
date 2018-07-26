@@ -17,7 +17,6 @@ module.exports = (function() {
       json : true
     },
       function(error, response, body){
-        console.log(body);
          callback(JSON.parse(body));
       }
     );
@@ -37,6 +36,18 @@ var searchType = function(userId,keyWord, keyType, orderKey,callback) {
     );
 };
 
+var reName =function(userId,fileId,folderId,newName, callback){
+    var data = { "userId" : userId , "fileId": fileId, "folderId" : folderId, "newName": newName };
+    request.post({
+      url: 'http://localhost:4000/api/google/rename/',
+      body : data,
+      json : true
+    },
+      function(error, response, body){
+        callback(body);
+      }
+    );
+}
 
 
 // var downloadFile = function(res, fileId,oauth2Client) {
@@ -337,6 +348,7 @@ var searchType = function(userId,keyWord, keyType, orderKey,callback) {
 
   return {
     list: list,
+    reName:reName,
     // downloadFile: downloadFile,
     // uploadFile: uploadFile,
     // deleteFile: deleteFile,

@@ -33,11 +33,11 @@ router.use(bodyParser.urlencoded({
 
 
 router.get('/folder/', (req, res) => {
-  var userId='0000000001';
+  var userId=req.user.userID;
   var folderId= 'root';
-  var orderkey; // check
+  var orderkey;
+  console.log("folder");
   google_util.list(userId,folderId, orderkey, function(fileList){
-
     res.render('google_list', {
       FolderID: folderId,
       filelist: fileList
@@ -46,7 +46,7 @@ router.get('/folder/', (req, res) => {
 });
 
 router.get('/folder/:id', (req, res) => {
-  var userId='0000000001';
+  var userId=req.user.userID;
   var folderId = req.params.id;
   var orderkey;
   google_util.list(userId,folderId, orderkey, function(filelist){
@@ -61,22 +61,40 @@ router.post('/search/',function(req,res){
   var filelist=JSON.parse(req.body.list);
   
   console.log(filelist);
-  var folderId= '0AGCP8EhCswtnUk9PVA';
-  res.render('google_list',{
-    FolderID : folderId,
-    filelist : filelist
+  var folderId= 'root';
+
+  res.render('google_list', {
+    FolderID: folderId,
+    filelist: filelist
   });
 });
 
 router.post('/searchtype/',function(req,res){
-    var userId='0000000001';
+    var userId=req.user.userID;
     var keyType=req.body.selectType;
     var keyWord=req.body.fileName;
     var orderKey;
+
     console.log('/searchtype/post : ',userId, keyType);
     google_util.searchType(userId,keyWord,keyType,orderKey, function(filelist){
       res.json(filelist);
     });
+});
+
+router.post('/rename/:id',function(req,res){
+  console.log('라우터 진입 ');
+  google_util.reName(req.user.userID,req.body.fileId,req.params.id,req.body.newname, function(filelist){
+    res.json(filelist);
+  });
+  // google_util.reName(userId,keyWord,keyType,orderKey, function(filelist){
+  //   res.json(filelist);
+  // });
+  // google_init(req.user, function(client) {
+  //   var Newname = req.body.filename;
+  //   var fileId = req.body.name;
+  //   console.log(req.params, req.body);
+  //   google_util.updateFile(Newname,fileId,client);
+  // });
 });
 
 
@@ -110,15 +128,6 @@ router.post('/delete', function(req, res) {
     var fileId = req.body.name;
     google_util.deleteFile(fileId,client);
     res.redirect(backURL);
-  });
-});
-
-router.post('/rename',function(req,res){
-  google_init(req.user, function(client) {
-    var Newname = req.body.filename;
-    var fileId = req.body.name;
-    console.log(req.params, req.body);
-    google_util.updateFile(Newname,fileId,client);
   });
 });
 
@@ -361,6 +370,19 @@ var refreshGoogleToken = function(userID) {
             console.log('[INFO] ' + userID + ' USER\'S GOOGLE ACCESS TOKEN IS REFRESHED SUCCESSFULLY!');
             knex.select('recentRefreshTime_g').from('GOOGLE_CONNECT_TB').where('userID', userID)
             .then(function(rows){
+              
+              var data = {
+                "user_id": userID,
+                "accesstoken": new_accessToken_b
+              };
+              request.post({
+                url: 'http://localhost:4000/api/google/refresh/token/',
+                body: data,
+                json: true
+              }, function(error, response, body){
+                console.log('[INFO] ' + userID + '\'S GOOGLE REFERSH TOKEN RESULT: ' + body);
+              });
+
                 resolve(moment(rows[0].recentRefreshTime_g));
             }).catch(function(err){
               console.log(err)

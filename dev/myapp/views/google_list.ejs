@@ -20,15 +20,18 @@
       <button type="button" onClick='Submit(1)'>다운로드</button>
       <button type="button" onClick='Submit(2)'>삭제</button>
       <td><input type="text" name="filename" placeholder="newname"></td>
-      <button type="submit" onClick='Submit(3)'>변경</button>
+      <button type="button" onClick='Rename()'>변경</button>
       <tr></tr>
-      <select name="type">
-        <option value="application/vnd.google-apps.folder">folder</option>
-        <option value="application/pdf">document-pdf</option>
-        <option value="application/vnd.google-apps.document">document-docx</option>
-        <option value="image/jpeg">image</option>
+      <select name="selectType">
+        <option value="...">...</option>
+        <option value="document">문서</option>
+        <option value="PDF">PDF</option>
+        <option value="video">video</option>
+        <option value="image">이미지</option>
+        <option value="audio">오디오</option>
+        <option value="etc">기타</option>
       </select>
-      <button type="submit" onClick='Submit(4)'>골라보기</button>
+      <button type="button" onClick='Select()'>골라보기</button>
       <div class="table-responsive">
         <table class="table table-hover" id="table_google">
           <thead>
@@ -106,7 +109,7 @@
                               else{
                                 %>
                 <tr class="file-row">
-                  <td><input type="checkbox" name="name" value="<%=oneItem.id%>"></td>
+                  <td><input type="checkbox" name="id" value="<%=oneItem.id%>"></td>
                   <td>
                     <%=i%>
                   </td>
@@ -148,11 +151,6 @@
       action_google.action = 'google/delete';
       $('.replace').load("google/<%=FolderID%>");
     }
-
-    if (index === 3) {
-      action_google.action = 'google/rename';
-    }
-
     if (index === 4) {
 
       action_google.action = 'google/searchtype';
@@ -162,6 +160,54 @@
 
     action_google.submit();
   };
+
+  function Rename() {
+  // 체크박스의 갯수를 변수에 담는다.
+  var chklen = action_google.name.length;
+  var fileId = '';
+  // 체크박스 갯수만큼 for 문을 돌려 체크된 놈의 value값을 가져온다.
+  for (i = 0; i < chklen; i++) {
+    if (action_google.id[i].checked == true) {
+      fileId = action_google.id[i].value;
+      break;
+    }
+  }
+  if (fileId == '') {
+    alert("이름을 변경하실 파일이나 폴더를 체크해주세요");
+  } else {
+    var newname = action_google.filename.value;
+
+    var body = {
+      "fileId": fileId,
+      "newname": newname
+    }
+
+    $.ajax({
+      type: "POST",
+      url: "google/rename/<%=FolderID%>",
+      async: true,
+      data: body,
+      dataType: "JSON",
+      success: function(json) {
+        console.log(json);
+    
+        $('.replace').load("google/folder/<%=FolderID%>");
+      },
+      beforeSend: function() {
+        // (이미지 보여주기 처리)
+        $('.wrap-loading').removeClass('display-none');
+      },
+      complete: function() {
+        // (이미지 감추기 처리)
+        $('.wrap-loading').addClass('display-none');
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  }
+}
+
 
 function Select(){
     var selectType = action_google.selectType.value;
@@ -180,8 +226,8 @@ function Select(){
           data: body,
           dataType: "JSON",
           success: function(json) {
-            // var obj = JSON.stringify(json);
-            // console.log(obj);
+             var obj = JSON.stringify(json);
+             console.log(obj);
             $('.replace').load("google/search/",{list:json});
           },
           error: function(error) {
