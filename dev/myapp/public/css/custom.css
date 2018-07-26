@@ -81,6 +81,75 @@
     padding-top: 54px;
 }
 
+.sidebar-nav > ul > li > a.active {
+    font-weight: 500;
+    background: #e8e8e8;
+    color: #60a5e8;
+}
+
+.sidebar-nav ul li a:hover {
+  color: #fff;
+  background: rgba(48, 126, 186, 0.5);
+}
+
+.sidebar-nav ul li a {
+    color: #607d8b;
+    padding: 20px 35px 15px 20px;
+    display: flex;
+    font-size: 14px;
+    white-space: nowrap;
+}
+.sidebar-nav ul li span {
+  display: inline-block
+}
+
+.sidebar-nav ul li .nav-ico {
+  margin-right: 20px;
+}
+
+.sidebar-nav ul li .dashboard-ico {
+  width: 20px;
+  height: 20px;
+  background: url('../icons/drive-icon/speedometer.png') no-repeat;
+  background-size: contain;
+}
+
+
+.sidebar-nav ul li .google-ico {
+  width: 20px;
+  height: 20px;
+  background: url('../icons/drive-icon/google.png') no-repeat;
+  background-size: contain;
+}
+
+.sidebar-nav ul li .dropbox-ico {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: url('../icons/drive-icon/dropbox.png') no-repeat;
+  background-size: contain;
+}
+
+.sidebar-nav ul li .box-ico {
+  width: 20px;
+  height: 20px;
+  background: url('../icons/drive-icon/box_round.ico') no-repeat;
+  background-size: contain;
+}
+
+.sidebar-nav ul li .connect-ico {
+  width: 20px;
+  height: 20px;
+  background: url('') no-repeat;
+  background-size: contain;
+}
+
+.sidebar-nav ul li .split-ico {
+  width: 20px;
+  height: 20px;
+}
+
+
 /* page-wrapper */
 @media (max-width: 1023px){
   .page-wrapper {
