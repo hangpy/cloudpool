@@ -49,8 +49,4 @@ $(function(){
       $('.replace').load("setting/page-setting-drive");
   });
 
-  $('#google').click( function() {
-    $('.replace').load("google/folder/");
-  });
-
 });

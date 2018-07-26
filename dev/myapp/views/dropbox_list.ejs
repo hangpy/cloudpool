@@ -328,7 +328,11 @@ function dropFormove(event) {
       console.log(json);
 
       var PresentFolderID = removeSpace("<%=FolderID%>");
-      $('.replace').load("dropbox/folder/" + PresentFolderID);
+      $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
+        $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+          console.log("load dropzone.js: " + textStatus);
+        });
+      });
     },
     beforeSend: function() {
       // (이미지 보여주기 처리)
@@ -405,7 +409,11 @@ function Refresh() {
     success: function(json) {
       console.log(json);
       var PresentFolderID = removeSpace("<%=FolderID%>");
-      $('.replace').load("dropbox/folder/" + PresentFolderID);
+      $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
+        $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+          console.log("load dropzone.js: " + textStatus);
+        });
+      });
     },
     beforeSend: function() {
       // (이미지 보여주기 처리)
@@ -425,7 +433,11 @@ function UploadSubmit() {
   uploadform.action = 'dropbox/upload/<%=FolderID%>';
   uploadform.submit();
   var PresentFolderID = removeSpace("<%=FolderID%>");
-  $('.replace').load("dropbox/folder/" + PresentFolderID);
+  $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
+    $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+      console.log("load dropzone.js: " + textStatus);
+    });
+  });
 };
 
 
@@ -469,7 +481,11 @@ function Rename() {
       success: function(json) {
         console.log(json);
         var PresentFolderID = removeSpace("<%=FolderID%>");
-        $('.replace').load("dropbox/folder/" + PresentFolderID);
+        $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
+          $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+            console.log("load dropzone.js: " + textStatus);
+          });
+        });
       },
       beforeSend: function() {
         // (이미지 보여주기 처리)
@@ -504,6 +520,10 @@ function Select() {
       console.log(obj);
       $('.replace').load("dropbox/selectview/folder/" + PresentFolderID, {
         obj: obj
+      }, function(){
+        $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+          console.log("load dropzone.js: " + textStatus);
+        });
       });
     },
     beforeSend: function() {
@@ -538,6 +558,10 @@ function Search() {
       var obj = JSON.stringify(json);
       $('.replace').load("dropbox/searchview/folder/" + PresentFolderID, {
         obj: obj
+      }, function(){
+        $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+          console.log("load dropzone.js: " + textStatus);
+        });
       });
     },
     beforeSend: function() {
@@ -585,7 +609,11 @@ function CreateFolder() {
     success: function(json) {
       var obj = JSON.stringify(json);
       var PresentFolderID = removeSpace("<%=FolderID%>");
-      $('.replace').load("dropbox/folder/" + PresentFolderID);
+      $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
+        $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+          console.log("load dropzone.js: " + textStatus);
+        });
+      });
     },
     beforeSend: function() {
       // (이미지 보여주기 처리)
