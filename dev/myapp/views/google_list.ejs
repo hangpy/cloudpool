@@ -48,7 +48,57 @@
           </thead>
           <!-- 이전 폴더로 이동 -->
           <tbody>
-          <%
+          <%  
+          function getImagePath(name){
+            var splitdata = name.split(".");
+            var mimetype = splitdata[splitdata.length-1];
+            var imagesrc='';
+            if(mimetype=='jpg'||mimetype=='jpeg'||mimetype=='png'||mimetype=='tiff'||mimetype=='tif'||mimetype=='gif'||mimetype=='bmp'){
+              imagesrc='icons/filetype-icon/jpg.png'
+            }
+            else if(mimetype==='avi'){
+              imagesrc='icons/filetype-icon/avi.png';
+            }
+            else if(mimetype==='csv'){
+              imagesrc='icons/filetype-icon/csv.png';
+            }
+            else if(mimetype==='doc'){
+              imagesrc='icons/filetype-icon/doc.png';
+            }
+            else if(mimetype==='iso'){
+              imagesrc='icons/filetype-icon/iso.png';
+            }
+            else if(mimetype==='mp3'){
+              imagesrc='icons/filetype-icon/mp3.png';
+            }
+            else if(mimetype==='mp4'){
+              imagesrc='icons/filetype-icon/mp4.png';
+            }
+            else if(mimetype==='pdf'){
+              imagesrc='icons/filetype-icon/pdf.png';
+            }
+            else if(mimetype==='ppt'||mimetype=='pptx'){
+              imagesrc='icons/filetype-icon/ppt.png';
+            }
+            else if(mimetype==='svg'){
+              imagesrc='icons/filetype-icon/svg.png';
+            }
+            else if(mimetype==='txt'){
+              imagesrc='icons/filetype-icon/txt.png';
+            }
+            else if(mimetype==='xls'){
+              imagesrc='icons/filetype-icon/xls.png';
+            }
+            else if(mimetype==='zip'){
+              imagesrc='icons/filetype-icon/zip.png';
+            }
+            else{
+              imagesrc='icons/filetype-icon/file.png';
+            }
+
+            return imagesrc;
+        }
+
                   <!--byte to kb,mb,gb  -->
                   function formatBytes(bytes,decimals) {
                      if(bytes == 0) return '0 Bytes';
@@ -87,6 +137,9 @@
                 <td>
                   <%=i%>
                 </td>
+                <td>
+                  <img name="imgsrc" src="icons/filetype-icon/folder.png">
+                </td>
                 <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
                 <td data-id='<%=oneItem.id%>'>
                   <a href="#" onclick="moveFolder_google(this);" value='<%=oneItem.id%>'>
@@ -95,9 +148,7 @@
                 </td>
                 <!-- <a href="#"><%=oneItem.name%></a> -->
                 <!-- <td><a href="http://localhost:3000/google/<%=oneItem.id%>"><%=oneItem.name%></a></td> -->
-                <td>
-                  <%=oneItem.mimeType%>
-                </td>
+
                 <td>
                   <%=oneItem.modifiedTime%>
                 </td>
@@ -116,10 +167,10 @@
                     <%=i%>
                   </td>
                   <td>
-                    <%=oneItem.name%>
+                    <img name="imgsrc" src="<%=getImagePath(oneItem.name)%>">
                   </td>
                   <td>
-                    <%=oneItem.mimeType%>
+                    <%=oneItem.name%>
                   </td>
                   <td>
                     <%=oneItem.modifiedTime%>
@@ -309,6 +360,73 @@ function Select(){
       }
    });
  }
+
+String.prototype.hashCode = function() {
+  var hash = 0,
+    i, chr;
+  if (this.length === 0) return hash;
+  for (i = 0; i < this.length; i++) {
+    chr = this.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
+ $(function() {
+
+//if (action_dropbox.name != 'action_dropbox') {
+  var imgsrc = document.getElementsByName('imgsrc');
+
+  var filename = document.getElementsByName('id');
+  console.log(filename);
+  var length = filename.length;
+
+  for (i = 0; i < length; i++) {
+    if (imgsrc[i].src === 'http://localhost:3000/icons/filetype-icon/jpg.png') {
+
+      var hashID = filename[i].value.hashCode();
+      var body = {
+        "order": i,
+        "hashID": hashID,
+        "path": filename[i].value
+      }
+
+      $.ajax({
+        type: "POST",
+        url: "google/getthumbnail/",
+        async: true,
+        data: body,
+        dataType: "JSON",
+        success: function(json) {
+          try {
+            var hashCheck = filename[json[0]].value.hashCode();
+            if (hashCheck == json[1]) {
+              imgsrc[json[0]].src = json[2];
+            }
+          } catch (error) {
+
+          }
+
+        },
+        beforeSend: function() {
+          // (이미지 보여주기 처리)
+          // $('.wrap-loading').removeClass('display-none');
+        },
+        complete: function() {
+          // (이미지 감추기 처리)
+          // $('.wrap-loading').addClass('display-none');
+        },
+        error: function(error) {
+          console.log(error);
+        }
+      });
+
+    }
+  }
+
+//}
+});
 
 
   // function Upload() {
