@@ -32,14 +32,33 @@ module.exports = (function(){
     });
   }
 
-  var uploadFile = function(client, FileInfo, FolderID){
-    var stream = fs.createReadStream(FileInfo.path);
-    client.files.uploadFile(FolderID, FileInfo.name, stream, function(err ,newfile){
-      if(err) console.log(err);
-      else{
-        //파일 아이디
-        console.log(newfile.entries[0].id);
-      }
+  var relieveRest = function(user_id, callback){
+    var data = {
+      "user_id": user_id
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/relieve',
+      body: data,
+      json: true
+    },
+  function(error, response, body) {
+    callback(body);
+  })
+  }
+
+  var uploadFileRest = function(user_id, folderId, FileInfo, callback) {
+    var data = {
+      "user_id": user_id,
+      "folderId": folderId,
+      "FileInfo": FileInfo
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/upload',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body);
     });
   }
 
@@ -82,10 +101,35 @@ module.exports = (function(){
     })
   }
 
-  var deleteFile = function(client, fileId){
-    client.files.delete(fileId).then(() => {
-      console.log('deletion succeeded');
-    })
+  var deleteFileRest = function(userID, fileId, callback) {
+    var data = {
+      "user_id": userID,
+      "fileId": fileId
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/delete',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body);
+    });
+  }
+
+  var createFolderRest = function(userID, folderID, foldername, callback) {
+    var data = {
+      "user_id": userID,
+      "folderID": folderID,
+      "foldername": foldername
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/create',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body);
+    });
   }
 
   var renameFile = function(client, fileId, newname){
@@ -171,11 +215,13 @@ module.exports = (function(){
   return {
     listFileRest: listFileRest,
     refreshFileRest: refreshFileRest,
-    uploadFile: uploadFile,
+    relieveRest: relieveRest,
+    uploadFileRest: uploadFileRest,
     uploadSplit: uploadFileSplit,
     downloadFile: downloadFile,
     downloadSplit: downloadFileSplit,
-    deleteFile: deleteFile,
+    deleteFileRest: deleteFileRest,
+    createFolderRest: createFolderRest,
     renameFile: renameFile,
     renameFolder: renameFolder,
     moveFile: moveFile,

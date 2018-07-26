@@ -54,20 +54,16 @@ router.post('/folder/refresh/', (req, res) => {
 });
 
 router.post('/upload/:id', function(req, res) {
-  box_init(req.user, function(client) {
-    var FolderID = req.params.id;
-    var form = new formidable.IncomingForm();
-    form.parse(req, function(err, fields, files) {
-
-      var FileInfo = files.userfile;
-
-      res.redirect('/');
-
-      //비동기 필요
-      box_util.uploadFile(client, FileInfo, FolderID);
+  var userID = req.user.userID;
+  var folderID = req.params.id;
+  var form = new formidable.IncomingForm();
+  form.parse(req, function(err, fields, files) {
+    var FileInfo = files.uploadfile;
+    box_util.uploadFileRest(userID, folderID, FileInfo, function(result) {
+      res.json(result);
     });
   });
-});
+})
 
 router.post('/download', function(req, res) {
   box_init(req.user, function(clinet) {
@@ -87,19 +83,19 @@ router.post('/download', function(req, res) {
 });
 
 router.post('/delete', function(req, res) {
-  box_init(req.user, function(client) {
-    var backURL = req.header('Referer') || '/';
-    console.log(req.body);
-    var FileID = req.body.name;
-    if (Array.isArray(FileID)) {
-      async.map(FileID, function(id, callback) {
-        box_util.deleteFile(client, id);
-        callback(null, 'finish');
-      });
-    } else {
-      box_util.deleteFile(client, FileID);
-    }
-    res.redirect(backURL);
+  var userID = req.user.userID;
+  var fileId = req.body.name;
+  box_util.deleteFileRest(userID, fileId, function(result){
+    res.json(result);
+  })
+})
+
+router.post('/create', (req, res) => {
+  var userID = req.user.userID;
+  var folderID = req.body.folderId;
+  var foldername = req.body.foldername;
+  box_util.createFolderRest(userID, folderID, foldername, function(result) {
+    res.json(result)
   });
 });
 
@@ -289,11 +285,21 @@ router.get('/refresh', function(req, res) {
 router.get('/relieve', function(req, res, next) {
   var userID = req.user.userID;
   knex.delete().from('BOX_CONNECT_TB').where('userID', userID).then(function(rows) {
-    console.log("[INFO] " + userID + "\'S BOX TOKEN IS RELIEVED SUCCESSFULLY");
-    res.send({
-      msg: "Relieved box connection successfully",
-      state: 1
-    });
+    box_util.relieveRest(userID, function(result){
+      if(result=='success'){
+        console.log("[INFO] " + userID + "\'S BOX TOKEN IS RELIEVED SUCCESSFULLY");
+        res.send({
+          msg: "Relieved box connection successfully",
+          state: 1
+        });
+      } else{
+        console.log(result);
+        res.send({
+          msg: "Failed to relieved box token",
+          state: 0
+        })
+      }
+    })
   }).catch(function(err) {
     console.log(err);
     res.send({

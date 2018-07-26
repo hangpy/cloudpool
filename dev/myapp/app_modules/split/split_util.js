@@ -97,9 +97,6 @@ const UTIL = (function() {
     var FileInfoG = FileInfo.getSync(0);
     var FileInfoD = FileInfo.getSync(1);
     var FileInfoB = FileInfo.getSync(2);
-    console.log('uploadSplit:FileInfoG:: '+FileInfoG);
-    console.log('uploadSplit:FileInfoD:: '+FileInfoD);
-    console.log('uploadSplit:FileInfoB:: '+typeof(FileInfoB));
     var splitedname = FileInfoD.split("\\");
     var temp =splitedname[(splitedname.length)-1];
     var FileName = temp.substring(0,temp.length-4);
@@ -146,10 +143,6 @@ const UTIL = (function() {
           });
       }
     ],function(err, results){
-      console.log(results);
-      console.log('userID : '+req.user.userID);
-      console.log('FileName: '+ FileName);
-      console.log('uploadSplit:FileInfoD:: '+FileInfoD);
       var time = new Date(Date.now())
       knex('SPLIT_FILE_TB').insert({
         userID : req.user.userID,
@@ -184,17 +177,12 @@ const UTIL = (function() {
 
         //fileName = req.body.name;
     //var fileName='1532015476688(M)20180125_주제 탐색1_SJS_마침.pptx';
-    console.log("splitFileID : "+splitFileID);
-    console.log('test');
     knex.select('*').from('SPLIT_FILE_TB').where('splitFileID', splitFileID)
     .then(function(rows){
       console.log(rows);
       boxID = rows[0].boxID;
       dbxPath = rows[0].dbxPath;
       googlePD = rows[0].googlePD;
-      console.log("boxID"+boxID);
-      console.log("dbxPath"+dbxPath);
-      console.log("googlePD"+googlePD);
     }).catch(function(err){
       console.log("SQL Error");
       console.log(err);
@@ -207,7 +195,6 @@ const UTIL = (function() {
   function(callback){
       dbx_init(req.user, function(client){
         dbxUtil.downloadSplit(client, dbxPath, '',req, res, function(dropdownpath){
-          console.log('dropdownpath'+dropdownpath);
           var zip = dropdownpath.split(".");
           if(zip[zip.length-1]=='zip'){
             zippath = dropdownpath;
@@ -276,7 +263,6 @@ var unzip_zip4j = function(splitFileID, zippath, req, res,callback){
   knex.select('fileName').from('SPLIT_FILE_TB').where('splitFileID', splitFileID)
   .then(function(rows){
     fileName = rows[0].fileName;
-    console.log("fileName"+fileName);
   }).catch(function(err){
     console.log("SQL Error");
     console.log(err);
@@ -289,7 +275,6 @@ var unzip_zip4j = function(splitFileID, zippath, req, res,callback){
   zipFile.extractAll(__dirname+"/downloads/org/", function(err, result){
     if(err) console.log(err);
     else{
-        console.log("Complete unzip : "+zippath);
         var patharr = ["../routes/downloads/dis/"+fileName+".zip","../routes/downloads/dis/"+fileName+".z01","../routes/downloads/dis/"+fileName+".z02"];
         //파일 최종 이름 가져오기
         var separatedfile =  patharr[1].split("/");
@@ -346,27 +331,51 @@ var loadData = function(userID, callback){
   });
 }
 
-var directory = function(rows, depth, head, callback){
+var removeDuplicates = function(arr, callback){
+  let unique_array = [];
+  var result = [];
+  for(let i = 0;i < arr.length; i++){
+    if((unique_array.indexOf(arr[i].name) == -1)){
+      unique_array.push(arr[i].name);
+      result.push(arr[i])
+    }
+  }
+  callback(result);
+};
+
+var directory = function(rows, depth, callback_result){
   var childList = [];
   var folderList = [];
+
   async.map(rows, function(row, callback_list){
+
     console.log("parent : "+row.parents);
 
-    if(row.parent=="/"){
+    if(row.parents=="/"&&depth == 1){
       console.log("root : "+row.parents);
+      console.log('root push');
       childList.push(row);
       callback_list(null, "finish");
     }else{
       var path = row.parents.split('/');
 
+      if(path[depth-1]==''){
+        path[depth-1]='/';
+      }
+
+      console.log("depth : "+depth);
       console.log("path.length : "+path.length);
-      console.log('head : '+ head) ;
-      console.log("path[depth] : "+path[depth]);
+      console.log("path[depth] : "+path[depth]); // a
+      console.log("path[depth-1] : "+path[depth-1]); // root
+
       //root는 depth 1
-      if(path.length-1 == depth && head == path[depth]){
+      if((path.length-1) == depth){
+        console.log("condition 1 : "+ (path.length-1 == depth));
         childList.push(row);
         console.log('child push');
-      }else if(path[depth]==head && path.length-1 > depth)
+        callback_list(null, "finish");
+      }else if((path.length-1) > depth){
+        console.log("condition 2 : "+ (path.length > depth));
         console.log('path[depth+1] : ' + path[depth+1]);
         console.log('path[depth] : '+  path[depth]);
         var folder = {
@@ -378,61 +387,31 @@ var directory = function(rows, depth, head, callback){
         folderList.push(folder);
         console.log('folder push');
         callback_list(null, "finish");
+      }else if((path.legnth-1) < depth||!(path[depth])){
+        console.log("condition 3 : " +( (path.legnth-1) < depth || !path[depth]));
+        callback_list(null, "finish");
       }
+    }
   },
   function(err, result){
-    if(err){console.log(err);}
-    else {
-      console.log(childList);
-      console.log(folderList);
-      callback(childList, folderList);
+    if(err){
+      console.log(err);
+    } else {
+      removeDuplicates(folderList, function(result){
+        callback_result(childList, result, depth);
+      });
     }
-  });
-    // for(var i =0; i<rows.length; i++){
-    //     console.log("parent : "+rows[i].parents);
-    //
-    //   if(rows[i].parent=="/"){
-    //     console.log("root : "+rows[i].parents);
-    //     childList.push(rows[i]);
-    //     i++;
-    //   }
-    //
-    //   var path = rows[i].parents.split('/');
-    //   var childList = [];
-    //   var folderList = [];
-    //   console.log("path.length : "+path.length);
-    //   console.log('head : '+ head) ;
-    //   console.log("path[depth] : "+path[depth]);
-    //   //root는 depth 1
-    //   if(path.length-1 == depth && head == path[depth]){
-    //     childList.push(rows[i]);
-    //     console.log('child push');
-    //   }else if(path[depth]==head && path.length-1 > depth)
-    //     console.log('path[depth+1] : ' + path[depth+1]);
-    //     console.log(' path[depth] : '+  path[depth]);
-    //     var folder = {
-    //       "name" : path[depth+1],
-    //       "parent" : path[depth]
-    //     };
-    //     console.log('folder name : '+folder.name);
-    //     console.log('folder parent : '+folder.parent);
-    //     folderList.push(folder);
-    //     console.log('folder push');
-    // }
-    // callback(childList, folderList);
+  }
+);}
 
 
-}
 
 var rename = function(splitFileID, newName){
   //update
-  console.log("splitFileID : "+splitFileID);
-  console.log("newName : "+newName);
   var orgName;
   knex.select().from('SPLIT_FILE_TB').where('splitFileID', splitFileID)
   .then(function(rows){
     orgName = rows[0].fileName;
-    console.log("orgName1 : "+orgName);
     var splitedName = orgName.split(".");
     var result = newName+"."+splitedName[splitedName.length-1];
 
