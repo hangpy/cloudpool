@@ -49,6 +49,18 @@ var reName =function(userId,fileId,folderId,newName, callback){
     );
 }
 
+var deleteFile =function(userId,fileId,callback){
+  var data = { "userId" : userId , "fileId": fileId};
+  request.post({
+    url: 'http://localhost:4000/api/google/delete/',
+    body : data,
+    json : true
+  },
+    function(error, response, body){
+      callback(body);
+    }
+  );
+}
 
 // var downloadFile = function(res, fileId,oauth2Client) {
 //     var drive = google.drive({
@@ -349,6 +361,7 @@ var reName =function(userId,fileId,folderId,newName, callback){
   return {
     list: list,
     reName:reName,
+    deleteFile:deleteFile,
     // downloadFile: downloadFile,
     // uploadFile: uploadFile,
     // deleteFile: deleteFile,

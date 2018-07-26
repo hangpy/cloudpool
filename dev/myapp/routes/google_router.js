@@ -82,9 +82,9 @@ router.post('/searchtype/',function(req,res){
 });
 
 router.post('/rename/:id',function(req,res){
-  console.log('라우터 진입 ');
-  google_util.reName(req.user.userID,req.body.fileId,req.params.id,req.body.newname, function(filelist){
-    res.json(filelist);
+  console.log('rename 라우터 진입 ');
+  google_util.reName(req.user.userID,req.body.fileId,req.params.id,req.body.newname, function(result){
+    res.json(result);
   });
   // google_util.reName(userId,keyWord,keyType,orderKey, function(filelist){
   //   res.json(filelist);
@@ -95,6 +95,14 @@ router.post('/rename/:id',function(req,res){
   //   console.log(req.params, req.body);
   //   google_util.updateFile(Newname,fileId,client);
   // });
+});
+
+
+router.post('/delete/', function(req, res) {
+  console.log('rename 라우터 진입 ');
+  google_util.deleteFile(req.user.userID,req.body.fileId, function(result){
+    res.json(result);
+  });
 });
 
 
@@ -117,16 +125,6 @@ router.post('/download', function(req, res) {
     var backURL = req.header('Referer') || '/';
     var fileId = req.body.name;
     google_util.downloadFile(res,fileId,client);
-    res.redirect(backURL);
-  });
-});
-
-router.post('/delete', function(req, res) {
-
-  google_init(req.user, function(client) {
-    var backURL = req.header('Referer') || '/';
-    var fileId = req.body.name;
-    google_util.deleteFile(fileId,client);
     res.redirect(backURL);
   });
 });
