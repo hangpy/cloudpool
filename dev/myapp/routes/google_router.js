@@ -140,10 +140,13 @@ router.post('/makedir/:id',function(req,res){
   });
 });
 
-router.post('/getthumbnail/:id',function(req,res){
+router.post('/getthumbnail/',function(req,res){
+  var fileId=req.body.path;
   google_init(req.user, function(client) {
-    var fileId;
-    google_util.getThumbnailLink(fileId,client);
+    google_util.getThumbnailLink(fileId,client,function(thumbNail){
+      var result = [req.body.order, req.body.hashID, thumbNail]
+      res.json(result);
+    });
   });
 });
 

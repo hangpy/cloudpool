@@ -65,11 +65,32 @@
   display: none;
 }
 
+@media (max-width: 767px){
+  .board-body .header .top-navbar .navbar-header {
+    width: 240px;
+  }
+
+  .board-body .header {
+    position: relative;
+  }
+}
+
 
 /* left sidbar */
 .left-sidebar {
     padding-top: 54px;
 }
+
+/* page-wrapper */
+@media (max-width: 1023px){
+  .page-wrapper {
+      margin-left: 240px;
+      -webkit-transition: 0.2s ease-in;
+      -o-transition: 0.2s ease-in;
+      transition: 0.2s ease-in;
+  }
+}
+
 
 /* toast CSS */
 

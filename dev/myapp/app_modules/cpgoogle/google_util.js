@@ -157,6 +157,27 @@ var deleteFile =function(userId,fileId,callback){
 
   }
 
+
+  
+  var getThumbnailLink = function(fileId,oauth2Client,callback) {
+    var drive = google.drive({
+      version: 'v3',
+      auth: oauth2Client
+    });
+    drive.files.get({
+      fileId: fileId,
+      fields: 'thumbnailLink'
+    }, (err, metadata) => {
+      if (err) {
+        console.log('The API returned an error!!!!!!!!!!!!!!!!!!!!: ' + err);
+        console.log('222222!!!!!!!!!!!!!!!!!!!!: ');
+        callback('fail');
+      } else {
+        callback(metadata.data.thumbnailLink);
+      }
+    });
+  }
+
 //   var deleteFile = function(fileId,oauth2Client) {
 //     var drive = google.drive({
 //       version: 'v3',
@@ -357,29 +378,6 @@ var deleteFile =function(userId,fileId,callback){
 //   }
 
 
-
-//   var getThumbnailLink = function(fileId,oauth2Client) {
-//     var drive = google.drive({
-//       version: 'v3',
-//       auth: oauth2Client
-//     });
-//     drive.files.get({
-//       fileId: fileId,
-//       // fileId: '1gd2kkvnSjz95WUM9KWePmhDc_BrAdlqq',
-//       // auth: oauth2Client,// daily 인증 횟수 오류 뜨면 활성화
-//       fields: 'thumbnailLink'
-//     }, (err, metadata) => {
-//       if (err) {
-//         console.log('The API returned an error!!!!!!!!!!!!!!!!!!!!: ' + err);
-//         console.log('222222!!!!!!!!!!!!!!!!!!!!: ');
-//         return;
-//       } else {
-//         console.log('metadata: ', metadata.data.thumbnailLink);
-//       }
-//     });
-  // }
-
-
   return {
     list: list,
     reName:reName,
@@ -393,6 +391,6 @@ var deleteFile =function(userId,fileId,callback){
     searchType: searchType,
     // makeDir: makeDir,
     // copyFile: copyFile,
-    // getThumbnailLink: getThumbnailLink
+    getThumbnailLink: getThumbnailLink
   }
 })();
