@@ -1489,6 +1489,7 @@ textarea {
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
+    display: none;
     width: 100%;
   }
   .header .top-navbar .navbar-nav {
@@ -1506,8 +1507,8 @@ textarea {
     margin-top: 0;
   }
   .header .top-navbar .navbar-nav > .nav-item > .nav-link {
-    padding-left: 0.50rem;
-    padding-right: 0.50rem;
+    /* padding-left: 0.50rem;
+    padding-right: 0.50rem; */
   }
   .header .top-navbar .navbar-nav .dropdown-menu {
     position: absolute;
