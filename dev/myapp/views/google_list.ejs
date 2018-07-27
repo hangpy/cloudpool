@@ -5,11 +5,11 @@
     <h4>Google -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4>
   </div>
   <div class="card-body">
-    <form name="uploadform" id="uploadform" action='google/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
+    <!-- <form name="uploadform" id="uploadform" action='google/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
       <input type='file' name='userfile'>
       <button type="button" onclick='Upload()'>업로드</button>
 
-    </form>
+    </form> -->
 
     <form name='action_google' method='post'>
     <button type="button" onClick='Download()'>다운로드</button>
@@ -221,6 +221,9 @@
         $('.replace').load("google/folder/<%=FolderID%>", function(){
           $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
             console.log("load dropzone.js: " + textStatus);
+          });
+          $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+            console.log("load context_menu.js: " + textStatus);
           });
         });
       },
