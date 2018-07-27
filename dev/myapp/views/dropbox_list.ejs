@@ -1,6 +1,43 @@
 <div class="card drive-area" name='dropbox-area'>
+
   <div class="card-title">
-    <h4>DropBox -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4>
+    <h4>
+                <%
+
+                          var foldername = FolderID.split("*");
+                          var totalfolderpath="";
+                          if(foldername[0]==""){%>
+                            <a onclick="moveFolder_dropbox(this)" value="folder/"> DropBox </a> /
+                          <%}
+                          else if(foldername[0]==FolderID){%>
+                            <a onclick="moveFolder_dropbox(this)" value="folder/"> DropBox </a> /
+                            <a onclick="moveFolder_dropbox(this)" value="folder/<%=foldername[0]%>"> <%=foldername[0]%> </a> /
+                          <%}
+                          else{
+                            %>
+                            <a onclick="moveFolder_dropbox(this)" value="folder/"> DropBox </a> /
+                          <%
+
+                          for(var i = 0; i < foldername.length ; i++){
+
+                            if(i == 0){
+                              totalfolderpath=foldername[i];
+                              %>
+
+                                  <a onclick="moveFolder_dropbox(this)" value="folder/<%=totalfolderpath%>"> <%=foldername[i]%>  </a> /
+                              <%
+                            }
+                            else{
+                              totalfolderpath=totalfolderpath+"*"+foldername[i];
+                              %>
+                              <a onclick="moveFolder_dropbox(this)" value="folder/<%=totalfolderpath%>"> <%=foldername[i]%>  </a> /
+
+                            <%}
+                          }
+                        }
+                %>
+              </h4>
+    <!-- <h4>DropBox -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4> -->
   </div>
   <div class="card-body">
 
