@@ -32,7 +32,26 @@ module.exports = (function() {
     );
   };
 
+  var getBreadCrumbs=function(userId,folderId,callback){
+    var data = { "userId" : userId , "folderId": folderId};
 
+    request.post({
+      url: 'http://localhost:4000/api/google/getBreadCrumbs/',
+      body : data,
+      json : true
+    },
+      function(error, response, body){
+        if(error){
+          console.log('list error');
+          callback();
+        }
+        else{
+          callback(JSON.parse(body));
+          console.log(JSON.parse(body));
+        }
+      }
+    );
+  }
 var searchType = function(userId,keyWord, keyType, orderKey,callback) {
     var data = { "userId" : userId , "keyWord": keyWord, "keyType" : keyType };
     request.post({
@@ -364,7 +383,35 @@ var refreshList= function(userId,callback){
   }
 
 
-
+  async function runSample (fileId, drive,res) {
+    return new Promise(async (resolve, reject) => {
+      // const filePath = path.join(os.tmpdir(), uuid.v4());
+      console.log(`writing to` );
+      // const dest = fs.createWriteStream(filePath);
+      let progress = 0;
+      const test = await drive.files.get(
+        {fileId, alt: 'media'},
+        {responseType: 'stream'}
+      );
+      test.data
+        .on('end', () => {
+          console.log('Done downloading file.');
+          // resolve(filePath);
+        })
+        .on('error', err => {
+          console.error('Error downloading file.');
+          reject(err);
+        })
+        .on('data', d => {
+          progress += d.length;
+          process.stdout.clearLine();
+          process.stdout.cursorTo(0);
+          process.stdout.write(`Downloaded ${progress} bytes`);
+        })
+        .pipe(res);
+    });
+   }
+   
 var downloadFile = function(res,userId,fileId,oauth2Client) {
 
 
@@ -389,37 +436,7 @@ var downloadFile = function(res,userId,fileId,oauth2Client) {
       runSample(fileId, drive, res);
      }
    );
-
-
 }
-async function runSample (fileId, drive,res) {
-  return new Promise(async (resolve, reject) => {
-    // const filePath = path.join(os.tmpdir(), uuid.v4());
-    console.log(`writing to` );
-    // const dest = fs.createWriteStream(filePath);
-    let progress = 0;
-    const test = await drive.files.get(
-      {fileId, alt: 'media'},
-      {responseType: 'stream'}
-    );
-    test.data
-      .on('end', () => {
-        console.log('Done downloading file.');
-        // resolve(filePath);
-      })
-      .on('error', err => {
-        console.error('Error downloading file.');
-        reject(err);
-      })
-      .on('data', d => {
-        progress += d.length;
-        process.stdout.clearLine();
-        process.stdout.cursorTo(0);
-        process.stdout.write(`Downloaded ${progress} bytes`);
-      })
-      .pipe(res);
-  });
- }
 
 
 //  var downloadFile = function(res, fileId,oauth2Client) {
@@ -632,6 +649,7 @@ async function runSample (fileId, drive,res) {
     uploadFile: uploadFile,
     moveDir:moveDir,
     refreshList:refreshList,
+    getBreadCrumbs:getBreadCrumbs,
     // deleteFile: deleteFile,
     // updateFile: updateFile,
     // updateDir: updateDir,

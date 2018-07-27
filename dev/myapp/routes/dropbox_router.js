@@ -16,7 +16,7 @@ module.exports = function(){
   //list - root
   router.get('/folder', (req,res)=>{
       var folderID = '';
-      console.log("read folder/");
+      console.log('[DROPBOX] ' + req.user.userID + ' REQUEST LIST FOLDER ID ABOUT : \n', folderID);
         dbxutil.getlistRest(req.user.userID, folderID, function(filelist){
           res.render('dropbox_list',{
               FolderID : '',
@@ -30,7 +30,7 @@ module.exports = function(){
   //list - folder
   //%25
   router.get('/folder/:id', (req,res)=>{
-      console.log("-------------------------------read folder/id");
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST LIST FOLDER ID ABOUT : \n', req.params.id);
     if(req.params.id.includes('%25')){
       var name = req.params.id.replace("%25","%");
     }
@@ -49,8 +49,8 @@ module.exports = function(){
   //search list view - root
   router.post('/searchview/folder/', (req,res)=>{
       var folderID = '';
-      console.log("read search folder/");
-      console.log(req.body.obj);
+      console.log('[DROPBOX] ' + req.user.userID + ' REQUEST SEARCH LIST FOLDER ID ABOUT : \n', folderID);
+
       var searchfilelist = JSON.parse(req.body.obj);
       res.render('dropbox_list',{
             FolderID : '',
@@ -62,7 +62,8 @@ module.exports = function(){
 
   //%25
   router.post('/searchview/folder/:id', (req,res)=>{
-      console.log("read folder/id");
+
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST SEARCH LIST FOLDER ID ABOUT : \n', req.params.id);
     // if(req.params.id.includes('%25')){
     //   var name = req.params.id.replace("%25","%");
     // }
@@ -80,7 +81,7 @@ module.exports = function(){
   //select list - root
   router.post('/selectview/folder/', (req,res)=>{
       var folderID = '';
-      console.log("read search folder/");
+      console.log('[DROPBOX] ' + req.user.userID + ' REQUEST SELECT LIST FOLDER ID ABOUT : \n', folderID);
       var searchfilelist = JSON.parse(req.body.obj);
       res.render('dropbox_list',{
             FolderID : '',
@@ -97,6 +98,7 @@ module.exports = function(){
     // }
     // else
     var name = req.params.id
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST SELECT LIST FOLDER ID ABOUT : \n', req.params.id);
     var folderID = '/'+name.replace(/[*]/g,"/");
     var searchfilelist = JSON.parse(req.body.obj);
     res.render('dropbox_list',{
@@ -111,6 +113,7 @@ module.exports = function(){
 
   router.post('/rename/',function(req,res){
     var FolderID = '';
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST RENAME FILE : \n', FolderID);
     var originName = req.body.originname;
     var typelist = originName.split(".");
     var type = typelist[typelist.length-1]
@@ -130,6 +133,7 @@ module.exports = function(){
 
   router.post('/rename/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST RENAME FILE : \n', FolderID);
     var originName = req.body.originname;
     var typelist = originName.split(".");
     var type = typelist[typelist.length-1]
@@ -148,6 +152,7 @@ module.exports = function(){
 
   router.post('/search/',function(req,res){
     var FolderID = '';
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST SEARCH FILE : \n', FolderID);
     var searchname = req.body.searchname;
     var searchFolder = req.body.searchfolder;
     dbxutil.sendsearchRest(req.user.userID, searchname, searchFolder, FolderID, function(result){
@@ -159,6 +164,7 @@ module.exports = function(){
 
   router.post('/search/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST SEARCH FILE : \n', FolderID);
     var searchname = req.body.searchname;
     var searchFolder = req.body.searchfolder;
     var searchtype = req.body.searchtype;
@@ -171,6 +177,7 @@ module.exports = function(){
 
   router.post('/select/',function(req,res){
     var FolderID = '';
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST SELECT FILE : \n', FolderID);
     var selecttype = req.body.selecttype;
     dbxutil.sendsearchtypeRest(req.user.userID, selecttype, FolderID, function(result){
         res.json(result);
@@ -181,6 +188,7 @@ module.exports = function(){
 
   router.post('/select/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST SELECT FILE : \n', FolderID);
     var selecttype = req.body.selecttype;
     dbxutil.sendsearchtypeRest(req.user.userID, selecttype, FolderID, function(result){
         res.json(result);
@@ -191,7 +199,7 @@ module.exports = function(){
 
   router.post('/delete/',function(req,res){
     var Splitname = req.body.name.split("*");
-    console.log(Splitname);
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST DELETE FILE : \n', Splitname);
     var FileID = Splitname[Splitname.length-1];
     for(var i = 0; i < Splitname.length-1 ; i++){
       if(i==0){
@@ -217,6 +225,7 @@ module.exports = function(){
   router.post('/download/',function(req,res){
     // var FolderID = '';
     var Splitname = req.body.name.split("*");
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST DOWNLOAD FILE : \n', Splitname);
     var FileID = Splitname[Splitname.length-1];
     for(var i = 0; i < Splitname.length-1 ; i++){
       if(i==0){
@@ -239,7 +248,7 @@ module.exports = function(){
   router.post('/upload/',function(req,res){
     var FolderID = '';
     var form = new formidable.IncomingForm();
-
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST UPLOAD FILE IN : \n', FolderID);
     form.parse(req, function(err, fields, files) {
 
       var FileInfo = files.uploads_list;
@@ -256,7 +265,7 @@ module.exports = function(){
   //upload - folder
   router.post('/upload/:id',function(req,res){
     var FolderID = '/'+req.params.id.replace(/[*]/g,"/");
-
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST UPLOAD FILE IN : \n', FolderID);
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
 
@@ -375,7 +384,7 @@ module.exports = function(){
   //send for refresh the user file list
   router.get('/refresh/', function(req, res) {
     var user_id = req.user.userID;
-    console.log("Get in the refresh router");
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST UPLOAD FILE IN : \n', FolderID);
     var FolderDir = '';
     dbxutil.getrefreshRest(user_id, FolderDir, function(result){
       res.json(result);
@@ -383,9 +392,10 @@ module.exports = function(){
   });
 
   router.post('/move/', function(req, res){
-    console.log("======move route===========");
+
     var fromFile = req.body.filename;
     var toFolder = req.body.toFolder;
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST MOVE FILE IN : \n',toFolder );
     dbxutil.movefileRest(req.user.userID, fromFile, toFolder, function(result){
       if(result =="finish_move_the_file"){
         res.json("finish");
@@ -397,9 +407,9 @@ module.exports = function(){
   });
 
   router.post('/makeFolder/', function(req, res){
-    console.log("======makeFolder route===========");
+
     var foldername = req.body.foldername;
-    console.log(foldername);
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST MAKE FOLDER IN : \n',foldername );
     dbxutil.makeFolderRest(req.user.userID, foldername, function(result){
       if(result =="finish_makefolder_the_file"){
         res.json("finish");
@@ -411,15 +421,30 @@ module.exports = function(){
   });
 
   router.post('/thumbnail/', function(req, res){
-    console.log("======getThumbnail route===========");
-    var filepath = req.body.path;
 
+    var filepath = req.body.path;
+    console.log('[DROPBOX] ' + req.user.userID + ' REQUEST GET THUMBNAIL IN : \n',filepath );
     dbxutil.getThumbnailRest(req.user.userID, filepath, function(imageurl){
       var result = [req.body.order, req.body.hashID, imageurl]
 
        res.json(result);
     })
   });
+
+
+  router.get('/getsize', function(req, res){
+    dbx_init(req.user, function(client){
+      client.usersGetSpaceUsage()
+          .then(function(response) {
+          console.log('Drop used :' + response.used);
+          console.log('Drop total :' + response.allocation.allocated);
+          })
+          .catch(function(error) {
+           console.error(error);
+          });
+
+    })
+  })
 
 
 

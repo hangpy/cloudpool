@@ -138,7 +138,6 @@ const UTIL = (function() {
   var movefileRest = function(user_id, fromFile, toFolder, callback){
     // initDropbox(usr_session, function(dbx){
     var user_id = user_id;
-    console.log("==========MOVE=======");
     // var accesstoken = dbx.accessToken;
     var data = {
       "user_id": user_id,
@@ -161,7 +160,6 @@ const UTIL = (function() {
   var makeFolderRest = function(user_id, foldername, callback){
     // initDropbox(usr_session, function(dbx){
     var user_id = user_id;
-    console.log("==========makefolder=======");
     // var accesstoken = dbx.accessToken;
     var data = {
       "user_id": user_id,
@@ -198,7 +196,7 @@ const UTIL = (function() {
       })
       .then(function(response) {
         //삭제후 알림 필요
-        console.log(response);
+
         callback("refresh");
       })
       .catch(function(err) {
@@ -219,12 +217,10 @@ const UTIL = (function() {
     var fullname = Filename.split(".");
     var mimetype = mime.getType(fullname[fullname.length - 1]);
     //zo3 같이 분할 파일은 null값
-    console.log("totalDir :" + totalDir);
     var URL = dbx.filesGetTemporaryLink({
       path: totalDir
     });
-    console.log(mimetype);
-    console.log(Filename);
+
     var newFileName = encodeURIComponent(Filename);
     res.setHeader('Content-disposition', 'attachment; filename*=UTF-8\'\'' + newFileName); //origFileNm으로 로컬PC에 파일 저장
     res.setHeader('Content-type', mimetype);
@@ -360,8 +356,6 @@ const UTIL = (function() {
   var listfile = function(dbx, FolderDir, callback) {
     var filelist = [];
     // initDropbox(usr_session, function(dbx){
-    console.log("list");
-    console.log("FolderDir : " + FolderDir);
     dbx.filesListFolder({
         path: FolderDir
       }) //list 원하는 경로
@@ -395,7 +389,7 @@ const UTIL = (function() {
             if (err) console.log(err);
             //list 받아오기 완료
             else {
-              console.log('Finish the File list');
+              // console.log('Finish the File list');
               callback(filelist);
             }
           }
@@ -409,7 +403,7 @@ const UTIL = (function() {
 
   var getThumbnailRest = function(user_id, filepath, callback){
     var user_id = user_id;
-    console.log("==========getThumbnailRest=======");
+
     // var accesstoken = dbx.accessToken;
     var data = {
       "user_id": user_id,
