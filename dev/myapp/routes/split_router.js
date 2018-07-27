@@ -45,44 +45,56 @@ module.exports = function() {
     splitUtil.loadData(req.user.userID, function(rows) {
       splitUtil.directory(rows, depth, function(childList, folderList, depth) {
         console.log('log router');
-        console.log('childList : ' + childList);
-        console.log('folderList : ' + folderList);
+        console.log('childList : '+childList);
+        console.log('folderList : '+folderList);
         console.log('depth : ' + depth);
-        res.render('split_list', {
-          FoldreID: id,
-          filelist: childList,
+        res.render('split_list',{
+          FolderID : id,
+          filelist : childList,
           folderlist: folderList,
           depth: depth
         });
       });
     });
   });
-  //
-  router.post('/upload/', upload.single('userfile'), function(req, res) {
+
+  router.post('/move/', function(req, res){
+    var FolderID = req.body.FolderID;
+    var target =  req.body.filename;
+    var dest = req.body.dest;
+    splitUtil.move(FolderID, target, dest);
+
+  })
+//
+  router.post('/upload/', upload.single('userfile'), function(req, res)
+  {
     var orgFile = splitUtil.orgFile(__dirname, req.file.path);
     var filesToAdd = splitUtil.filesToAdd;
     filesToAdd.addSync(orgFile);
-    var size = splitUtil.sizeSplit(req.file.size);
-    console.log("Split size : " + size);
-    //분리될 파일이 저장될곳
-    var zipFile = splitUtil.zipFileU(__dirname, req.file.filename);
-    var parameters = splitUtil.parameters();
-    var target = [];
-    //원래 파일 저장
-    zipFile.createZipFile(filesToAdd, parameters, true, size, function(err, result) {
-      if (err) {
-        console.log(err);
-      } else {
-        zipFile.getSplitZipFiles(function(err, results) {
-          if (err) {
-            console.log("Split error : " + err);
-          } else {
-            console.log("Complete Zip4J from " + req.file.filename);
-            splitUtil.upload(results, req.file.size, req, res);
-            //파일 삭제 추가
-          }
-        });
-      }
+    splitUtil.checkDrive(req.user.userID, function(driveState) {
+      var size = splitUtil.sizeSplit(req.file.size, driveState);
+      console.log("Split size : "+size);
+      //분리될 파일이 저장될곳
+      var zipFile = splitUtil.zipFileU(__dirname, req.file.filename);
+      var parameters = splitUtil.parameters();
+      var target = [];
+      //원래 파일 저장
+      zipFile.createZipFile(filesToAdd, parameters, true, size ,function(err, result){
+        if(err){
+          console.log(err);
+        } else {
+          zipFile.getSplitZipFiles(function(err, results){
+            if(err){
+              console. log("Split error : "+err);
+            }
+            else{
+              console.log("Complete Zip4J from " +req.file.filename);
+              splitUtil.upload(results, req.file.size, driveState, req, res);
+              //파일 삭제 추가
+            }
+          });
+        }
+      });
     });
   });
 
