@@ -5,6 +5,9 @@ var path = require('path'),
   async = require('async'),
   fs = require('fs'),
   request = require('request');
+
+  var mime = require('mime');
+
   const redis_client = require('../config/redis');
 
 module.exports = (function() {
@@ -24,12 +27,31 @@ module.exports = (function() {
         else{
           callback(JSON.parse(body));
         }
-         
+
       }
     );
   };
 
+  var getBreadCrumbs=function(userId,folderId,callback){
+    var data = { "userId" : userId , "folderId": folderId};
 
+    request.post({
+      url: 'http://localhost:4000/api/google/getBreadCrumbs/',
+      body : data,
+      json : true
+    },
+      function(error, response, body){
+        if(error){
+          console.log('list error');
+          callback();
+        }
+        else{
+          callback(JSON.parse(body));
+          console.log(JSON.parse(body));
+        }
+      }
+    );
+  }
 var searchType = function(userId,keyWord, keyType, orderKey,callback) {
     var data = { "userId" : userId , "keyWord": keyWord, "keyType" : keyType };
     request.post({
@@ -62,7 +84,7 @@ var reName =function(userId,fileId,folderId,newName, callback){
     );
 }
 
-var deleteFile =function(userId,fileId,callback){
+var deleteFile =function(userId, fileId, callback){
   var data = { "userId" : userId , "fileId": fileId};
   request.post({
     url: 'http://localhost:4000/api/google/delete/',
@@ -218,7 +240,98 @@ var refreshList= function(userId,callback){
   }
 
 
-  
+  var downloadFileSplit = function(fileId, oauth2Client, callback) {
+      var drive = google.drive({
+        version: 'v3',
+        auth: oauth2Client
+      });
+      var downpath_google;
+      var dest;
+
+      drive.files.get({
+        fileId: fileId,
+        alt: "media"
+      }, (err, metadata) => {
+        if (err) {
+          console.log('The API returned an error: ' + err);
+          return;
+        }
+        console.log('Downloading %s...', metadata.name);
+        downpath_google='../routes/downloads/dis/'+metadata.name;
+        dest = fs.createWriteStream(downpath_google);
+        callback(downpath_google);
+      }).pipe(dest);
+  }
+
+      var uploadFileSplit = function(FilePath, Folder, oauth2Client, callback) {
+          var drive = google.drive({
+            version: 'v3',
+            auth: oauth2Client
+          });
+
+          var splitedname = FilePath.split("\\");
+          var FileName =splitedname[(splitedname.length)-1];
+          var fullname = FilePath.split(".");
+          var type = fullname[fullname.length-1];
+          var path = FilePath.substr(0,FilePath.length-FileName.length);
+          var mimetype = mime.getType(fullname[fullname.length-1]);
+
+          console.log("FileName : "+FileName);
+          console.log("FilePath : "+path);
+          console.log("FullName : "+fullname);
+          console.log("Type : "+ type);
+          console.log("MimeType : "+mimetype);
+
+          if (Folder == '\'root\'') {
+            var fileMetadata = {
+              'name': FileName
+            };
+            var media = {
+              mimeType: 'application/octet-stream',
+              body: fs.createReadStream(FilePath)
+            };
+
+            drive.files.create({
+              resource: fileMetadata,
+              media: media,
+              fields: 'id'
+            }, function(err, file) {
+              if (err) {
+                console.error(err);
+              } else {
+                console.log('Uploaded!');
+                console.log(file)
+              }
+            });
+          } else {
+            var FolderID = Folder;
+            // 디렉토리 내에서 업로
+            var fileMetadata = {
+              'name': FileName,
+              parents: [FolderID]
+            };
+
+            var media = {
+              mimeType: 'application/octet-stream',
+              body: fs.createReadStream(FilePath)
+            };
+
+            drive.files.create({
+              resource: fileMetadata,
+              media: media,
+              fields: 'id'
+            }, function(err, file) {
+              if (err) {
+                console.error(err);
+              } else {
+                console.log('Uploaded!');
+                callback(file.data.id);
+              }
+            });
+          }
+
+      }
+
   var getThumbnailLink = function(fileId,oauth2Client,callback) {
     var drive = google.drive({
       version: 'v3',
@@ -249,7 +362,7 @@ var refreshList= function(userId,callback){
         callback(body);
       }
     );
-    
+
   }
 
   var GetSize= function(oauth2Client,callback){
@@ -270,7 +383,35 @@ var refreshList= function(userId,callback){
   }
 
 
-
+  async function runSample (fileId, drive,res) {
+    return new Promise(async (resolve, reject) => {
+      // const filePath = path.join(os.tmpdir(), uuid.v4());
+      console.log(`writing to` );
+      // const dest = fs.createWriteStream(filePath);
+      let progress = 0;
+      const test = await drive.files.get(
+        {fileId, alt: 'media'},
+        {responseType: 'stream'}
+      );
+      test.data
+        .on('end', () => {
+          console.log('Done downloading file.');
+          // resolve(filePath);
+        })
+        .on('error', err => {
+          console.error('Error downloading file.');
+          reject(err);
+        })
+        .on('data', d => {
+          progress += d.length;
+          process.stdout.clearLine();
+          process.stdout.cursorTo(0);
+          process.stdout.write(`Downloaded ${progress} bytes`);
+        })
+        .pipe(res);
+    });
+   }
+   
 var downloadFile = function(res,userId,fileId,oauth2Client) {
 
 
@@ -295,37 +436,7 @@ var downloadFile = function(res,userId,fileId,oauth2Client) {
       runSample(fileId, drive, res);
      }
    );
-
-
 }
-async function runSample (fileId, drive,res) {
-  return new Promise(async (resolve, reject) => {
-    // const filePath = path.join(os.tmpdir(), uuid.v4());
-    console.log(`writing to` );
-    // const dest = fs.createWriteStream(filePath);
-    let progress = 0;
-    const test = await drive.files.get(
-      {fileId, alt: 'media'},
-      {responseType: 'stream'}
-    );
-    test.data
-      .on('end', () => {
-        console.log('Done downloading file.');
-        // resolve(filePath);
-      })
-      .on('error', err => {
-        console.error('Error downloading file.');
-        reject(err);
-      })
-      .on('data', d => {
-        progress += d.length;
-        process.stdout.clearLine();
-        process.stdout.cursorTo(0);
-        process.stdout.write(`Downloaded ${progress} bytes`);
-      })
-      .pipe(res);
-  });
- }
 
 
 //  var downloadFile = function(res, fileId,oauth2Client) {
@@ -538,6 +649,7 @@ async function runSample (fileId, drive,res) {
     uploadFile: uploadFile,
     moveDir:moveDir,
     refreshList:refreshList,
+    getBreadCrumbs:getBreadCrumbs,
     // deleteFile: deleteFile,
     // updateFile: updateFile,
     // updateDir: updateDir,
@@ -546,6 +658,8 @@ async function runSample (fileId, drive,res) {
     GetSize:GetSize,
     // makeDir: makeDir,
     // copyFile: copyFile,
-    getThumbnailLink: getThumbnailLink
+    getThumbnailLink: getThumbnailLink,
+    downloadSplit: downloadFileSplit,
+    uploadSplit : uploadFileSplit
   }
 })();

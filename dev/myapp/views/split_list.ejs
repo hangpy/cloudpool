@@ -3,9 +3,9 @@
     <h4>분할업로드 -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4>
   </div>
   <div class="card-body">
-    <form name="uploadform" id="uploadform" action='split/upload/' method='post' enctype="multipart/form-data">
+    <form name="uploadform" id="uploadform" action='split/upload/'method='post' enctype="multipart/form-data">
       <input type='file' name='userfile'>
-      <button type="button" onclick='UploadSubmit()' >업로드</button>
+      <button type="submit"  >업로드</button>
     </form>
 
     <form name='action_split' method='post'>
@@ -22,7 +22,7 @@
       </select> -->
       <button  type="submit" onClick='Submit(4)' >새 폴더 생성</button>
       <div class="table-responsive">
-        <div class="dropzone" name='split-area'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
+        <div class="dropzone" name='split-dropzone'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
         <table class="table table-hover" id="table_split" data-id = '<%=FolderID%>'>
                 <tr>
                     <td> </td>
@@ -106,84 +106,83 @@
   </div>
 </div>
 <script language=javascript>
-
-
-function dragStart(event) {
-  event.dataTransfer.setData("data", event.target.attributes[2].nodeValue);
-}
-
-function allowDrop(event) {
-  event.preventDefault();
-}
-
-function dropFormove(event) {
-  event.preventDefault();
-  var filename = event.dataTransfer.getData("data");
-  var toFolder = event.target.dataset.id;
-  console.log(event);
-  var body = {
-    "FolderID" : <%=FolderID%>,
-    "filename": filename,
-    "dest": toFolder
-  }
-  $.ajax({
-    type: "POST",
-    url: "split/move/",
-    async: true,
-    data: body,
-    dataType: "JSON",
-    success: function(json) {
-      console.log(json);
-
-      $('.replace').load("split/folder/<%=FolderID%>", function(){
-        $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
-          console.log("load dropzone.js: " + textStatus);
-        });
-      });
-    },
-    beforeSend: function() {
-      // (이미지 보여주기 처리)
-      $('.wrap-loading').removeClass('display-none');
-    },
-    complete: function() {
-      // (이미지 감추기 처리)
-      $('.wrap-loading').addClass('display-none');
-    },
-    error: function(error) {
-      console.log(error);
-    }
-  });
-}
+//
+//
+// function dragStart(event) {
+//   event.dataTransfer.setData("data", event.target.attributes[2].nodeValue);
+// };
+//
+// function allowDrop(event) {
+//   event.preventDefault();
+// };
+//
+// function dropFormove(event) {
+//   event.preventDefault();
+//   var filename = event.dataTransfer.getData("data");
+//   var toFolder = event.target.dataset.id;
+//   console.log(event);
+//   var body = {
+//     "FolderID" : <%=FolderID%>,
+//     "filename": filename,
+//     "dest": toFolder
+//   }
+//   $.ajax({
+//     type: "POST",
+//     url: "split/move/",
+//     async: true,
+//     data: body,
+//     dataType: "JSON",
+//     success: function(json) {
+//       console.log(json);
+//
+//       $('.replace').load("split/folder/<%=FolderID%>", function(){
+//         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+//           console.log("load dropzone.js: " + textStatus);
+//         });
+//       });
+//     },
+//     beforeSend: function() {
+//       // (이미지 보여주기 처리)
+//       $('.wrap-loading').removeClass('display-none');
+//     },
+//     complete: function() {
+//       // (이미지 감추기 처리)
+//       $('.wrap-loading').addClass('display-none');
+//     },
+//     error: function(error) {
+//       console.log(error);
+//     }
+//   });
+// };
 
 function Submit(index){
   if(index===1){
     action_split.action='split/download';
-    $('.graph').load("split");
+    $('.replace').load("split");
   }
   if(index===2){
     action_split.action='split/delete';
+    $('.replace').load("split");
   }
 
   if(index===3){
     action_split.action='split/rename';
-    $('.graph').load("split");
+    $('.replace').load("split");
   }
 
   if(index===4){
     action_split.action='split/createFolder';
-    $('.graph').load("split");
+    $('.replace').load("split");
     // $('.graph').load("google/searchtype",{post});
   }
 
   action_split.submit();
 };
 
-
-
 function UploadSubmit(){
   uploadform.action='split/upload/';
   uploadform.submit();
-  $('.graph').load("split");
+  // $('.replace').load("split");
 };
 
 </script>
