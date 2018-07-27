@@ -93,7 +93,7 @@ const UTIL = (function() {
 
 
   var upload = function(FileInfo, size, driveState, req, res){
-
+    
     var FileInfoG = FileInfo.getSync(0);
     var FileInfoD = FileInfo.getSync(1);
     var FileInfoB = FileInfo.getSync(2);
