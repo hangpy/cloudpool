@@ -350,11 +350,14 @@ function dropFormove(event) {
     },
     beforeSend: function() {
       // (이미지 보여주기 처리)
-      $('.wrap-loading').removeClass('display-none');
+      $('.mv-file-info-box').css('visibility', 'visible').animate({
+        'bottom': '+=140'
+      }, 'fast');
     },
     complete: function() {
-      // (이미지 감추기 처리)
-      $('.wrap-loading').addClass('display-none');
+      $('.mv-file-info-box').animate({
+        'bottom': '-=140'
+      }, 'fast').css('visibility', 'hidden');
     },
     error: function(error) {
       console.log(error);
@@ -403,11 +406,14 @@ function Delete() {
       },
       beforeSend: function() {
         // (이미지 보여주기 처리)
-        $('.wrap-loading').removeClass('display-none');
+        $('.del-file-info-box').css('visibility', 'visible').animate({
+          'bottom': '+=140'
+        }, 'fast');
       },
       complete: function() {
-        // (이미지 감추기 처리)
-        $('.wrap-loading').addClass('display-none');
+        $('.del-file-info-box').animate({
+          'bottom': '-=140'
+        }, 'fast').css('visibility', 'hidden');
       },
       error: function(error) {
         console.log(error);
@@ -433,14 +439,17 @@ function Refresh() {
         });
       });
     },
-    beforeSend: function() {
-      // (이미지 보여주기 처리)
-      $('.wrap-loading').removeClass('display-none');
-    },
-    complete: function() {
-      // (이미지 감추기 처리)
-      $('.wrap-loading').addClass('display-none');
-    },
+    // beforeSend: function() {
+    //   // (이미지 보여주기 처리)
+    //   $('.rf-file-info-box').css('visibility', 'visible').animate({
+    //     'bottom': '+=140'
+    //   }, 'fast');
+    // },
+    // complete: function() {
+    //   $('.rf-file-info-box').animate({
+    //     'bottom': '-=140'
+    //   }, 'fast').css('visibility', 'hidden');
+    // },
     error: function(error) {
       console.log(error);
     }
@@ -513,46 +522,20 @@ function Rename() {
       },
       beforeSend: function() {
         // (이미지 보여주기 처리)
-        $('.wrap-loading').removeClass('display-none');
+        $('.cg-file-info-box').css('visibility', 'visible').animate({
+          'bottom': '+=140'
+        }, 'fast');
       },
       complete: function() {
-        // (이미지 감추기 처리)
-        $('.wrap-loading').addClass('display-none');
+        $('.cg-file-info-box').animate({
+          'bottom': '-=140'
+        }, 'fast').css('visibility', 'hidden');
       },
       error: function(error) {
         console.log(error);
       }
     });
   }
-}
-
-
-function Refresh() {
- $.ajax({
-   type: "GET",
-   url: "google/refresh/",
-   async: false,
-   success: function(json) {
-     console.log(json);
-     var PresentFolderID = removeSpace('<%=FolderID%>');
-     $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
-       $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
-         console.log("load dropzone.js: " + textStatus);
-       });
-     });
-   },
-   beforeSend: function() {
-     // (이미지 보여주기 처리)
-     $('.wrap-loading').removeClass('display-none');
-   },
-   complete: function() {
-     // (이미지 감추기 처리)
-     $('.wrap-loading').addClass('display-none');
-   },
-   error: function(error) {
-     console.log(error);
-   }
- });
 }
 
 
@@ -566,7 +549,7 @@ function Select() {
   $.ajax({
     type: "POST",
     url: "dropbox/select/" + PresentFolderID,
-    async: false,
+    async: true,
     data: body,
     dataType: "JSON",
     success: function(json) {
@@ -585,11 +568,14 @@ function Select() {
     },
     beforeSend: function() {
       // (이미지 보여주기 처리)
-      $('.wrap-loading').removeClass('display-none');
+      $('.sh-file-info-box').css('visibility', 'visible').animate({
+        'bottom': '+=140'
+      }, 'fast');
     },
     complete: function() {
-      // (이미지 감추기 처리)
-      $('.wrap-loading').addClass('display-none');
+      $('.sh-file-info-box').animate({
+        'bottom': '-=140'
+      }, 'fast').css('visibility', 'hidden');
     },
     error: function(error) {
       console.log(error);
@@ -608,7 +594,7 @@ function Search() {
   $.ajax({
     type: "POST",
     url: "dropbox/search/" + PresentFolderID,
-    async: false,
+    async: true,
     data: body,
     dataType: "JSON",
     success: function(json) {
@@ -626,11 +612,14 @@ function Search() {
     },
     beforeSend: function() {
       // (이미지 보여주기 처리)
-      $('.wrap-loading').removeClass('display-none');
+      $('.sh-file-info-box').css('visibility', 'visible').animate({
+        'bottom': '+=140'
+      }, 'fast');
     },
     complete: function() {
-      // (이미지 감추기 처리)
-      $('.wrap-loading').addClass('display-none');
+      $('.sh-file-info-box').animate({
+        'bottom': '-=140'
+      }, 'fast').css('visibility', 'hidden');
     },
     error: function(error) {
       console.log(error);
@@ -663,7 +652,7 @@ function CreateFolder() {
   $.ajax({
     type: "POST",
     url: "dropbox/makeFolder/",
-    async: false,
+    async: true,
     data: body,
     dataType: "JSON",
     success: function(json) {
@@ -680,11 +669,14 @@ function CreateFolder() {
     },
     beforeSend: function() {
       // (이미지 보여주기 처리)
-      $('.wrap-loading').removeClass('display-none');
+      $('.mk-folder-info-box').css('visibility', 'visible').animate({
+        'bottom': '+=140'
+      }, 'fast');
     },
     complete: function() {
-      // (이미지 감추기 처리)
-      $('.wrap-loading').addClass('display-none');
+      $('.mk-folder-info-box').animate({
+        'bottom': '-=140'
+      }, 'fast').css('visibility', 'hidden');
     },
     error: function(error) {
       console.log(error);
