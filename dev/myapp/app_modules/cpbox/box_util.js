@@ -14,7 +14,7 @@ module.exports = (function(){
       json: true
     },
     function(error, response, body) {
-      callback(body.list);
+      callback(body.list, body.path, body.pathname);
     });
   }
 

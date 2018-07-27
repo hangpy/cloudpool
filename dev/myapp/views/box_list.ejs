@@ -1,7 +1,15 @@
 
 <div class="card box-area">
   <div class="card-title">
-    <h4>Box -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4>
+    <h4>
+      <%
+        for(var i = folderpath.length-1; i>-1; i--) {
+          %>
+          <a onclick="moveFolder_box(this)" value="<%=folderpath[i]%>"> <%=pathname[i]%>  </a> /
+          <%
+        }
+      %>
+    </h4>
   </div>
   <div class="card-body">
   <button type="button" onClick='Refresh()'>파일 리스트 최신화</button>&nbsp;&nbsp;
@@ -29,7 +37,7 @@
   <p></p>
   <form name='action_box' method='post'>
     체크박스 :&nbsp;
-    <button type="button" onClick='Download()'>다운로드(개발중,파일만)</button>&nbsp;&nbsp;
+    <button type="button" onClick='Download()'>다운로드(파일만)</button>&nbsp;&nbsp;
     <button type="button" onClick='Delete()'>삭제</button>&nbsp;&nbsp;
     <input type="text" id="filename" placeholder="새이름">
     <button type="button" onClick='Rename()'>이름 바꾸기</button>
@@ -164,10 +172,6 @@
       </table>
     </div>
     <!-- end of table-responsive -->
-  </form>
-  <p></p>
-  <form action='box/thumbnail' method='post' enctype="multipart/form-data">
-    <button type="submit">썸네일(개발중)</button>
   </form>
   </div>
   <!-- end of card-body -->

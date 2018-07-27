@@ -29,14 +29,16 @@ var sdk = new BoxSDK({
 
 router.get('/folder', function(req, res) {
   var folderID = 0;
-  box_util.listFileRest(req.user.userID, folderID, function(filelist) {
+  box_util.listFileRest(req.user.userID, folderID, function(filelist, folderpath, pathname) {
     if(filelist==null) {
       console.log('filelist are loading in rest server...');
       res.send('동기화 중입니다...');
     } else {
       res.render('box_list', {
         FolderID: folderID,
-        filelist: filelist
+        filelist: filelist,
+        folderpath: folderpath,
+        pathname: pathname
       });
     }
   });
@@ -44,10 +46,12 @@ router.get('/folder', function(req, res) {
 
 router.get('/folder/:id', function(req, res) {
   var folderID = req.params.id;
-  box_util.listFileRest(req.user.userID, folderID, function(filelist) {
+  box_util.listFileRest(req.user.userID, folderID, function(filelist, folderpath, pathname) {
     res.render('box_list', {
       FolderID: folderID,
-      filelist: filelist
+      filelist: filelist,
+      folderpath: folderpath,
+      pathname: pathname
     });
   });
 });
