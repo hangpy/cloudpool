@@ -462,7 +462,8 @@ var move = function(FolderID, target, dest){
     zipFileU : zipFileU,
     rename : rename,
     directory : directory,
-    move : move
+    move : move,
+    checkDrive : checkDrive
   }
 })();
 

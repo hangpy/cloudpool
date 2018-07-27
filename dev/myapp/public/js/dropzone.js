@@ -76,11 +76,16 @@ function F_FileMultiUpload(files, obj, drive, folderID) {
       contentType: false,
       success: function(response) {
         console.log("success");
-        Refresh();
+        if(drive!='split'){
+          Refresh();
+        }
+
       },
       complete: function(response) {
         console.log("complete");
-        Refresh();
+        if(drive!='split'){
+          Refresh();
+        }
       }
 
     });

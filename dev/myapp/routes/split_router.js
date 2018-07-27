@@ -64,12 +64,15 @@ module.exports = function(){
 
   })
 //
-  router.post('/upload/', upload.single('userfile'), function(req, res)
+  router.post('/upload/', upload.single('uploads_list'), function(req, res)
   {
+    console.log('upload');
+    console.log(req.file);
     var orgFile = splitUtil.orgFile(__dirname, req.file.path);
     var filesToAdd = splitUtil.filesToAdd;
     filesToAdd.addSync(orgFile);
     splitUtil.checkDrive(req.user.userID, function(driveState) {
+      console.log('driveState check');
       var size = splitUtil.sizeSplit(req.file.size, driveState);
       console.log("Split size : "+size);
       //분리될 파일이 저장될곳
