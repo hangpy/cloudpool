@@ -67,7 +67,7 @@ module.exports = function() {
   })
 //
 
-  router.post('/upload/', upload.single('userfile'), function(req, res)
+  router.post('/upload/', upload.single('uploads_list'), function(req, res)
   {
     console.log('upload');
 
