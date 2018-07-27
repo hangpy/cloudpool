@@ -502,6 +502,36 @@ function Rename() {
   }
 }
 
+
+function Refresh() {
+ $.ajax({
+   type: "GET",
+   url: "google/refresh/",
+   async: false,
+   success: function(json) {
+     console.log(json);
+     var PresentFolderID = removeSpace('<%=FolderID%>');
+     $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
+       $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+         console.log("load dropzone.js: " + textStatus);
+       });
+     });
+   },
+   beforeSend: function() {
+     // (이미지 보여주기 처리)
+     $('.wrap-loading').removeClass('display-none');
+   },
+   complete: function() {
+     // (이미지 감추기 처리)
+     $('.wrap-loading').addClass('display-none');
+   },
+   error: function(error) {
+     console.log(error);
+   }
+ });
+}
+
+
 function Select() {
   var selecttype = action_dropbox.selecttype.value;
 
