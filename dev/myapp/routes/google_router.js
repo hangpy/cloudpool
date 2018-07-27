@@ -103,7 +103,7 @@ router.post('/upload/:id',function(req,res){
     var folderID = req.params.id;
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
-      var FileInfo = files.userfile;
+      var FileInfo = files.uploads_list;
       console.log(FileInfo);
       google_util.uploadFile(req.user.userID,FileInfo, folderID, client,function(result){
         res.json(result);
@@ -114,14 +114,6 @@ router.post('/upload/:id',function(req,res){
 
 // 동시삭제, 동시다운로드 불가 다운로드 및 삭제 방식 변경 필요
 
-router.post('/download', function(req, res) {
-  google_init(req.user, function(client) {
-    var backURL = req.header('Referer') || '/';
-    var fileId = req.body.name;
-    google_util.downloadFile(res,fileId,client);
-    res.redirect(backURL);
-  });
-});
 
 router.post('/getthumbnail/',function(req,res){
   var fileId=req.body.path;
@@ -145,8 +137,24 @@ router.post('/mvdir/:id',function(req,res){
   });
 });
 
+router.get('/getsize/',function(req,res){
+  // var fileId=req.body.fileId;
+  // var folderId=req.body.folderId;
+  // var CurfolderId = req.params.id;
+  google_init(req.user, function(client) {
+    google_util.GetSize(client,function(result){
+      res.json(result);
+    });
+  });
+});
 
-
+router.post('/download/',function(req,res){
+  console.log('다운로드 돌입');
+  var fileId=req.body.id;
+  google_init(req.user, function(client) {
+    google_util.downloadFile(res,req.user.userID,fileId,client);
+  });
+});
 
 router.post('/changedir/:id',function(req,res){
   google_init(req.user, function(client) {

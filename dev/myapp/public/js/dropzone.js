@@ -76,7 +76,10 @@ function F_FileMultiUpload(files, obj, drive, folderID) {
       contentType: false,
       success: function(response) {
         console.log("success");
-        Refresh();
+        if(drive=='google') $('.replace').load(drive + '/folder/'+ folderID);
+        else{
+          Refresh();
+        }
       },
       complete: function(response) {
         console.log("complete");
