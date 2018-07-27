@@ -27,6 +27,8 @@
         <option value="etc">기타</option>
       </select>
       <button type="button" onClick='Select()'>골라보기</button>
+      <button type="button" onClick='ListRefresh()'>리스트 새로고침</button>
+      
       <div class="table-responsive">
         <div class="dropzone" name='google-dropzone'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
         <div class='current-folder' name="<%= FolderID %>"></div>
@@ -111,14 +113,14 @@
                               %>
             <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=oneItem%>">
 
-                <td data-id='<%=oneItem%>'></td>
+              <td></td>
               <td>/</td>
               <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
               <td data-id=<%=oneItem%>><a href="#" onclick="moveFolder_google(this);" value='<%=oneItem%>'>..</a></td>
               <!-- <td><a href="http://localhost:3000/google/<%=oneItem%>">..</a></td> -->
-              <td data-id='<%=oneItem%>'></td>
-              <td data-id='<%=oneItem%>'></td>
-              <td data-id='<%=oneItem%>'></td>
+              <td></td>
+              <td></td>
+              <td></td>
             </tr>
             <%
                               }
@@ -128,15 +130,15 @@
                                     if(oneItem.mimeType=="application/vnd.google-apps.folder"){
                                       %>
               <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=oneItem.id%>" class="folder-row">
-                <td data-id='<%=oneItem.id%>'><input type="checkbox" name="id" class="checkbox" value="<%=oneItem.id%>"></td>
-                <td data-id='<%=oneItem.id%>'>
+                <td><input type="checkbox" name="id" class="checkbox" value="<%=oneItem.id%>"></td>
+                <td>
                   <%=i%>
                 </td>
-                <td data-id='<%=oneItem.id%>'>
+                <td>
                   <img name="imgsrc" src="icons/filetype-icon/folder.png" width="64" height="64"/>
                 </td>
                 <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                <td data-id='<%=oneItem.id%>'>
+                <td>
                   <a href="#" onclick="moveFolder_google(this);" value='<%=oneItem.id%>'>
                     <%=oneItem.name%>
                   </a>
@@ -144,10 +146,10 @@
                 <!-- <a href="#"><%=oneItem.name%></a> -->
                 <!-- <td><a href="http://localhost:3000/google/<%=oneItem.id%>"><%=oneItem.name%></a></td> -->
 
-                <td data-id='<%=oneItem.id%>'>
+                <td>
                   <%=oneItem.modifiedTime%>
                 </td>
-                <td data-id='<%=oneItem.id%>'>
+                <td>
                   <%=size%>
                 </td>
               </tr>
@@ -157,20 +159,20 @@
                               else{
                                 %>
                   <tr ondragstart="dragStart(event)" draggable="true" value="<%=oneItem.id%>" class="file-row">
-                    <td data-id='<%=oneItem.id%>'><input type="checkbox" name="id" class="checkbox" value="<%=oneItem.id%>"></td>
-                    <td data-id='<%=oneItem.id%>'>
+                    <td><input type="checkbox" name="id" class="checkbox" value="<%=oneItem.id%>"></td>
+                    <td>
                     <%=i%>
                   </td>
-                  <td data-id='<%=oneItem.id%>'>
+                  <td>
                     <img name="imgsrc" src="<%=getImagePath(oneItem.name)%>"width="64" height="64"/>
                   </td>
-                  <td data-id='<%=oneItem.id%>'>
+                  <td>
                     <%=oneItem.name%>
                   </td>
-                  <td data-id='<%=oneItem.id%>'>
+                  <td>
                     <%=oneItem.modifiedTime%>
                   </td>
-                  <td data-id='<%=oneItem.id%>'>
+                  <td>
                     <%=size%>
                   </td>
                 </tr>
@@ -204,7 +206,7 @@
   function dropFormove(event) {
     event.preventDefault();
     var fileId = event.dataTransfer.getData("data");
-    var folderId = event.target.dataset.id;
+    var folderId = $(event.currentTarget).attr('value');
     console.log(event);
     var body = {
       "fileId": fileId,
@@ -378,6 +380,25 @@ function Select(){
           }
       });
 }
+
+
+  function ListRefresh(){
+      $.ajax({
+            type: "GET",
+            url: "google/refresh/list/",
+            async: true,
+            dataType: "JSON",
+            success: function(json) {
+              var obj = JSON.stringify(json);
+              console.log(obj);
+              $('.replace').load("google/folder/");
+            },
+            error: function(error) {
+              console.log(error);
+            }
+        });
+  }
+
 
   function Upload() {
    var form = $('#uploadform')[0];
