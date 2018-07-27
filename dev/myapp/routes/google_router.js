@@ -47,11 +47,16 @@ router.get('/folder/', (req, res) => {
         res.send('드라이브 동기화 중입니다. 최대 소요시간 약 5분');
       }
       else{
+
         google_util.list(userId,folderId, orderkey, function(fileList){
+          console.log('진입');
           if(fileList!=undefined){
+            console.log('진입2');
             res.render('google_list', {
               FolderID: folderId,
-              filelist: fileList
+              filelist: fileList,
+              folderList: ['root'],
+              folderNameList:['Google']
             });
           }
         });
@@ -74,14 +79,20 @@ router.get('/folder/:id', (req, res) => {
         res.send('드라이브 동기화 중입니다. 최대 소요시간 약 5분');
       }
       else{
-        google_util.list(userId,folderId, orderkey, function(fileList){
-          if(fileList!=undefined){
-            res.render('google_list', {
-              FolderID: folderId,
-              filelist: fileList
-            });
-          }
+        google_util.getBreadCrumbs(userId,folderId,function(folderList){
+          // console.log(folderList);
+          google_util.list(userId,folderId, orderkey, function(fileList){
+            if(fileList!=undefined){
+              res.render('google_list', {
+                FolderID: folderId,
+                filelist: fileList,
+                folderList:folderList[0],
+                folderNameList:folderList[1]
+              });
+            }
+          });
         });
+
       }
     }
   });
@@ -188,6 +199,18 @@ router.get('/refresh/list/',function(req,res){
   console.log('refresh 진입 ');
   var userId = req.user.userID;
   google_util.refreshList(userId,function(result){
+    res.json(result);
+  });
+});
+
+
+
+
+router.get('/getBreadCrumbs/',function(req,res){
+  console.log('getBreadCrumbs 진입 ');
+  var userId = '0000000001';
+  var folderId = '1_eAWwPQt-5XHaQ_xHstk9wTenoxBfaMt';
+  google_util.getBreadCrumbs(userId,folderId,function(result){
     res.json(result);
   });
 });

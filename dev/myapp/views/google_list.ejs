@@ -2,7 +2,25 @@
 <h6 class="card-subtitle">For multiple file upload put class <code>.dropzone</code> to form.</h6>
 <div class="card">
   <div class="card-title">
-    <h4>Google -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4>
+  
+        
+      <%
+
+      for(var i = 0; i < folderList.length ; i++){
+
+        if(i == 0){
+          %>
+          <a onclick="moveFolder_google(this)" value="<%=folderList[0]%>"> Google </a> /
+            
+          <%
+        }
+        else{
+          %>
+          <a onclick="moveFolder_google(this)" value="<%=folderList[i]%>"> <%=folderNameList[i]%>  </a> /
+
+        <%}
+      }
+%>
   </div>
   <div class="card-body">
     <!-- <form name="uploadform" id="uploadform" action='google/upload/<%=FolderID%>' method='post' enctype="multipart/form-data">
