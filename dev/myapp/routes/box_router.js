@@ -126,20 +126,24 @@ router.post('/thumbnail', function(req, res) {
 
 router.get('/search/:content', function(req, res) {
   var content = req.params.content;
-  box_util.searchRest(req.user.userID, content, function(filelist) {
+  box_util.searchRest(req.user.userID, content, function(filelist, folderpath, pathname) {
     res.render('box_list', {
       FolderID: 0,
-      filelist: filelist
+      filelist: filelist,
+      folderpath: folderpath,
+      pathname: pathname
     });
   });
 });
 
 router.get('/select/:selecttype', function(req, res) {
   var selecttype = req.params.selecttype;
-  box_util.selectRest(req.user.userID, selecttype, function(filelist) {
+  box_util.selectRest(req.user.userID, selecttype, function(filelist, folderpath, pathname) {
     res.render('box_list', {
       FolderID: 0,
-      filelist: filelist
+      filelist: filelist,
+      folderpath: folderpath,
+      pathname: pathname
     });
   });
 });
