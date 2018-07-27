@@ -6,6 +6,15 @@
   <div class="card-body">
   <button type="button" onClick='Refresh()'>파일 리스트 최신화</button>&nbsp;&nbsp;
   <button type="button" onClick='SpaceCheck()'>공간 체크</button>&nbsp;&nbsp;
+  <select name="selecttype">
+    <option value="document">문서</option>
+    <option value="PDF">PDF</option>
+    <option value="video">video</option>
+    <option value="image">이미지</option>
+    <option value="audio">오디오</option>
+    <option value="etc">기타</option>
+  </select>
+  <button type="button" onClick='Select()'>골라보기</button>&nbsp;&nbsp;
   <input type="text" id="content" placeholder="검색">
   <button type="button" onClick='Search()'>검색</button>
   <p></p>
@@ -23,9 +32,7 @@
     <button type="button" onClick='Download()'>다운로드(개발중,파일만)</button>&nbsp;&nbsp;
     <button type="button" onClick='Delete()'>삭제</button>&nbsp;&nbsp;
     <input type="text" id="filename" placeholder="새이름">
-    <button type="button" onClick='Rename()'>이름 바꾸기</button>&nbsp;&nbsp;
-    <input type="text" id="pathId" placeholder="폴더 ID">
-    <button type="button" onClick='MovePath()'>경로 이동</button>
+    <button type="button" onClick='Rename()'>이름 바꾸기</button>
     <p></p>
     <div class="table-responsive">
       <div class="dropzone" name='box-dropzone'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
@@ -56,19 +63,19 @@
                      {
                         var oneItem = filelist[i];
                         var size = formatBytes(oneItem.size,3);
-                        if(oneItem.mimeType=='folder'){
+                        if(oneItem.type=='folder'){
                           %>
 
-            <tr class="folder-row">
+            <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=oneItem.id%>" class="folder-row">
               <td><input type="checkbox" class="checkbox" name="name" value="<%=oneItem.id%>"></td>
               <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-              <td data-id='<%=oneItem.id%>'>
+              <td>
                 <a href="#" onclick="moveFolder_box(this)" value='<%=oneItem.id%>'>
                   <%=oneItem.name%>
                 </a>
               </td>
-              <td name="mimeType" value='<%=oneItem.mimeType%>'>
-                <%=oneItem.mimeType%>
+              <td name="type" value='<%=oneItem.type%>'>
+                <%=oneItem.type%>
               </td>
               <td>
                 <%=oneItem.modifiedTime%>
@@ -81,13 +88,13 @@
                 } else {
              %>
 
-            <tr class="file-row">
+            <tr ondragstart="dragStart(event)" draggable="true" value="<%=oneItem.id%>" class="file-row">
               <td><input type="checkbox" class="checkbox" name="name" value="<%=oneItem.id%>"></td>
               <td>
                 <%=oneItem.name%>
               </td>
-              <td name="mimeType" value='<%=oneItem.mimeType%>'>
-                <%=oneItem.mimeType%>
+              <td name="type" value='<%=oneItem.type%>'>
+                <%=oneItem.type%>
               </td>
               <td>
                 <%=oneItem.modifiedTime%>
@@ -109,9 +116,6 @@
   <p></p>
   <form action='box/thumbnail' method='post' enctype="multipart/form-data">
     <button type="submit">썸네일(개발중)</button>
-  </form>
-  <form action='box/search' method='post' enctype="multipart/form-data">
-    <button type="submit">검색(개발중)</button>
   </form>
   </div>
   <!-- end of card-body -->
@@ -157,21 +161,21 @@
     // 체크박스의 갯수를 변수에 담는다.
     var chklen = action_box.name.length;
     var name = '';
-    var mimelist = document.getElementsByName('mimeType');
+    var typelist = document.getElementsByName('type');
     // console.log()[3].attributes.value.value);
-    var mimeType = '';
+    var type = '';
     // 체크박스 갯수만큼 for 문을 돌려 체크된 놈의 value값을 가져온다.
     for (i = 0; i < chklen; i++) {
       if (action_box.name[i].checked == true) {
         name = action_box.name[i].value;
-        mimeType = mimelist[i].attributes.value.value;
+        type = typelist[i].attributes.value.value;
         break;
       }
     }
     if (name == '') {
       alert("삭제하실 파일이나 폴더를 체크해주세요");
     }
-    else if (mimeType == 'folder') {
+    else if (type == 'folder') {
       alert('폴더는 다운로드 할 수 없습니다');
     }
     else {
@@ -301,45 +305,44 @@
     }
   }
 
-  function MovePath() {
-    // 체크박스의 갯수를 변수에 담는다.
-    var chklen = action_box.name.length;
-    var name = '';
-    // 체크박스 갯수만큼 for 문을 돌려 체크된 놈의 value값을 가져온다.
-    for (i = 0; i < chklen; i++) {
-      if (action_box.name[i].checked == true) {
-        name = action_box.name[i].value;
-        break;
-      }
-    }
-    if (name == '') {
-      alert("경로를 변경할 파일이나 폴더를 체크해주세요");
-    } else if(!$('#pathId').val()) {
-      alert('이동할 폴더 ID를 입력해주세요');
-    } else {
-      var body = {
-        "name": name,
-        "pathId": action_box.pathId.value
-      }
+  function dragStart(event) {
+    event.dataTransfer.setData("data", event.target.attributes[2].nodeValue);
+  }
 
-      $.ajax({
-        type: "POST",
-        url: "box/movepath/",
-        async: true,
-        data: body,
-        dataType: "JSON",
-        success: function(json) {
-          console.log(json);
-          if(json!='success'){
-            alert(json);
-          }
-          $('.replace').load("box/folder/<%=FolderID%>");
-        },
-        error: function(error) {
-          console.log(error);
-        }
-      });
+  function allowDrop(event) {
+    event.preventDefault();
+  }
+
+  function dropFormove(event) {
+    event.preventDefault();
+    var filename = event.dataTransfer.getData("data");
+    var toFolder = $(event.currentTarget).attr('value');
+    console.log(event);
+
+    var body = {
+      "name": filename,
+      "pathId": toFolder
     }
+    console.log(filename);
+    console.log(toFolder);
+
+    $.ajax({
+      type: "POST",
+      url: "box/movepath/",
+      async: true,
+      data: body,
+      dataType: "JSON",
+      success: function(json) {
+        console.log(json);
+        if(json!='success'){
+          alert(json);
+        }
+        $('.replace').load("box/folder/<%=FolderID%>");
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
   }
 
   function Search() {

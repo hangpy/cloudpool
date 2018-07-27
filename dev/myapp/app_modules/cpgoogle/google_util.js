@@ -17,7 +17,14 @@ module.exports = (function() {
       json : true
     },
       function(error, response, body){
-         callback(JSON.parse(body));
+        if(error){
+          console.log('list error');
+          callback();
+        }
+        else{
+          callback(JSON.parse(body));
+        }
+         
       }
     );
   };
@@ -31,7 +38,13 @@ var searchType = function(userId,keyWord, keyType, orderKey,callback) {
       json : true
     },
       function(error, response, body){
-        callback(body);
+        if(error){
+          console.log('list error');
+          callback();
+        }
+        else{
+          callback(body);
+        }
       }
     );
 };
@@ -154,7 +167,6 @@ var deleteFile =function(userId,fileId,callback){
           }
         });
       }
-
   }
 
 

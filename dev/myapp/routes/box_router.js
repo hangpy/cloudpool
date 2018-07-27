@@ -30,10 +30,15 @@ var sdk = new BoxSDK({
 router.get('/folder', function(req, res) {
   var folderID = 0;
   box_util.listFileRest(req.user.userID, folderID, function(filelist) {
-    res.render('box_list', {
-      FolderID: folderID,
-      filelist: filelist
-    });
+    if(filelist==null) {
+      console.log('filelist are loading in rest server...');
+      res.send('동기화 중입니다...');
+    } else {
+      res.render('box_list', {
+        FolderID: folderID,
+        filelist: filelist
+      });
+    }
   });
 });
 
