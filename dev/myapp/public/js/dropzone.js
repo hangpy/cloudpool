@@ -86,6 +86,7 @@ function F_FileMultiUpload(files, obj, drive, folderID) {
 
       },
       complete: function(response) {
+        console.log('response : '+ response);
         console.log("complete");
         if(drive!='split'){
           Refresh();
