@@ -66,10 +66,11 @@ module.exports = function() {
 
   })
 //
-  router.post('/upload/', upload.single('uploads_list'), function(req, res)
+
+  router.post('/upload/', upload.single('userfile'), function(req, res)
   {
     console.log('upload');
-    console.log(req.file);
+
     var orgFile = splitUtil.orgFile(__dirname, req.file.path);
     var filesToAdd = splitUtil.filesToAdd;
     filesToAdd.addSync(orgFile);
