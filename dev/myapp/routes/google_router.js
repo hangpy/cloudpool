@@ -7,7 +7,7 @@ const google_util = require('../app_modules/cpgoogle/google_util.js'); //수정
 const google_init = require('../app_modules/cpgoogle/google_init');
 const moment = require('moment');
 const schedule = require('node-schedule');
-const redis_client = require('../app_modules/config/redis')
+const redis_client = require('../app_modules/config/redis');
 const request = require('request');
 
 /* modules for getting user access token 지우지마!*/
@@ -37,11 +37,26 @@ router.get('/folder/', (req, res) => {
   var folderId= 'root';
   var orderkey;
   console.log("folder");
-  google_util.list(userId,folderId, orderkey, function(fileList){
-    res.render('google_list', {
-      FolderID: folderId,
-      filelist: fileList
-    });
+
+  redis_client.hget("USER" + userId,'isWaitGoogle',function(err,isWait){
+    if(err){
+      console.log('redis error');
+    }
+    else{
+      if(isWait>0){
+        res.send('드라이브 동기화 중입니다. 최대 소요시간 약 5분');
+      }
+      else{
+        google_util.list(userId,folderId, orderkey, function(fileList){
+          if(fileList!=undefined){
+            res.render('google_list', {
+              FolderID: folderId,
+              filelist: fileList
+            });
+          }
+        });
+      }
+    }
   });
 });
 
@@ -49,11 +64,26 @@ router.get('/folder/:id', (req, res) => {
   var userId=req.user.userID;
   var folderId = req.params.id;
   var orderkey;
-  google_util.list(userId,folderId, orderkey, function(filelist){
-    res.render('google_list', {
-      FolderID: folderId,
-      filelist: filelist
-    });
+
+  redis_client.hget("USER" + userId,'isWaitGoogle',function(err,isWait){
+    if(err){
+      console.log('redis error');
+    }
+    else{
+      if(isWait>0){
+        res.send('드라이브 동기화 중입니다. 최대 소요시간 약 5분');
+      }
+      else{
+        google_util.list(userId,folderId, orderkey, function(fileList){
+          if(fileList!=undefined){
+            res.render('google_list', {
+              FolderID: folderId,
+              filelist: fileList
+            });
+          }
+        });
+      }
+    }
   });
 });
 
@@ -113,8 +143,6 @@ router.post('/upload/:id',function(req,res){
 });
 
 // 동시삭제, 동시다운로드 불가 다운로드 및 삭제 방식 변경 필요
-
-
 router.post('/getthumbnail/',function(req,res){
   var fileId=req.body.path;
   google_init(req.user, function(client) {
@@ -155,6 +183,15 @@ router.post('/download/',function(req,res){
     google_util.downloadFile(res,req.user.userID,fileId,client);
   });
 });
+
+router.get('/refresh/list/',function(req,res){
+  console.log('refresh 진입 ');
+  var userId = req.user.userID;
+  google_util.refreshList(userId,function(result){
+    res.json(result);
+  });
+});
+
 
 router.post('/changedir/:id',function(req,res){
   google_init(req.user, function(client) {
@@ -200,16 +237,35 @@ router.get('/callback', function(req, res) {
     var accessToken = tokens.access_token;
     var refreshToken = tokens.refresh_token;
 
+    redis_client.hset("USER" + req.user.userID, "isWaitGoogle", 1, function(err, reply){
+      if(err){
+        console.log("REDIS ERROR: " + err);
+      } else {
+        console.log("REDIS REPLY: " + reply);
+      }
+    });
+    
     var data = {"userId" : userID , "CP_love" : accessToken};
-
     request.post({
       url: 'http://localhost:4000/api/google/set/',
       body : data,
       json : true
     },
       function(error, response, body){
-        console.log(body);
-        console.log("Complete register rest API Server - Google ");
+        if(error){
+          console.log('rest api server request error!');
+        }
+        else{
+          console.log(body);
+          console.log("Complete to register rest API Server - Google ");
+          redis_client.hset("USER" + req.user.userID, "isWaitGoogle", 0, function(err, reply){
+            if(err){
+              console.log("REDIS ERROR: " + err);
+            } else {
+              console.log("REDIS REPLY: " + reply);
+            }
+          });
+        }
       }
     );
 
@@ -321,11 +377,26 @@ router.get('/refresh', function(req, res) {
 router.get('/relieve', function(req, res, next){
   var userID = req.user.userID;
   knex.delete().from('GOOGLE_CONNECT_TB').where('userID', userID).then(function(rows){
-    console.log("[INFO] " + userID + "\'S GOOGLE TOKEN IS RELIEVED SUCCESSFULLY");
-    res.send({
-      msg: "Relieved google connection successfully",
-      state: 1
-    });
+    var data = {"userId" : userID};
+    request.post({
+      url: 'http://localhost:4000/api/google/relieve/',
+      body : data,
+      json : true
+    },
+      function(error, response, body){
+        if(error) {
+          console.log(error);
+        }
+        else{
+          console.log(body);
+        }
+        console.log("[INFO] " + userID + "\'S GOOGLE TOKEN IS RELIEVED SUCCESSFULLY");
+        res.send({
+          msg: "Relieved google connection successfully",
+          state: 1
+        });
+      }
+    ); 
   }).catch(function(err){
     console.log(err);
     res.send({

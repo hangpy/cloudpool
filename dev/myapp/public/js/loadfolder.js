@@ -19,6 +19,9 @@ function moveFolder_google(obj){
     $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
       console.log("load dropzone.js: " + textStatus);
     });
+    $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+      console.log("load context_menu.js: " + textStatus);
+    });
   });
 }
 
@@ -27,6 +30,9 @@ function moveFolder_box(obj){
   $('.replace').load("box/folder/"+FolderID, function(){
     $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
       console.log("load dropzone.js: " + textStatus);
+    });
+    $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+      console.log("load context_menu.js: " + textStatus);
     });
   });
 }
@@ -38,6 +44,9 @@ function moveFolder_dropbox(obj){
     $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
       console.log("load dropzone.js: " + textStatus);
     });
+    $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+      console.log("load context_menu.js: " + textStatus);
+    });
   });
 }
 
@@ -46,6 +55,9 @@ function moveFolder_split(obj){
   $('.replace').load("split/folder/"+FolderID, function(){
     $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
       console.log("load dropzone.js: " + textStatus);
+    });
+    $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+      console.log("load context_menu.js: " + textStatus);
     });
   });
 }

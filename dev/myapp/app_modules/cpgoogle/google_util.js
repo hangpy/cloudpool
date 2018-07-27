@@ -8,6 +8,7 @@ var path = require('path'),
 
   var mime = require('mime');
 
+  const redis_client = require('../config/redis');
 
 module.exports = (function() {
 
@@ -19,7 +20,14 @@ module.exports = (function() {
       json : true
     },
       function(error, response, body){
-         callback(JSON.parse(body));
+        if(error){
+          console.log('list error');
+          callback();
+        }
+        else{
+          callback(JSON.parse(body));
+        }
+
       }
     );
   };
@@ -33,7 +41,13 @@ var searchType = function(userId,keyWord, keyType, orderKey,callback) {
       json : true
     },
       function(error, response, body){
-        callback(body);
+        if(error){
+          console.log('list error');
+          callback();
+        }
+        else{
+          callback(body);
+        }
       }
     );
 };
@@ -62,6 +76,54 @@ var deleteFile =function(userId,fileId,callback){
       callback(body);
     }
   );
+}
+
+var refreshList= function(userId,callback){
+  redis_client.hset("USER" + userId, "isWaitGoogle", 1, function(err, reply){
+    if(err){
+      console.log("REDIS ERROR: " + err);
+      callback();
+    } else {
+      console.log("REDIS REPLY: " + reply);
+
+      var data = {"userId" : userId};
+
+      request.post({
+        url: 'http://localhost:4000/api/google/refresh/list/',
+        body : data,
+        json : true
+      },
+        function(error, response, body){
+          if(error){
+            console.log('rest api server request error!');
+            redis_client.hset("USER" + userId, "isWaitGoogle", 0, function(err, reply){
+              if(err){
+                console.log("REDIS ERROR: " + err);
+                callback();
+              } else {
+                console.log("REDIS REPLY: " + reply);
+                callback(body);
+              }
+            });
+            callback();
+          }
+          else{
+            console.log(body);
+            console.log("Complete to register rest API Server - Google ");
+            redis_client.hset("USER" + userId, "isWaitGoogle", 0, function(err, reply){
+              if(err){
+                console.log("REDIS ERROR: " + err);
+                callback();
+              } else {
+                console.log("REDIS REPLY: " + reply);
+                callback(body);
+              }
+            });
+          }
+        }
+      );
+    }
+  });
 }
 
 // var downloadFile = function(res, fileId,oauth2Client) {
@@ -156,7 +218,6 @@ var deleteFile =function(userId,fileId,callback){
           }
         });
       }
-
   }
 
 
@@ -570,6 +631,7 @@ async function runSample (fileId, drive,res) {
     downloadFile: downloadFile,
     uploadFile: uploadFile,
     moveDir:moveDir,
+    refreshList:refreshList,
     // deleteFile: deleteFile,
     // updateFile: updateFile,
     // updateDir: updateDir,
