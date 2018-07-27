@@ -59,7 +59,7 @@ router.get('/folder/:id', (req, res) => {
 
 router.post('/search/',function(req,res){
   var filelist=JSON.parse(req.body.list);
-  
+
   console.log(filelist);
   var folderId= 'root';
 
@@ -103,7 +103,7 @@ router.post('/upload/:id',function(req,res){
     var folderID = req.params.id;
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
-      var FileInfo = files.userfile;
+      var FileInfo = files.uploads_list;
       console.log(FileInfo);
       google_util.uploadFile(req.user.userID,FileInfo, folderID, client,function(result){
         res.json(result);
@@ -209,7 +209,7 @@ router.get('/callback', function(req, res) {
       knex.select('refreshToken_g').from('GOOGLE_RELIEVE_TB').where('userID', userID).then(function(rows){
         if(rows != null){
           refreshToken = rows[0].refreshToken_g;
-        
+
           knex('GOOGLE_CONNECT_TB').insert({
             // todo: session에서 userID 추출
             userID: userID,
@@ -380,7 +380,7 @@ var refreshGoogleToken = function(userID) {
             console.log('[INFO] ' + userID + ' USER\'S GOOGLE ACCESS TOKEN IS REFRESHED SUCCESSFULLY!');
             knex.select('recentRefreshTime_g').from('GOOGLE_CONNECT_TB').where('userID', userID)
             .then(function(rows){
-              
+
               var data = {
                 "user_id": userID,
                 "accesstoken": new_accessToken_b

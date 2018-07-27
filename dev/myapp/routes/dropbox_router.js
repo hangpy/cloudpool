@@ -422,6 +422,21 @@ module.exports = function(){
   });
 
 
+  router.get('/getsize', function(req, res){
+    dbx_init(req.user, function(client){
+      client.usersGetSpaceUsage()
+          .then(function(response) {
+          console.log('Drop used :' + response.used);
+          console.log('Drop total :' + response.allocation.allocated);
+          })
+          .catch(function(error) {
+           console.error(error);
+          });
+
+    })
+  })
+
+
 
 
   return router;
