@@ -155,7 +155,7 @@ const UTIL = (function() {
         googlePD: results[0],
         mimeType: mimeType,
         size: size,
-        parents: '//',
+        parents: '/',
         modifiedTime : time
       }).then(function(){
       });
@@ -196,112 +196,135 @@ const UTIL = (function() {
               var zip = dropdownpath.split(".");
               if(zip[zip.length-1]=='zip'){
                 zippath = dropdownpath;
+                console.log('zippath dropbox : ' + zippath);
+                  callback(null,'dropbox complete');
+              }else{
+                  callback(null,'dropbox complete');
               }
             })
           });
 
-          callback(null,'dropbox complete');
+
       },
       function(callback){
         //Box
         box_init(req.user, function(client){
           var FileID = boxID;
-          if (Array.isArray(FileID)) {
-            async.map(FileID, function(id, callback1) {
-              boxUtil.downloadSplit(client, boxID, function(filename){
-                var zip = filename.split(".");
-
-                if(zip[zip.length-1]=='zip'){
-                  zippath = filename;
-                }
-              });
-              callback1(null, 'finish');
-            });
-          } else {
+          // if (Array.isArray(FileID)) {
+          //   async.map(FileID, function(id, callback1) {
+          //     boxUtil.downloadSplit(client, boxID, function(filename){
+          //       var zip = filename.split(".");
+          //
+          //       if(zip[zip.length-1]=='zip'){
+          //         zippath = filename;
+          //
+          //         console.log('zippath box : ' + zippath);
+          //       }
+          //     });
+          //     callback1(null, 'finish');
+          //     callback(null, 'finish');
+          //   });
+          // } else {
             boxUtil.downloadSplit(client, boxID, function(filename){
               var zip = filename.split(".");
-
               if(zip[zip.length-1]=='zip'){
                 zippath = filename;
+
+                console.log('zippath box : ' + zippath);
+
+                callback(null, 'finish');
+              }else{
+                callback(null, 'finish');
               }
             });
-          }
+          //}
         });
 
-        callback(null,'box complete');
       }
       , function(callback){
         //Google
-        google_init(req.user, function(client) {
-          googleUtil.downloadSplit(googlePD, client, function(filename){
-            var zip = filename.split(".");
+        // google_init(req.user, function(client) {
+        //   googleUtil.downloadSplit(googlePD, client, function(filename){
+        //     var zip = filename.split(".");
+        //
+        //     if(zip[zip.length-1]=='zip'){
+        //       zippath = filename;
+        //         callback(null,'google complete');
+        //     }else{
+        //         callback(null,'google complete');
+        //     }
+        //   });
+        // });
 
-            if(zip[zip.length-1]=='zip'){
-              zippath = filename;
-            }
-          });
-        });
-
-        callback(null,'google complete');
+          callback(null,'google complete');
       }
     ], function(err, results){
-      console.log('zippath: '+zippath);
-      callback0(zippath);
+        console.log('zippath: '+zippath);
+        unzip_zip4j(splitFileID, zippath,function(orgdir, orgfile){
+          callback0(orgdir, orgfile);
+        });
+
       });
 }
 
-var unzip_zip4j = function(splitFileID, zippath, req, res,callback){
+var unzip_zip4j = function(splitFileID, zippath, callback){
   var fileName;
 
   knex.select('fileName').from('SPLIT_FILE_TB').where('splitFileID', splitFileID)
   .then(function(rows){
     fileName = rows[0].fileName;
+    console.log('fileName SQL: '+fileName);
+
+    var file = java.newInstanceSync("java.io.File", "..\\routes\\downloads\\dis\\"+fileName+".zip");
+    var zipFile = java.newInstanceSync("net.lingala.zip4j.core.ZipFile", file.getAbsolutePathSync());
+    console.log(__dirname+"\\downloads\\org");
+    zipFile.extractAll(__dirname+"\\downloads\\org\\" , function(err, result){
+      if(err) console.log(err);
+      else{
+          console.log('fileName ZIP: '+fileName);
+          var patharr = ["..\\routes\\downloads\\dis\\"+fileName+".zip","..\\routes\\downloads\\dis\\"+fileName+".z01","..\\routes\\downloads\\dis\\"+fileName+".z02"];
+          //파일 최종 이름 가져오기
+          var separatedfile =  patharr[1].split("\\");
+          var filename=separatedfile[separatedfile.length-1];
+          var timestamp = filename.split('(M)')[0];
+
+
+          var orgfilename = timestamp+"(M)"+fileName;
+          async.map(patharr,
+                  function(path, callback){
+                    //원본파일삭제 patharr[0]은 undefine이라서 예외처리
+                      fs.unlink(path, function(err){
+                        if(err)throw err;
+
+                        console.log('Successfully deleted downloaded file -> '+path);
+
+                      });
+                  },
+                  function(err,result){
+                      if(err) console.log(err);
+                      //다운로드 완료
+                      else {
+                        var orgdir=__dirname+"/downloads/org/"+orgfilename;
+                        console.log("original file path is " + orgdir);
+                        callback(orgdir,orgfilename);
+                      }
+                  }
+                );
+      }
+    });
+
+
+//end
+
   }).catch(function(err){
     console.log("SQL Error");
     console.log(err);
   });
 
-  var file = java.newInstanceSync("java.io.File", "../routes/downloads/dis/"+fileName+".zip");
-
-  var zipFile = java.newInstanceSync("net.lingala.zip4j.core.ZipFile", file.getAbsolutePathSync());
-
-  zipFile.extractAll(__dirname+"/downloads/org/", function(err, result){
-    if(err) console.log(err);
-    else{
-        var patharr = ["../routes/downloads/dis/"+fileName+".zip","../routes/downloads/dis/"+fileName+".z01","../routes/downloads/dis/"+fileName+".z02"];
-        //파일 최종 이름 가져오기
-        var separatedfile =  patharr[1].split("/");
-        var filename=separatedfile[separatedfile.length-1];
-        var timestamp = filename.split('(M)')[0];
 
 
-        var orgfilename = timestamp+"(M)"+fileName;
-        async.map(patharr,
-                function(path, callback){
-                  //원본파일삭제 patharr[0]은 undefine이라서 예외처리
-
-                    fs.unlink(path, function(err){
-                      if(err)throw err;
-
-                      console.log('Successfully deleted downloaded file -> '+path);
-
-                    });
 
 
-                },
-                function(err,result){
-                    if(err) console.log(err);
-                    //다운로드 완료
-                    else {
-                      var orgdir=__dirname+"/downloads/org/"+orgfilename;
-                      console.log("original file path is " + orgdir);
-                      callback(orgdir,orgfilename);
-                    }
-                }
-              );
-
-    }
-  });
 };
 
 var sendfile = function(orgdir, orgfilename, req, res){
@@ -448,6 +471,65 @@ var move = function(FolderID, target, dest){
     });
 }
 
+var deleteFile = function(FileID, driveState, req){
+
+  var googleCount = driveState[0];
+  var dropboxCount = driveState[1];
+  var boxCount = driveState[2];
+  //select files
+  var userID = req.user.userID;
+  var googlePD;
+  var boxID;
+  var dbxPath;
+  knex.select('*').from('SPLIT_FILE_TB').where('splitFileID',FileID).then(function(rows){
+    googlePD = rows[0].googlePD;
+    boxID = rows[0].boxID;
+    dbxPath = rows[0].dbxPath;
+
+
+  async.parallel([
+    function(callback_del){
+      if(googleCount!=0){
+        googleUtil.deleteFile(userID ,googlePD, function(result){
+        callback_del(null, result);
+        });
+
+      }else{
+      callback_del(null, null);
+      }
+
+    },function(callback_del){
+
+      if(dropboxCount != 0){
+        dbx_init(req.user, function(client) {
+              dbxUtil.delete(client, dbxPath ,'',userID, function(result){
+                callback_del(null, result);
+              });
+        });
+      }else{
+        callback_del(null,null);
+      }
+    },function(callback_del){
+      if(boxCount != 0){
+          boxUtil.deleteFileRest(userID, boxID, function(result){
+              callback_del(null, result);
+          });
+      }else{
+          callback_del(null, null);
+      }
+
+    }],function(err, result){
+      //knex delete
+      knex('SPLIT_FILE_TB').where('splitFileID',FileID).del().then(function(result){
+        console.log('delete result : '+result);
+      })
+    }
+  );
+})
+
+
+}
+
 
   return {
     storage: storage,
@@ -462,7 +544,9 @@ var move = function(FolderID, target, dest){
     zipFileU : zipFileU,
     rename : rename,
     directory : directory,
-    move : move
+    move : move,
+    checkDrive : checkDrive,
+    deleteFile : deleteFile
   }
 })();
 

@@ -80,14 +80,22 @@ function F_FileMultiUpload(files, obj, drive, folderID) {
       contentType: false,
       success: function(response) {
         console.log("success");
-        if(drive=='google') $('.replace').load(drive + '/folder/'+ folderID);
-        else{
+
+        // if(drive=='google') {
+        //   $('.replace').load(drive + '/folder/'+ folderID);
+        // }else
+        if(drive!='split'){
           Refresh();
         }
+
+
       },
       complete: function(response) {
+        console.log('response : '+ response);
         console.log("complete");
-        Refresh();
+        if(drive!='split'){
+          Refresh();
+        }
       }
 
     });
