@@ -6,6 +6,8 @@ var path = require('path'),
   fs = require('fs'),
   request = require('request');
 
+  var mime = require('mime');
+
 
 module.exports = (function() {
 
@@ -158,7 +160,98 @@ var deleteFile =function(userId,fileId,callback){
   }
 
 
-  
+  var downloadFileSplit = function(fileId, oauth2Client, callback) {
+      var drive = google.drive({
+        version: 'v3',
+        auth: oauth2Client
+      });
+      var downpath_google;
+      var dest;
+
+      drive.files.get({
+        fileId: fileId,
+        alt: "media"
+      }, (err, metadata) => {
+        if (err) {
+          console.log('The API returned an error: ' + err);
+          return;
+        }
+        console.log('Downloading %s...', metadata.name);
+        downpath_google='../routes/downloads/dis/'+metadata.name;
+        dest = fs.createWriteStream(downpath_google);
+        callback(downpath_google);
+      }).pipe(dest);
+  }
+
+      var uploadFileSplit = function(FilePath, Folder, oauth2Client, callback) {
+          var drive = google.drive({
+            version: 'v3',
+            auth: oauth2Client
+          });
+
+          var splitedname = FilePath.split("\\");
+          var FileName =splitedname[(splitedname.length)-1];
+          var fullname = FilePath.split(".");
+          var type = fullname[fullname.length-1];
+          var path = FilePath.substr(0,FilePath.length-FileName.length);
+          var mimetype = mime.getType(fullname[fullname.length-1]);
+
+          console.log("FileName : "+FileName);
+          console.log("FilePath : "+path);
+          console.log("FullName : "+fullname);
+          console.log("Type : "+ type);
+          console.log("MimeType : "+mimetype);
+
+          if (Folder == '\'root\'') {
+            var fileMetadata = {
+              'name': FileName
+            };
+            var media = {
+              mimeType: 'application/octet-stream',
+              body: fs.createReadStream(FilePath)
+            };
+
+            drive.files.create({
+              resource: fileMetadata,
+              media: media,
+              fields: 'id'
+            }, function(err, file) {
+              if (err) {
+                console.error(err);
+              } else {
+                console.log('Uploaded!');
+                console.log(file)
+              }
+            });
+          } else {
+            var FolderID = Folder;
+            // 디렉토리 내에서 업로
+            var fileMetadata = {
+              'name': FileName,
+              parents: [FolderID]
+            };
+
+            var media = {
+              mimeType: 'application/octet-stream',
+              body: fs.createReadStream(FilePath)
+            };
+
+            drive.files.create({
+              resource: fileMetadata,
+              media: media,
+              fields: 'id'
+            }, function(err, file) {
+              if (err) {
+                console.error(err);
+              } else {
+                console.log('Uploaded!');
+                callback(file.data.id);
+              }
+            });
+          }
+
+      }
+
   var getThumbnailLink = function(fileId,oauth2Client,callback) {
     var drive = google.drive({
       version: 'v3',
@@ -189,7 +282,7 @@ var deleteFile =function(userId,fileId,callback){
         callback(body);
       }
     );
-    
+
   }
 
 
@@ -366,6 +459,8 @@ var deleteFile =function(userId,fileId,callback){
     searchType: searchType,
     // makeDir: makeDir,
     // copyFile: copyFile,
-    getThumbnailLink: getThumbnailLink
+    getThumbnailLink: getThumbnailLink,
+    downloadSplit: downloadFileSplit,
+    uploadSplit : uploadFileSplit
   }
 })();

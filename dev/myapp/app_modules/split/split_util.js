@@ -155,7 +155,7 @@ const UTIL = (function() {
         googlePD: results[0],
         mimeType: mimeType,
         size: size,
-        parents: '//',
+        parents: '/',
         modifiedTime : time
       }).then(function(){
       });
