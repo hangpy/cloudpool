@@ -61,7 +61,7 @@
                       if(folderList[0]==FolderID){
             %>
 
-              <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>">
+              <tr ondrop="dropFormove(event)" ondragleave="dragLeave(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>" class="folder-row">
                 <td></td>
                 <td><img src="icons/filetype-icon/back.png"></td>
                 <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
@@ -87,7 +87,7 @@
                         }
 
                       %>
-                <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>">
+                <tr ondrop="dropFormove(event)" ondragleave="dragLeave(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>" class="folder-row">
                   <td data-id='<%=beforeFolder%>'></td>
                   <td data-id='<%=beforeFolder%>'><img src="icons/filetype-icon/back.png"></td>
                   <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
@@ -177,7 +177,7 @@
                                     }
                                     else var Foldername = oneItem.name;
                                   %>
-                  <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=Foldername%>" class="folder-row">
+                  <tr ondrop="dropFormove(event)" ondragleave="dragLeave(event)" ondragover="allowDrop(event)" value="<%=Foldername%>" class="folder-row">
                     <td><input class="checkbox" type="checkbox" name="name" value="<%=oneItem.name%>"></td>
                     <td ><img data-id='<%=Foldername%>' name="imgsrc" src="icons/filetype-icon/folder.png"></td>
                     <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
@@ -203,7 +203,7 @@
                                     }
                                     else var Foldername = oneItem.name;
                                   %>
-                    <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=FolderID%>*<%=Foldername%>" class="folder-row">
+                    <tr ondrop="dropFormove(event)" ondragleave="dragLeave(event)" ondragover="allowDrop(event)" value="<%=FolderID%>*<%=Foldername%>" class="folder-row">
                       <td data-id='<%=FolderID%>*<%=Foldername%>'><input class="checkbox" type="checkbox" name="name" value="<%=oneItem.name%>"></td>
                       <td data-id='<%=FolderID%>*<%=Foldername%>'><img name="imgsrc" src="icons/filetype-icon/folder.png"></td>
                       <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
@@ -295,6 +295,28 @@ function dragStart(event) {
 
 function allowDrop(event) {
   event.preventDefault();
+  if(event){
+    var targetFolderValue = $(event.currentTarget).attr('value');
+    console.log('targetFolderValue: ' + targetFolderValue);
+    $('table').find('.folder-row').each(function(e){
+
+      if($(this).attr('value') == targetFolderValue){
+        $(this).addClass('active');
+      } else {
+        $(this).removeClass('active');
+      }
+    });
+  } else {
+    $('table').find('.folder-row').each(function(e){
+      $(this).removeClass('active');
+    });
+  }
+}
+
+function dragLeave(event){
+  $('table').find('.folder-row').each(function(e){
+    $(this).removeClass('active');
+  });
 }
 
 function dropFormove(event) {
@@ -339,6 +361,7 @@ function dropFormove(event) {
     }
   });
 }
+
 
 function Submit(index) {
   if (index === 1) {

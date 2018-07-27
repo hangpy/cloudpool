@@ -184,6 +184,15 @@ router.post('/download/',function(req,res){
   });
 });
 
+router.get('/refresh/list/',function(req,res){
+  console.log('refresh 진입 ');
+  var userId = req.user.userID;
+  google_util.refreshList(userId,function(result){
+    res.json(result);
+  });
+});
+
+
 router.post('/changedir/:id',function(req,res){
   google_init(req.user, function(client) {
     var fileId ;
