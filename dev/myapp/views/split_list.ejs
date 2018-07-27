@@ -23,7 +23,7 @@
       <button  type="submit" onClick='Submit(4)' >새 폴더 생성</button>
       <div class="table-responsive">
         <div class="dropzone" name='split-area'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
-        <table class="table table-hover" id="table_split" data-id = '<%=folderItem%>'>
+        <table class="table table-hover" id="table_split" data-id = '<%=FolderID%>'>
                 <tr>
                     <td> </td>
                     <td>번호</td>
@@ -32,6 +32,7 @@
                     <td>올린날짜</td>
                     <td>파일용량</td>
                 </tr>
+
                   <%
                   function formatBytes(bytes,decimals) {
                      if(bytes == 0) return '0 Bytes';
@@ -46,21 +47,36 @@
 
                   var depthSave = depth;
 
+                  if(depthSave > 1){
+                  %>
+                  <tr class="folder-row">
+
+                      <td></td>
+                      <td>/</td>
+                      <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
+                      <td><a href="#" onclick="moveFolder_split(this)" value ="<%=folderItem.name%>*<%=(depthSave-2)%>"> /..</a></td>
+                      <!-- <td><a href="http://localhost:3000/google/<%=oneItem%>">..</a></td> -->
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                  </tr>
+                  <%
+                }
                     if(folderlist.length > 0){
                       for(var i = 0; i< folderlist.length; i++){
                         var folderItem = folderlist[i];
 
                         %>
-                        <tr class="folder-row">
+                        <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=folderItem.name%>*<%=depthSave%>" class="folder-row">
 
-                            <td></td>
-                            <td>/</td>
+                            <td data-id='<%=folderItem.name%>*<%=depthSave%>'></td>
+                            <td data-id='<%=folderItem.name%>*<%=depthSave%>'>/</td>
                             <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
                             <td><a href="#" onclick="moveFolder_split(this)" value ="<%=folderItem.name%>*<%=depthSave%>"> <%=folderItem.name%></a></td>
                             <!-- <td><a href="http://localhost:3000/google/<%=oneItem%>">..</a></td> -->
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td data-id='<%=folderItem.name%>*<%=depthSave%>'></td>
+                            <td data-id='<%=folderItem.name%>*<%=depthSave%>'></td>
+                            <td data-id='<%=folderItem.name%>*<%=depthSave%>'></td>
                         </tr>
                         <%
                       }
@@ -72,7 +88,7 @@
                           var size = formatBytes(oneItem.size,3);
 
                           %>
-                        <tr class="file-row">
+                        <tr ondragstart="dragStart(event)" draggable="true" value="<%=oneItem.splitFileID%>" class="file-row">
                          <td><input type="checkbox" name="name" value="<%=oneItem.splitFileID%>" ></td>
                          <td><%=i%></td>
                          <td><%=oneItem.fileName%></td>
@@ -90,6 +106,55 @@
   </div>
 </div>
 <script language=javascript>
+
+
+function dragStart(event) {
+  event.dataTransfer.setData("data", event.target.attributes[2].nodeValue);
+}
+
+function allowDrop(event) {
+  event.preventDefault();
+}
+
+function dropFormove(event) {
+  event.preventDefault();
+  var filename = event.dataTransfer.getData("data");
+  var toFolder = event.target.dataset.id;
+  console.log(event);
+  var body = {
+    "FolderID" : <%=FolderID%>,
+    "filename": filename,
+    "dest": toFolder
+  }
+  $.ajax({
+    type: "POST",
+    url: "split/move/",
+    async: true,
+    data: body,
+    dataType: "JSON",
+    success: function(json) {
+      console.log(json);
+
+      $('.replace').load("split/folder/<%=FolderID%>", function(){
+        $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+          console.log("load dropzone.js: " + textStatus);
+        });
+      });
+    },
+    beforeSend: function() {
+      // (이미지 보여주기 처리)
+      $('.wrap-loading').removeClass('display-none');
+    },
+    complete: function() {
+      // (이미지 감추기 처리)
+      $('.wrap-loading').addClass('display-none');
+    },
+    error: function(error) {
+      console.log(error);
+    }
+  });
+}
+
 function Submit(index){
   if(index===1){
     action_split.action='split/download';

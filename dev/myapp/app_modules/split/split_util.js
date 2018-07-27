@@ -59,22 +59,24 @@ const UTIL = (function() {
     return result;
   };
 
-  var sizeSplit = function(size) {
+  var sizeSplit = function(size, driveState) {
+
+    var googleCount = driveState[0];
+    var dropboxCount = driveState[1];
+    var boxCount = driveState[2];
+    var sum = googleCount + dropboxCount + boxCount;
     var result;
     console.log('file size : '+ size);
-    if (size > min * 3) {
-      result = parseInt(size / 3);
-      return result;
-    } else {
-      if (size > min * 2) {
-        result = parseInt(size / 2);
+
+
+      if (size > min * sum) {
+        result = parseInt(size / sum);
         return result;
       } else {
         result = size;
         return result;
-
-      }
     }
+   // 최소사이즈 보다 작을시 에러 메세지
   };
 
 
@@ -88,59 +90,60 @@ const UTIL = (function() {
     return java.newInstanceSync("net.lingala.zip4j.core.ZipFile", dirname + "/uploads/dis/" + filename + ".zip");
   };
 
-  var refreshSpace = function(){
-    dbxUil.checkSpace();
-  }
 
-  var upload = function(FileInfo,size, req, res){
+
+  var upload = function(FileInfo, size, driveState, req, res){
 
     var FileInfoG = FileInfo.getSync(0);
     var FileInfoD = FileInfo.getSync(1);
     var FileInfoB = FileInfo.getSync(2);
+
     var splitedname = FileInfoD.split("\\");
     var temp =splitedname[(splitedname.length)-1];
     var FileName = temp.substring(0,temp.length-4);
     var mimeTemp = temp.split(".");
     var mimeType = mimeTemp[(mimeTemp.length)-2];
     var googlePD;
+
+    var googleCount = driveState[0];
+    var dropboxCount = driveState[1];
+    var boxCount = driveState[2];
+
     async.parallel([
       function(callback){
-        google_init(req.user, function(client) {
-          var folderID = 'root'
-          //var form = new formidable.IncomingForm();
-            // form.parse(req, function(err, fields, files) {
-            googleUtil.uploadSplit(FileInfoG, folderID, client,function(result){
-
+        if(googleCount!=0){
+          google_init(req.user, function(client) {
+              var folderID = 'root'
+              googleUtil.uploadSplit(FileInfoG, folderID, client, function(result){
               callback(null, result);
             });
-
-            //res.redirect('/google/' + folderID);
-
-          // });
-        })
+          })
+        }else{
+          callback(null,null);
+        }
       },
       function(callback){
-        dbx_init(req.user, function(client){
-              dbxUtil.uploadSplit(client, FileInfoD , '');
-              callback(null, temp);
-        });
-
-
-      },
-      function(callback){
-        box_init(req.user, function(client){
-          var FolderID = '0';
-            //var form = new formidable.IncomingForm();
-            //form.parse(req, function(err, fields, files) {
-              var FileInfo = FileInfoB;
-              //res.redirect('/' + FolderID);
-                //비동기 필요
-              boxUtil.uploadSplit(client, FileInfoB, FolderID, function(result){
-                callback(null, result);
-              });
-
-          //  });
+        if(dropboxCount != 0){
+          dbx_init(req.user, function(client) {
+                dbxUtil.uploadSplit(client, FileInfoD , '');
+                callback(null, temp);
           });
+        }else{
+          callback(null,null);
+        }
+      },
+      function(callback){
+        if(boxCount != 0){
+          box_init(req.user, function(client) {
+            var FolderID = '0';
+            boxUtil.uploadSplit(client, FileInfoB, FolderID, function(result){
+              callback(null, result);
+            });
+          });
+        }else{
+          callback(null, null);
+        }
+
       }
     ],function(err, results){
       var time = new Date(Date.now())
@@ -155,12 +158,8 @@ const UTIL = (function() {
         parents: '//',
         modifiedTime : time
       }).then(function(){
-        });
-
+      });
     })
-
-
-
 
   }
 
@@ -189,72 +188,66 @@ const UTIL = (function() {
     });
 
 
+    async.parallel([
+        //Dropbox
+      function(callback){
+          dbx_init(req.user, function(client){
+            dbxUtil.downloadSplit(client, dbxPath, '',req, res, function(dropdownpath){
+              var zip = dropdownpath.split(".");
+              if(zip[zip.length-1]=='zip'){
+                zippath = dropdownpath;
+              }
+            })
+          });
 
-  async.parallel([
-      //Dropbox
-  function(callback){
-      dbx_init(req.user, function(client){
-        dbxUtil.downloadSplit(client, dbxPath, '',req, res, function(dropdownpath){
-          var zip = dropdownpath.split(".");
-          if(zip[zip.length-1]=='zip'){
-            zippath = dropdownpath;
+          callback(null,'dropbox complete');
+      },
+      function(callback){
+        //Box
+        box_init(req.user, function(client){
+          var FileID = boxID;
+          if (Array.isArray(FileID)) {
+            async.map(FileID, function(id, callback1) {
+              boxUtil.downloadSplit(client, boxID, function(filename){
+                var zip = filename.split(".");
+
+                if(zip[zip.length-1]=='zip'){
+                  zippath = filename;
+                }
+              });
+              callback1(null, 'finish');
+            });
+          } else {
+            boxUtil.downloadSplit(client, boxID, function(filename){
+              var zip = filename.split(".");
+
+              if(zip[zip.length-1]=='zip'){
+                zippath = filename;
+              }
+            });
           }
-        })
-      });
+        });
 
-      callback(null,'dropbox complete');
-  },
-  function(callback){
-    //Box
-    box_init(req.user, function(client){
-      var FileID = boxID;
-      if (Array.isArray(FileID)) {
-        async.map(FileID, function(id, callback1) {
-          boxUtil.downloadSplit(client, boxID, function(filename){
+        callback(null,'box complete');
+      }
+      , function(callback){
+        //Google
+        google_init(req.user, function(client) {
+          googleUtil.downloadSplit(googlePD, client, function(filename){
             var zip = filename.split(".");
 
             if(zip[zip.length-1]=='zip'){
               zippath = filename;
             }
           });
-          callback1(null, 'finish');
         });
-      } else {
-        boxUtil.downloadSplit(client, boxID, function(filename){
-          var zip = filename.split(".");
 
-          if(zip[zip.length-1]=='zip'){
-            zippath = filename;
-          }
-        });
+        callback(null,'google complete');
       }
-    });
-
-    callback(null,'box complete');
-  }
-  , function(callback){
-    //Google
-    google_init(req.user, function(client) {
-      googleUtil.downloadSplit(googlePD, client, function(filename){
-        var zip = filename.split(".");
-
-        if(zip[zip.length-1]=='zip'){
-          zippath = filename;
-        }
+    ], function(err, results){
+      console.log('zippath: '+zippath);
+      callback0(zippath);
       });
-    });
-
-    callback(null,'google complete');
-  }
-], function(err, results){
-
-  console.log('zippath: '+zippath);
-
-  callback0(zippath);
-});
-
-
-
 }
 
 var unzip_zip4j = function(splitFileID, zippath, req, res,callback){
@@ -427,6 +420,35 @@ var rename = function(splitFileID, newName){
 }
 
 
+var checkDrive = function(userID, callback){
+  knex.select('*').from('DRIVE_STATE_TB').where('userID',userID).then(function(rows){
+    var googleCount = rows[0].googleCount;
+    var dropboxCount = rows[0].dropboxCount;
+    var boxCount = rows[0].boxCount;
+    var result =[];
+    result.push(googleCount)
+    result.push(dropboxCount)
+    result.push(boxCount)
+    callback(result);
+  }).catch(function(err){
+    console.log("SQL Error");
+    console.log(err);
+  });
+}
+
+var move = function(FolderID, target, dest){
+    knex('SPLIT_FILE_TB').where('',target).update({
+      parents : dest,
+      thisKeyIsSkipped : undefined
+    }).then(function(rows){
+      console.log('rows : '+rows);
+    }).catch(function(err){
+      console.log("SQL Error");
+      console.log(err);
+    });
+}
+
+
   return {
     storage: storage,
     upload: upload,
@@ -439,7 +461,8 @@ var rename = function(splitFileID, newName){
     orgFile: orgFile,
     zipFileU : zipFileU,
     rename : rename,
-    directory : directory
+    directory : directory,
+    move : move
   }
 })();
 
