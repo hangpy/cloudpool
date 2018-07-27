@@ -30,10 +30,15 @@ var sdk = new BoxSDK({
 router.get('/folder', function(req, res) {
   var folderID = 0;
   box_util.listFileRest(req.user.userID, folderID, function(filelist) {
-    res.render('box_list', {
-      FolderID: folderID,
-      filelist: filelist
-    });
+    if(filelist==null) {
+      console.log('filelist are loading in rest server...');
+      res.send('동기화 중입니다...');
+    } else {
+      res.render('box_list', {
+        FolderID: folderID,
+        filelist: filelist
+      });
+    }
   });
 });
 
@@ -66,19 +71,9 @@ router.post('/upload/:id', function(req, res) {
 })
 
 router.post('/download', function(req, res) {
-  box_init(req.user, function(clinet) {
-    var backURL = req.header('Referer') || '/';
-    console.log(req.body);
+  box_init(req.user, function(client) {
     var FileID = req.body.name;
-    if (Array.isArray(FileID)) {
-      async.map(FileID, function(id, callback) {
-        box_util.downloadFile(id);
-        callback(null, 'finish');
-      });
-    } else {
-      box_util.downloadFile(clinet, FileID);
-    }
-    res.redirect(backURL);
+    box_util.downloadFile(client, FileID, res);
   });
 });
 
@@ -125,16 +120,24 @@ router.post('/thumbnail', function(req, res) {
   });
 });
 
-router.post('/search', function(req, res) {
+router.get('/search/:content', function(req, res) {
+  var content = req.params.content;
+  box_util.searchRest(req.user.userID, content, function(filelist) {
+    res.render('box_list', {
+      FolderID: 0,
+      filelist: filelist
+    });
+  });
+});
+
+router.post('/space', function(req, res) {
   box_init(req.user, function(client) {
-    var searchText = 'test';
-    box_util.search(client, searchText, function(filelist) {
-      console.log("return - 4");
-      console.log(filelist);
-      res.render('box_list', {
-        FolderID: 0,
-        filelist: filelist
-      });
+    box_util.spaceCheck(client, function(total, used){
+      var space = {
+        'total':total,
+        'used':used
+      }
+      res.json(space);
     });
   });
 });

@@ -56,22 +56,62 @@ module.exports = function(passport) {
                 data = {
                   "user_id": userID
                 }
-                // 연동 되었을 때만 post보내게 바꾸기
-                request.post({
-                  url: 'http://localhost:4000/api/dropbox/login/',
-                  body: data,
-                  json: true
-                }, function(error, response, body) {
-                  console.log('========================localhost:4000=========================');
-                  console.log(body);
-                });
-                request.post({
-                  url: 'http://localhost:4000/api/box/login/',
-                  body: data,
-                  json: true
-                }, function(error, response, body) {
-                  console.log('========================localhost:4000=========================');
-                  console.log(body);
+                knex.select().from('DRIVE_STATE_TB').where('userID', userID).then(function(rows){
+                  var google_state = rows[0].googleCount;
+                  var dropbox_state = rows[0].dropboxCount;
+                  var box_state = rows[0].boxCount;
+
+                  if(google_state > 0) {
+
+                  } else {
+
+                  }
+
+                  if(dropbox_state > 0) {
+                    request.post({
+                      url: 'http://localhost:4000/api/dropbox/login/',
+                      body: data,
+                      json: true
+                    }, function(error, response, body) {
+                      console.log('========================localhost:4000=========================');
+                      console.log(body);
+                    });
+                  } else {
+                    console.log('[INFO] ' + userID + ' USER\'S DROPBOX DRIVE IS NOT YET CONNECTED');
+                  }
+
+                  if(box_state > 0) {
+                    knex.select('accessToken_b').from('BOX_CONNECT_TB').where('userID', userID).then(function(rows){
+                      console.log('[INFO] ' + userID + ' USER\'S BOX TOKEN IS SENDED TO REST SERVER');
+                      console.log('-------------------------------------------------------' + rows[0].accessToken_b);
+                      request.post({
+                        url: 'http://localhost:4000/api/box/refresh/token/',
+                        body: {
+                          user_id: userID,
+                          accesstoken: rows[0].accessToken_b
+                        },
+                        json: true
+                      }, function(error, response, body){
+                        console.log(body);
+                      })
+                    }).catch(function(err){
+                      console.log(err);
+                    });
+                    request.post({
+                      url: 'http://localhost:4000/api/box/login/',
+                      body: data,
+                      json: true,
+                    }, function(error, response, body) {
+                      console.log('========================localhost:4000=========================');
+                      console.log(body);
+                    });
+
+                  } else {
+                    console.log('[INFO] ' + userID + ' USER\'S BOX DRIVE IS NOT YET CONNECTED');
+                  }
+
+                }).catch(function(err){
+                  console.log(err);
                 });
 
                 redis_client.hmset("USER" + userID, {

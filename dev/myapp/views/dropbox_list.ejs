@@ -98,7 +98,7 @@
                       if(folderList[0]==FolderID){
             %>
 
-              <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>">
+              <tr ondrop="dropFormove(event)" ondragleave="dragLeave(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>" class="folder-row">
                 <td></td>
                 <td><img src="icons/filetype-icon/back.png"></td>
                 <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
@@ -124,7 +124,7 @@
                         }
 
                       %>
-                <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>">
+                <tr ondrop="dropFormove(event)" ondragleave="dragLeave(event)" ondragover="allowDrop(event)" value="<%=beforeFolder%>" class="folder-row">
                   <td data-id='<%=beforeFolder%>'></td>
                   <td data-id='<%=beforeFolder%>'><img src="icons/filetype-icon/back.png"></td>
                   <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
@@ -214,14 +214,14 @@
                                     }
                                     else var Foldername = oneItem.name;
                                   %>
-                  <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=Foldername%>" class="folder-row">
+                  <tr ondrop="dropFormove(event)" ondragleave="dragLeave(event)" ondragover="allowDrop(event)" value="<%=Foldername%>" class="folder-row">
                     <td><input class="checkbox" type="checkbox" name="name" value="<%=oneItem.name%>"></td>
-                    <td data-id='<%=Foldername%>'><img name="imgsrc" src="icons/filetype-icon/folder.png"></td>
+                    <td ><img data-id='<%=Foldername%>' name="imgsrc" src="icons/filetype-icon/folder.png"></td>
                     <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                    <td data-id='<%=Foldername%>'>
+                    <td >
                       <!-- <a href="/dropbox/<%=Foldername%>" id="Folder_<%=i%>" value="<%=Foldername%>"> -->
 
-                      <a href="#" onclick="moveFolder_dropbox(this)" value='folder/<%=Foldername%>'>
+                      <a data-id='<%=Foldername%>' href="#" onclick="moveFolder_dropbox(this)" value='folder/<%=Foldername%>'>
                         <%=oneItem.name%>
                       </a>
                     </td>
@@ -240,7 +240,7 @@
                                     }
                                     else var Foldername = oneItem.name;
                                   %>
-                    <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=FolderID%>*<%=Foldername%>" class="folder-row">
+                    <tr ondrop="dropFormove(event)" ondragleave="dragLeave(event)" ondragover="allowDrop(event)" value="<%=FolderID%>*<%=Foldername%>" class="folder-row">
                       <td data-id='<%=FolderID%>*<%=Foldername%>'><input class="checkbox" type="checkbox" name="name" value="<%=oneItem.name%>"></td>
                       <td data-id='<%=FolderID%>*<%=Foldername%>'><img name="imgsrc" src="icons/filetype-icon/folder.png"></td>
                       <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
@@ -332,12 +332,35 @@ function dragStart(event) {
 
 function allowDrop(event) {
   event.preventDefault();
+  if(event){
+    var targetFolderValue = $(event.currentTarget).attr('value');
+    console.log('targetFolderValue: ' + targetFolderValue);
+    $('table').find('.folder-row').each(function(e){
+
+      if($(this).attr('value') == targetFolderValue){
+        $(this).addClass('active');
+      } else {
+        $(this).removeClass('active');
+      }
+    });
+  } else {
+    $('table').find('.folder-row').each(function(e){
+      $(this).removeClass('active');
+    });
+  }
+}
+
+function dragLeave(event){
+  $('table').find('.folder-row').each(function(e){
+    $(this).removeClass('active');
+  });
 }
 
 function dropFormove(event) {
   event.preventDefault();
   var filename = event.dataTransfer.getData("data");
-  var toFolder = event.target.dataset.id;
+  var toFolder = $(event.currentTarget).attr('value');
+
   console.log(event);
   var body = {
     "filename": filename,
@@ -357,6 +380,9 @@ function dropFormove(event) {
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
         });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
+        });
       });
     },
     beforeSend: function() {
@@ -372,6 +398,7 @@ function dropFormove(event) {
     }
   });
 }
+
 
 function Submit(index) {
   if (index === 1) {
@@ -438,6 +465,9 @@ function Refresh() {
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
         });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
+        });
       });
     },
     beforeSend: function() {
@@ -461,6 +491,9 @@ function UploadSubmit() {
   $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
     $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
       console.log("load dropzone.js: " + textStatus);
+    });
+    $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+      console.log("load context_menu.js: " + textStatus);
     });
   });
 };
@@ -510,6 +543,9 @@ function Rename() {
           $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
             console.log("load dropzone.js: " + textStatus);
           });
+          $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+            console.log("load context_menu.js: " + textStatus);
+          });
         });
       },
       beforeSend: function() {
@@ -526,6 +562,36 @@ function Rename() {
     });
   }
 }
+
+
+function Refresh() {
+ $.ajax({
+   type: "GET",
+   url: "google/refresh/",
+   async: false,
+   success: function(json) {
+     console.log(json);
+     var PresentFolderID = removeSpace('<%=FolderID%>');
+     $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
+       $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+         console.log("load dropzone.js: " + textStatus);
+       });
+     });
+   },
+   beforeSend: function() {
+     // (이미지 보여주기 처리)
+     $('.wrap-loading').removeClass('display-none');
+   },
+   complete: function() {
+     // (이미지 감추기 처리)
+     $('.wrap-loading').addClass('display-none');
+   },
+   error: function(error) {
+     console.log(error);
+   }
+ });
+}
+
 
 function Select() {
   var selecttype = action_dropbox.selecttype.value;
@@ -548,6 +614,9 @@ function Select() {
       }, function(){
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
+        });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
         });
       });
     },
@@ -586,6 +655,9 @@ function Search() {
       }, function(){
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
+        });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
         });
       });
     },
@@ -637,6 +709,9 @@ function CreateFolder() {
       $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
+        });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
         });
       });
     },
