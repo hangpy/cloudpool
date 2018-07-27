@@ -14,7 +14,7 @@ $(function() {
      case 'box-dropzone':
        return 'box'
        break;
-     case 'split-area':
+     case 'split-dropzone':
        return 'split'
        break;
    }
