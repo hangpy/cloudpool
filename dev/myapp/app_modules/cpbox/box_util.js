@@ -201,6 +201,21 @@ module.exports = (function(){
     });
   }
 
+  var selectRest = function(user_id, selecttype, callback){
+    var data = {
+      "user_id": user_id,
+      "selecttype": selecttype
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/select/',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body.list);
+    });
+  }
+
   var spaceCheck = function(client, callback) {
     client.users.get(client.CURRENT_USER_ID, null, function(err, info){
       if(err)console.log(err);
@@ -227,6 +242,7 @@ module.exports = (function(){
     movePathRest: movePathRest,
     thumbnail: thumbnail,
     searchRest: searchRest,
+    selectRest: selectRest,
     spaceCheck: spaceCheck
   }
 

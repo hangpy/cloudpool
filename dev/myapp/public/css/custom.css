@@ -18,6 +18,81 @@
 
 */
 
+/* login-page */
+body.login-body {
+  background: rgb(55, 76, 116);
+  height: 100%;
+}
+
+body.login-body .btn-primary {
+    background: rgb(55, 76, 116);
+    border: 1px solid rgb(39, 55, 84);
+}
+
+body.login-body .btn-primary:hover {
+    background: rgb(17, 26, 46);
+    border: 1px solid rgb(39, 55, 84);
+}
+
+body.login-body header {
+  padding: 20px;
+  position: fixed;
+}
+
+body.login-body .logo {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 700;
+  font-family: Source Sans Pro;
+}
+
+body.login-body .login-form label a,
+body.login-body .register-link a {
+  color: #1976d2;
+}
+
+/* register-page */
+body.register-body {
+  background: rgb(55, 76, 116);
+  height: 100%;
+}
+
+body.register-body .btn-primary {
+    background: rgb(55, 76, 116);
+    border: 1px solid rgb(39, 55, 84);
+}
+
+body.register-body .btn-primary:hover {
+    background: rgb(17, 26, 46);
+    border: 1px solid rgb(39, 55, 84);
+}
+
+body.register-body header {
+  padding: 20px;
+  position: fixed;
+}
+
+body.register-body .logo {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 700;
+  font-family: Source Sans Pro;
+}
+
+body.register-body .login-form label a,
+body.register-body .register-link a {
+  color: #1976d2;
+}
+
+body.register-body .login-content {
+  margin: 15% 0;
+}
+
+body.register-body .container-fluid {
+    padding: 0px;
+}
+
+
 /* footer override */
 .board-body .footer {
   background: #ffffff none repeat scroll 0 0;
@@ -465,3 +540,59 @@ ul.contextMenu li:last-child:hover a:hover {
   display:none;
 }
 */
+
+
+
+
+/* function state */
+.board-body .mv-file-info-box,
+.board-body .del-file-info-box,
+.board-body .cg-file-info-box,
+.board-body .sh-file-info-box,
+.board-body .mk-folder-info-box {
+  visibility: hidden;
+  position: fixed;
+  height: 120px;
+  width: 300px;
+  right: 20px;
+  bottom: -120px;
+  padding: 0px
+}
+
+.popcard-title {
+  width: 100%;
+  height: 30px;
+  padding-left: 20px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: rgb(85, 85, 85);
+}
+
+.popcard-title span {
+  padding: 5px;
+  line-height: 30px;
+}
+
+.popcard-content {
+  height: 100%;
+  margin: 20px 10px 20px 10px;
+}
+
+.popcard-content span.popcard-content-text {
+  padding: 30px;
+  padding-left: 15px;
+  font-weight:bolder;
+  font-size: 14px;
+  color: rgb(75, 75, 75);
+  line-height: 50px;
+}
+
+.popcard-content span.loading-img {
+  width: 14px;
+  height: 14px;
+  padding: 20px;
+  padding-top: 12px;
+  background: url('../images/loading1.gif') no-repeat;
+  background-size: contain;
+}
