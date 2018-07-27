@@ -179,12 +179,12 @@
                                   %>
                   <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=Foldername%>" class="folder-row">
                     <td><input class="checkbox" type="checkbox" name="name" value="<%=oneItem.name%>"></td>
-                    <td data-id='<%=Foldername%>'><img name="imgsrc" src="icons/filetype-icon/folder.png"></td>
+                    <td ><img data-id='<%=Foldername%>' name="imgsrc" src="icons/filetype-icon/folder.png"></td>
                     <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
-                    <td data-id='<%=Foldername%>'>
+                    <td >
                       <!-- <a href="/dropbox/<%=Foldername%>" id="Folder_<%=i%>" value="<%=Foldername%>"> -->
 
-                      <a href="#" onclick="moveFolder_dropbox(this)" value='folder/<%=Foldername%>'>
+                      <a data-id='<%=Foldername%>' href="#" onclick="moveFolder_dropbox(this)" value='folder/<%=Foldername%>'>
                         <%=oneItem.name%>
                       </a>
                     </td>
@@ -300,7 +300,8 @@ function allowDrop(event) {
 function dropFormove(event) {
   event.preventDefault();
   var filename = event.dataTransfer.getData("data");
-  var toFolder = event.target.dataset.id;
+  var toFolder = $(event.currentTarget).attr('value');
+
   console.log(event);
   var body = {
     "filename": filename,
@@ -319,6 +320,9 @@ function dropFormove(event) {
       $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
+        });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
         });
       });
     },
@@ -401,6 +405,9 @@ function Refresh() {
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
         });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
+        });
       });
     },
     beforeSend: function() {
@@ -424,6 +431,9 @@ function UploadSubmit() {
   $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
     $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
       console.log("load dropzone.js: " + textStatus);
+    });
+    $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+      console.log("load context_menu.js: " + textStatus);
     });
   });
 };
@@ -473,6 +483,9 @@ function Rename() {
           $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
             console.log("load dropzone.js: " + textStatus);
           });
+          $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+            console.log("load context_menu.js: " + textStatus);
+          });
         });
       },
       beforeSend: function() {
@@ -512,6 +525,9 @@ function Select() {
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
         });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
+        });
       });
     },
     beforeSend: function() {
@@ -549,6 +565,9 @@ function Search() {
       }, function(){
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
+        });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
         });
       });
     },
@@ -600,6 +619,9 @@ function CreateFolder() {
       $('.replace').load("dropbox/folder/" + PresentFolderID, function(){
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
+        });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
         });
       });
     },
