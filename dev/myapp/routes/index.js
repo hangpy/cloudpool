@@ -16,9 +16,10 @@ router.get('/', function(req, res, next) {
   .then(function(rows){
     console.log('Render from /');
     res.render('index', {
-      title: 'Express',
+      title: 'index',
       user: req.user,
-      drive_state: rows[0]
+      drive_state: rows[0],
+      replace: 'dashboard'
     });
   })
   .catch(function(err){

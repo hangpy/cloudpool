@@ -108,18 +108,18 @@
                           var dropbox_state = drive_state.dropboxCount;
                           var box_state = drive_state.boxCount
                         %>
-                        <li><a href="#" id="dashboard"><span class='dashboard-ico nav-ico'></span><span>Dashboard</span></a></li>
+                        <li><a href="#" id="dashboard"><span class='dashboard-ico nav-ico'></span><span class='sidebar-item-title'>Dashboard</span></a></li>
                         <% if(google_state > 0) { %>
-                        <li><a href="#" id="google"><span class='google-ico nav-ico'></span><span>Google</span></a></li>
+                        <li><a href="#" id="google"><span class='google-ico nav-ico'></span><span class='sidebar-item-title'>Google</span></a></li>
                         <% } %>
                         <% if(dropbox_state > 0) { %>
-                        <li><a href="#" id="dropbox"><span class='dropbox-ico nav-ico'></span><span>Dropbox</span></a></li>
+                        <li><a href="#" id="dropbox"><span class='dropbox-ico nav-ico'></span><span class='sidebar-item-title'>Dropbox</span></a></li>
                         <% } %>
                         <% if(box_state > 0) { %>
-                        <li><a href="#" id="box"><span class='box-ico nav-ico'></span><span>Box</span></a></li>
+                        <li><a href="#" id="box"><span class='box-ico nav-ico'></span><span class='sidebar-item-title'>Box</span></a></li>
                         <% } %>
 
-                        <li><a href="#" class="setting-drive"><span class='connect-ico nav-ico'></span><span>드라이브 연결</span></a></li>
+                        <li><a href="#" class="setting-drive"><span class='connect-ico nav-ico'></span><span class='sidebar-item-title'>드라이브 연결</span></a></li>
 
 
                         <!-- <li> <a class="has-arrow" href="#" aria-expanded="false"><i class="ti-settings"></i><span class="hide-menu">설정</span></a>
@@ -131,7 +131,7 @@
                     <div style="margin: 10px"></div>
 
                     <ul id="sidebarnav">
-                      <li><a href="#" id="split"><span class='split-ico nav-ico'></span><span>Split Merge</span></a></li>
+                      <li><a href="#" id="split"><span class='split-ico nav-ico'></span><span class='sidebar-item-title'>Split Merge</span></a></li>
                     </ul>
 
                 </nav>
@@ -145,11 +145,11 @@
           <!-- Bread crumb -->
           <div class="row page-titles">
               <div class="col-md-5 align-self-center">
-                  <h3 class="text-primary">Dashboard</h3> </div>
+                  <h3 class="text-primary replace-title">Dashboard</h3> </div>
               <div class="col-md-7 align-self-center">
                   <ol class="breadcrumb">
                       <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-                      <li class="breadcrumb-item active">Dashboard</li>
+                      <li class="breadcrumb-item active"></li>
                   </ol>
               </div>
           </div>
@@ -159,6 +159,7 @@
             <!-- Start Page Content -->
 
             <!-- part to be loaded dynamically -->
+            <div class="get-replace" style="display: none"></div>
             <div class="replace"></div>
 
           </div>
@@ -182,13 +183,13 @@
 
     <!-- Right Click ContextMenu -->
     <ul class="contextMenu">
-      <li><a href="#"><i class="fa fa-download"></i> 다운로드</a></li>
-      <li><a href="#"><i class="fa fa-plus"></i> 폴더 만들기</a></li>
-      <li><a href="#"><i class="fa fa-edit"></i> 이름 바꾸기</a></li>
-      <li><a href="#"><i class="fa fa-arrow-right"></i> 이동</a></li>
-      <li><a href="#"><i class="fa fa-copy"></i> 복사</a></li>
-      <li><a href="#"><i class="fa fa-trash"></i> 삭제</a></li>
-      <li><a href="#"><i class="fa fa-info-circle"></i> 상세정보</a></li>
+      <li><a href="#" class="download-bt"><i class="fa fa-download"></i> 다운로드</a></li>
+      <li><a href="#" class="mkfolder-bt"><i class="fa fa-plus"></i> 폴더 만들기</a></li>
+      <li><a href="#" class="cgname-bt"><i class="fa fa-edit"></i> 이름 바꾸기</a></li>
+      <li><a href="#" class="mvfile-bt"><i class="fa fa-arrow-right"></i> 파일 이동</a></li>
+      <li><a href="#" class="copy-bt"><i class="fa fa-copy"></i> 복사</a></li>
+      <li><a href="#" class="delete-bt"><i class="fa fa-trash"></i> 삭제</a></li>
+      <li><a href="#" class="detail-bt"><i class="fa fa-info-circle"></i> 상세정보</a></li>
     </ul>
 
 
@@ -228,7 +229,16 @@
 
     <!-- custom javascript files -->
     <script src="js/loadejs.js"></script>
-    <script src="js/context_menu.js"></script>
+    <!-- <script src="js/context_menu.js"></script> -->
+
+    <% if(replace == 'dashboard') { %>
+    <script>
+      $('.replace').load('/dashboard', function(){
+        console.log();
+      });
+    </script>
+    <% } %>
+
 
 
 
