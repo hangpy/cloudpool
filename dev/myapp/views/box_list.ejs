@@ -6,6 +6,8 @@
   <div class="card-body">
   <button type="button" onClick='Refresh()'>파일 리스트 최신화</button>&nbsp;&nbsp;
   <button type="button" onClick='SpaceCheck()'>공간 체크</button>&nbsp;&nbsp;
+  <input type="text" id="content" placeholder="검색">
+  <button type="button" onClick='Search()'>검색</button>
   <p></p>
   <form id="uploadform" method='post' enctype="multipart/form-data">
     현재폴더에 :&nbsp;
@@ -337,6 +339,15 @@
           console.log(error);
         }
       });
+    }
+  }
+
+  function Search() {
+    if(!$('#content').val()||$('#content').val()=='.'){
+      alert('검색 내용을 입력해주세요');
+    } else {
+      var content = $('#content').val();
+      $('.replace').load("box/search/"+content);
     }
   }
 

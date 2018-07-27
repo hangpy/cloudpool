@@ -186,37 +186,19 @@ module.exports = (function(){
   	});
   }
 
-  var search = function(client, searchText, callback){
-    client.search.query(
-  	searchText,
-  	{
-  		//options
-      type: 'file'
-  	})
-  	.then(results => {
-      var filelist = [];
-      async.map(results.entries, function(item, callback_list){
-        var iteminfo={
-          'id' : item.id,
-          'name' : item.name,
-          'mimeType' : item.type,
-          'modifiedTime' : item.modified_at,
-          'size' : item.size,
-          'parents' : item.parent.id
-        };
-        filelist.push(iteminfo);
-        callback_list(null, 'finish');
-      },
-      function(err,result){
-        if(err) console.log(err);
-        //list 받아오기 완료
-        else {
-          console.log('Finish the File list');
-          callback(filelist);
-        }
-
-      });
-  	});
+  var searchRest = function(user_id, content, callback){
+    var data = {
+      "user_id": user_id,
+      "content": content
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/search/',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body.list);
+    });
   }
 
   var spaceCheck = function(client, callback) {
@@ -244,7 +226,7 @@ module.exports = (function(){
     renameFileRest: renameFileRest,
     movePathRest: movePathRest,
     thumbnail: thumbnail,
-    search: search,
+    searchRest: searchRest,
     spaceCheck: spaceCheck
   }
 

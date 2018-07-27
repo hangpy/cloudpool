@@ -115,16 +115,12 @@ router.post('/thumbnail', function(req, res) {
   });
 });
 
-router.post('/search', function(req, res) {
-  box_init(req.user, function(client) {
-    var searchText = 'test';
-    box_util.search(client, searchText, function(filelist) {
-      console.log("return - 4");
-      console.log(filelist);
-      res.render('box_list', {
-        FolderID: 0,
-        filelist: filelist
-      });
+router.get('/search/:content', function(req, res) {
+  var content = req.params.content;
+  box_util.searchRest(req.user.userID, content, function(filelist) {
+    res.render('box_list', {
+      FolderID: 0,
+      filelist: filelist
     });
   });
 });
