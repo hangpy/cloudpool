@@ -48,6 +48,4 @@ function moveFolder_split(obj){
       console.log("load dropzone.js: " + textStatus);
     });
   });
-
-
 }

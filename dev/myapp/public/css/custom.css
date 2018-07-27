@@ -151,6 +151,11 @@
 
 
 /* page-wrapper */
+
+.page-titles .replace-title{
+
+}
+
 @media (max-width: 1023px){
   .page-wrapper {
       margin-left: 240px;
@@ -160,6 +165,19 @@
   }
 }
 
+/* table */
+.board-body .table-hover tbody tr:hover {
+    background-color: rgba(48, 126, 186, 0.1);
+    cursor: pointer;
+}
+
+.board-body .table-hover tbody tr.active {
+    background-color: rgba(48, 126, 186, 0.2);
+}
+
+.board-body .table-hover .checkbox {
+  visibility: hidden;
+}
 
 /* toast CSS */
 

@@ -17,6 +17,9 @@ $(function(){
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
         });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
+        });
       });
   });
 
@@ -24,6 +27,9 @@ $(function(){
       $('.replace').load("box/folder/", function(){
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
+        });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
         });
       });
   });
@@ -33,6 +39,9 @@ $(function(){
         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
           console.log("load dropzone.js: " + textStatus);
         });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
+        });
       });
   });
 
@@ -40,6 +49,20 @@ $(function(){
     $('.replace').load("google/folder/", function(){
       $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
         console.log("load dropzone.js: " + textStatus);
+      });
+      $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+        console.log("load context_menu.js: " + textStatus);
+      });
+    });
+  });
+
+  $('#dashboard').click( function() {
+    $('.replace').load("dashboard", function(){
+      $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+        console.log("load dropzone.js: " + textStatus);
+      });
+      $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+        console.log("load context_menu.js: " + textStatus);
       });
     });
   });
