@@ -70,7 +70,8 @@ module.exports = function() {
   router.post('/upload/', upload.single('uploads_list'), function(req, res)
   {
     console.log('upload');
-
+    console.log(req.body);
+    console.log(req.file);
     var orgFile = splitUtil.orgFile(__dirname, req.file.path);
     var filesToAdd = splitUtil.filesToAdd;
     filesToAdd.addSync(orgFile);
@@ -78,6 +79,7 @@ module.exports = function() {
       console.log('driveState check');
       var size = splitUtil.sizeSplit(req.file.size, driveState);
       console.log("Split size : "+size);
+
       //분리될 파일이 저장될곳
       var zipFile = splitUtil.zipFileU(__dirname, req.file.filename);
       var parameters = splitUtil.parameters();
@@ -106,12 +108,12 @@ module.exports = function() {
   router.post('/download/', function(req, res) {
     var fileID = req.body.name;
     console.log('fileID : ' + req.body.name);
-    splitUtil.download(fileID, req, res, function(zippath) {
-      splitUtil.unzip_zip4j(fileID, zippath, req, res, function(orgdir, orgfilename) {
-        res.download(orgdir, function() {
-          fs.unlink(orgdir);
-        });
-      });
+    splitUtil.download(fileID, req, res, function(orgdir, orgfile) {
+
+        // res.download(orgdir, function() {
+        //   fs.unlink(orgdir);
+        // });
+
     });
   });
 
@@ -123,5 +125,13 @@ module.exports = function() {
 
   });
 
+
+  router.post('/delete/', function(req, res){
+    console.log(req.body.name);
+    var fileID = req.body.name;
+    splitUtil.checkDrive(req.user.userID, function(driveState){
+      splitUtil.deleteFile(fileID, driveState, req);
+    });
+  });
   return router;
 }

@@ -106,54 +106,54 @@
   </div>
 </div>
 <script language=javascript>
-
-
-function dragStart(event) {
-  event.dataTransfer.setData("data", event.target.attributes[2].nodeValue);
-};
-
-function allowDrop(event) {
-  event.preventDefault();
-};
-
-function dropFormove(event) {
-  event.preventDefault();
-  var filename = event.dataTransfer.getData("data");
-  var toFolder = event.target.dataset.id;
-  console.log(event);
-  var body = {
-    "FolderID" : <%=FolderID%>,
-    "filename": filename,
-    "dest": toFolder
-  }
-  $.ajax({
-    type: "POST",
-    url: "split/move/",
-    async: true,
-    data: body,
-    dataType: "JSON",
-    success: function(json) {
-      console.log(json);
-
-      $('.replace').load("split/folder/<%=FolderID%>", function(){
-        $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
-          console.log("load dropzone.js: " + textStatus);
-        });
-      });
-    },
-    beforeSend: function() {
-      // (이미지 보여주기 처리)
-      $('.wrap-loading').removeClass('display-none');
-    },
-    complete: function() {
-      // (이미지 감추기 처리)
-      $('.wrap-loading').addClass('display-none');
-    },
-    error: function(error) {
-      console.log(error);
-    }
-  });
-};
+//
+//
+// function dragStart(event) {
+//   event.dataTransfer.setData("data", event.target.attributes[2].nodeValue);
+// };
+//
+// function allowDrop(event) {
+//   event.preventDefault();
+// };
+//
+// function dropFormove(event) {
+//   event.preventDefault();
+//   var filename = event.dataTransfer.getData("data");
+//   var toFolder = event.target.dataset.id;
+//   console.log(event);
+//   var body = {
+//     "FolderID" : <%=FolderID%>,
+//     "filename": filename,
+//     "dest": toFolder
+//   }
+//   $.ajax({
+//     type: "POST",
+//     url: "split/move/",
+//     async: true,
+//     data: body,
+//     dataType: "JSON",
+//     success: function(json) {
+//       console.log(json);
+//
+//       $('.replace').load("split/folder/<%=FolderID%>", function(){
+//         $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+//           console.log("load dropzone.js: " + textStatus);
+//         });
+//       });
+//     },
+//     beforeSend: function() {
+//       // (이미지 보여주기 처리)
+//       $('.wrap-loading').removeClass('display-none');
+//     },
+//     complete: function() {
+//       // (이미지 감추기 처리)
+//       $('.wrap-loading').addClass('display-none');
+//     },
+//     error: function(error) {
+//       console.log(error);
+//     }
+//   });
+// };
 
 function Submit(index){
   if(index===1){
@@ -162,6 +162,7 @@ function Submit(index){
   }
   if(index===2){
     action_split.action='split/delete';
+    $('.replace').load("split");
   }
 
   if(index===3){

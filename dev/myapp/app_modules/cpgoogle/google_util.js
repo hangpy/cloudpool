@@ -65,7 +65,7 @@ var reName =function(userId,fileId,folderId,newName, callback){
     );
 }
 
-var deleteFile =function(userId,fileId,callback){
+var deleteFile =function(userId, fileId, callback){
   var data = { "userId" : userId , "fileId": fileId};
   request.post({
     url: 'http://localhost:4000/api/google/delete/',
