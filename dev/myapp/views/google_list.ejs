@@ -28,7 +28,7 @@
       </select>
       <button type="button" onClick='Select()'>골라보기</button>
       <div class="table-responsive">
-        <div class="dropzone" name='google-area'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
+        <div class="dropzone" name='google-dropzone'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
         <div class='current-folder' name="<%= FolderID %>"></div>
         <table class="table table-hover" id="table_google">
           <thead>
@@ -43,8 +43,7 @@
           </thead>
           <!-- 이전 폴더로 이동 -->
           <tbody>
-
-          <%  
+          <%
           function getImagePath(name){
             var splitdata = name.split(".");
             var mimetype = splitdata[splitdata.length-1];
@@ -129,7 +128,7 @@
                                     if(oneItem.mimeType=="application/vnd.google-apps.folder"){
                                       %>
               <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=oneItem.id%>" class="folder-row">
-                <td data-id='<%=oneItem.id%>'><input type="checkbox" name="id" value="<%=oneItem.id%>"></td>
+                <td data-id='<%=oneItem.id%>'><input type="checkbox" name="id" class="checkbox" value="<%=oneItem.id%>"></td>
                 <td data-id='<%=oneItem.id%>'>
                   <%=i%>
                 </td>
@@ -158,7 +157,7 @@
                               else{
                                 %>
                   <tr ondragstart="dragStart(event)" draggable="true" value="<%=oneItem.id%>" class="file-row">
-                    <td data-id='<%=oneItem.id%>'><input type="checkbox" name="id" value="<%=oneItem.id%>"></td>
+                    <td data-id='<%=oneItem.id%>'><input type="checkbox" name="id" class="checkbox" value="<%=oneItem.id%>"></td>
                     <td data-id='<%=oneItem.id%>'>
                     <%=i%>
                   </td>
@@ -222,6 +221,9 @@
         $('.replace').load("google/folder/<%=FolderID%>", function(){
           $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
             console.log("load dropzone.js: " + textStatus);
+          });
+          $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+            console.log("load context_menu.js: " + textStatus);
           });
         });
       },
@@ -288,7 +290,7 @@
       dataType: "JSON",
       success: function(json) {
         console.log(json);
-    
+
         $('.replace').load("google/folder/<%=FolderID%>");
       },
       beforeSend: function() {
@@ -332,7 +334,7 @@
       dataType: "JSON",
       success: function(json) {
         console.log(json);
-    
+
         $('.replace').load("google/folder/<%=FolderID%>");
       },
       beforeSend: function() {
@@ -483,7 +485,7 @@ String.prototype.hashCode = function() {
   //     dataType: "JSON",
   //     success: function(json) {
   //       console.log(json);
-    
+
   //       $('.replace').load("google/folder/<%=FolderID%>");
   //     },
   //     beforeSend: function() {

@@ -145,4 +145,10 @@ $(function() {
     $('a[data-action="close"]').on("click", function() {
       $(this).closest(".card").removeClass().slideUp("fast");
     });
+
+    $('#sidebarnav li a').on('click', function(){
+      var content_title = $(this).children('.sidebar-item-title').text();
+      $('h3.replace-title').text(content_title);
+    });
+    
 });

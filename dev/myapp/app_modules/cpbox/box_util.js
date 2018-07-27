@@ -77,13 +77,17 @@ module.exports = (function(){
   }
 
 
-  var downloadFile = function(client, fileId){
+  var downloadFile = function(client, fileId, res){
     client.files.getReadStream(fileId).then(stream => {
       client.files.get(fileId).then(file => {
         var fileName = file.name;
         console.log(fileName);
-        var output = fs.createWriteStream('../app_modules/cpbox/download/'+fileName);
-        stream.pipe(output);
+        var newFileName = encodeURIComponent(fileName);
+
+        res.setHeader('Content-disposition', 'attachment; filename*=UTF-8\'\'' + newFileName); //origFileNm으로 로컬PC에 파일 저장
+        // res.setHeader('Content-type', mimetype);
+        stream.pipe(res)
+        .on('finish', function () { console.log("finish"); });
       })
     })
   }
@@ -182,37 +186,30 @@ module.exports = (function(){
   	});
   }
 
-  var search = function(client, searchText, callback){
-    client.search.query(
-  	searchText,
-  	{
-  		//options
-      type: 'file'
-  	})
-  	.then(results => {
-      var filelist = [];
-      async.map(results.entries, function(item, callback_list){
-        var iteminfo={
-          'id' : item.id,
-          'name' : item.name,
-          'mimeType' : item.type,
-          'modifiedTime' : item.modified_at,
-          'size' : item.size,
-          'parents' : item.parent.id
-        };
-        filelist.push(iteminfo);
-        callback_list(null, 'finish');
-      },
-      function(err,result){
-        if(err) console.log(err);
-        //list 받아오기 완료
-        else {
-          console.log('Finish the File list');
-          callback(filelist);
-        }
+  var searchRest = function(user_id, content, callback){
+    var data = {
+      "user_id": user_id,
+      "content": content
+    };
+    request.post({
+      url: 'http://localhost:4000/api/box/search/',
+      body: data,
+      json: true
+    },
+    function(error, response, body) {
+      callback(body.list);
+    });
+  }
 
-      });
-  	});
+  var spaceCheck = function(client, callback) {
+    client.users.get(client.CURRENT_USER_ID, null, function(err, info){
+      if(err)console.log(err);
+      else{
+        console.log("used : "+ info.space_used);
+        console.log("Total : "+ info.space_amount);
+        callback(info.space_amount, info.space_used);
+      }
+    });
   }
 
 
@@ -229,7 +226,8 @@ module.exports = (function(){
     renameFileRest: renameFileRest,
     movePathRest: movePathRest,
     thumbnail: thumbnail,
-    search: search
+    searchRest: searchRest,
+    spaceCheck: spaceCheck
   }
 
 })();

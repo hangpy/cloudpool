@@ -1,15 +1,18 @@
 
-<div class="card">
+<div class="card box-area">
   <div class="card-title">
     <h4>Box -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4>
   </div>
   <div class="card-body">
-  <button type="button" onClick='Refresh()'>파일 리스트 최신화</button>
+  <button type="button" onClick='Refresh()'>파일 리스트 최신화</button>&nbsp;&nbsp;
+  <button type="button" onClick='SpaceCheck()'>공간 체크</button>&nbsp;&nbsp;
+  <input type="text" id="content" placeholder="검색">
+  <button type="button" onClick='Search()'>검색</button>
   <p></p>
   <form id="uploadform" method='post' enctype="multipart/form-data">
     현재폴더에 :&nbsp;
     <input type='file' id='uploadfile' name='uploadfile'>
-    <button type="button" onclick='UploadSubmit()'>업로드</button>
+    <button type="button" onclick='Upload()'>업로드</button>
     &nbsp;&nbsp;
     <input type="text" id="foldername" placeholder="새폴더 이름">
     <button type="button" onClick='CreateFolder()'>새폴더 만들기</button>
@@ -17,7 +20,7 @@
   <p></p>
   <form name='action_box' method='post'>
     체크박스 :&nbsp;
-    <button type="button" onClick='Submit("download")'>다운로드(개발중,파일만)</button>&nbsp;&nbsp;
+    <button type="button" onClick='Download()'>다운로드(개발중,파일만)</button>&nbsp;&nbsp;
     <button type="button" onClick='Delete()'>삭제</button>&nbsp;&nbsp;
     <input type="text" id="filename" placeholder="새이름">
     <button type="button" onClick='Rename()'>이름 바꾸기</button>&nbsp;&nbsp;
@@ -25,13 +28,12 @@
     <button type="button" onClick='MovePath()'>경로 이동</button>
     <p></p>
     <div class="table-responsive">
-      <div class="dropzone" name='box-area'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
+      <div class="dropzone" name='box-dropzone'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
       <div class='current-folder' name="<%= FolderID %>"></div>
       <table class="table table-hover" id="table_box">
         <thead>
           <tr>
             <td> </td>
-            <td>번 호</td>
             <td>파일이름</td>
             <td>파일형식</td>
             <td>올린날짜</td>
@@ -58,17 +60,14 @@
                           %>
 
             <tr class="folder-row">
-              <td><input type="checkbox" name="name" value="<%=oneItem.id%>"></td>
-              <td>
-                <%=i%>
-              </td>
+              <td><input type="checkbox" class="checkbox" name="name" value="<%=oneItem.id%>"></td>
               <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
               <td data-id='<%=oneItem.id%>'>
                 <a href="#" onclick="moveFolder_box(this)" value='<%=oneItem.id%>'>
                   <%=oneItem.name%>
                 </a>
               </td>
-              <td>
+              <td name="mimeType" value='<%=oneItem.mimeType%>'>
                 <%=oneItem.mimeType%>
               </td>
               <td>
@@ -83,14 +82,11 @@
              %>
 
             <tr class="file-row">
-              <td><input type="checkbox" name="name" value="<%=oneItem.id%>"></td>
-              <td>
-                <%=i%>
-              </td>
+              <td><input type="checkbox" class="checkbox" name="name" value="<%=oneItem.id%>"></td>
               <td>
                 <%=oneItem.name%>
               </td>
-              <td>
+              <td name="mimeType" value='<%=oneItem.mimeType%>'>
                 <%=oneItem.mimeType%>
               </td>
               <td>
@@ -123,14 +119,7 @@
 <!-- end of card -->
 
 <script>
-  function Submit(index) {
-    if (index == 'download') {
-      document.action_box.action = 'box/download';
-    }
-    document.action_box.submit();
-  }
-
-  function UploadSubmit() {
+  function Upload() {
     if(!$('#uploadfile').val()){
       alert('업로드할 파일을 선택해주세요');
     } else {
@@ -148,13 +137,49 @@
         success: function(json) {
           console.log(json);
           alert(json);
-          $('.replace').load("box/folder/<%=FolderID%>");
+          $('.replace').load("box/folder/<%=FolderID%>", function(){
+            $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+              console.log("load dropzone.js: " + textStatus);
+            });
+            $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+              console.log("load context_menu.js: " + textStatus);
+            });
+          });
         },
         error: function(error) {
           console.log(error);
         }
       });
     }
+  }
+
+  function Download() {
+    // 체크박스의 갯수를 변수에 담는다.
+    var chklen = action_box.name.length;
+    var name = '';
+    var mimelist = document.getElementsByName('mimeType');
+    // console.log()[3].attributes.value.value);
+    var mimeType = '';
+    // 체크박스 갯수만큼 for 문을 돌려 체크된 놈의 value값을 가져온다.
+    for (i = 0; i < chklen; i++) {
+      if (action_box.name[i].checked == true) {
+        name = action_box.name[i].value;
+        mimeType = mimelist[i].attributes.value.value;
+        break;
+      }
+    }
+    if (name == '') {
+      alert("삭제하실 파일이나 폴더를 체크해주세요");
+    }
+    else if (mimeType == 'folder') {
+      alert('폴더는 다운로드 할 수 없습니다');
+    }
+    else {
+      document.action_box.action = 'box/download';
+      document.action_box.submit();
+      $('.replace').load("box/folder/<%=FolderID%>");
+    }
+
   }
 
   function Delete() {
@@ -315,6 +340,32 @@
         }
       });
     }
+  }
+
+  function Search() {
+    if(!$('#content').val()||$('#content').val()=='.'){
+      alert('검색 내용을 입력해주세요');
+    } else {
+      var content = $('#content').val();
+      $('.replace').load("box/search/"+content);
+    }
+  }
+
+  function SpaceCheck() {
+    $.ajax({
+      type: "POST",
+      url: "box/space/",
+      async: false,
+      success: function(json) {
+        console.log(json);
+        alert('total: '+json.total+", used: "+json.used);
+        $('.replace').load("box/folder/<%=FolderID%>");
+      },
+      error: function(error) {
+        console.log(error);
+        alert(error);
+      }
+    });
   }
 
 
