@@ -1,10 +1,5 @@
 <h4 class="card-title">Dropzone</h4>
 <h6 class="card-subtitle">For multiple file upload put class <code>.dropzone</code> to form.</h6>
-<!-- <form id="uploadform" action='google/upload/<%=FolderID%>' method='post' enctype="multipart/form-data" class="dropzone">
-      <div class="fallback">
-          <input name="userfile" type="file" multiple />
-      </div> -->
-
 <div class="card">
   <div class="card-title">
     <h4>Google -> 여기 뭐 들어갈지 고민 ㄱㄱ</h4>
@@ -17,7 +12,7 @@
     </form>
 
     <form name='action_google' method='post'>
-      <button type="button" onClick='Submit(1)'>다운로드</button>
+    <button type="button" onClick='Download()'>다운로드</button>
       <button type="button" onClick='Delete()'>삭제</button>
       <td><input type="text" name="filename" placeholder="newname"></td>
       <button type="button" onClick='Rename()'>변경</button>
@@ -33,22 +28,22 @@
       </select>
       <button type="button" onClick='Select()'>골라보기</button>
       <div class="table-responsive">
-        <div class="dropzone" name='google-area'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
+        <div class="dropzone" name='google-dropzone'>여기로 파일을 드래그해서 업로드 할 수 있습니다</div>
         <div class='current-folder' name="<%= FolderID %>"></div>
         <table class="table table-hover" id="table_google">
           <thead>
             <tr>
               <td> </td>
               <td>번호</td>
-              <td>파일이름</td>
               <td>파일형식</td>
+              <td>파일이름</td>
               <td>올린날짜</td>
               <td>파일용량</td>
             </tr>
           </thead>
           <!-- 이전 폴더로 이동 -->
           <tbody>
-          <%  
+          <%
           function getImagePath(name){
             var splitdata = name.split(".");
             var mimetype = splitdata[splitdata.length-1];
@@ -114,16 +109,16 @@
                             if(i==0){
                               var oneItem = filelist[0];
                               %>
-            <tr>
+            <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=oneItem%>">
 
-              <td></td>
+                <td data-id='<%=oneItem%>'></td>
               <td>/</td>
               <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
               <td data-id=<%=oneItem%>><a href="#" onclick="moveFolder_google(this);" value='<%=oneItem%>'>..</a></td>
               <!-- <td><a href="http://localhost:3000/google/<%=oneItem%>">..</a></td> -->
-              <td></td>
-              <td></td>
-              <td></td>
+              <td data-id='<%=oneItem%>'></td>
+              <td data-id='<%=oneItem%>'></td>
+              <td data-id='<%=oneItem%>'></td>
             </tr>
             <%
                               }
@@ -132,13 +127,13 @@
                                     var size = formatBytes(oneItem.size,3);
                                     if(oneItem.mimeType=="application/vnd.google-apps.folder"){
                                       %>
-              <tr class="folder-row">
-                <td><input type="checkbox" name="id" value="<%=oneItem.id%>"></td>
-                <td>
+              <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=oneItem.id%>" class="folder-row">
+                <td data-id='<%=oneItem.id%>'><input type="checkbox" name="id" class="checkbox" value="<%=oneItem.id%>"></td>
+                <td data-id='<%=oneItem.id%>'>
                   <%=i%>
                 </td>
-                <td>
-                  <img name="imgsrc" src="icons/filetype-icon/folder.png">
+                <td data-id='<%=oneItem.id%>'>
+                  <img name="imgsrc" src="icons/filetype-icon/folder.png" width="64" height="64"/>
                 </td>
                 <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
                 <td data-id='<%=oneItem.id%>'>
@@ -149,10 +144,10 @@
                 <!-- <a href="#"><%=oneItem.name%></a> -->
                 <!-- <td><a href="http://localhost:3000/google/<%=oneItem.id%>"><%=oneItem.name%></a></td> -->
 
-                <td>
+                <td data-id='<%=oneItem.id%>'>
                   <%=oneItem.modifiedTime%>
                 </td>
-                <td>
+                <td data-id='<%=oneItem.id%>'>
                   <%=size%>
                 </td>
               </tr>
@@ -161,21 +156,21 @@
                                     }
                               else{
                                 %>
-                <tr class="file-row">
-                  <td><input type="checkbox" name="id" value="<%=oneItem.id%>"></td>
-                  <td>
+                  <tr ondragstart="dragStart(event)" draggable="true" value="<%=oneItem.id%>" class="file-row">
+                    <td data-id='<%=oneItem.id%>'><input type="checkbox" name="id" class="checkbox" value="<%=oneItem.id%>"></td>
+                    <td data-id='<%=oneItem.id%>'>
                     <%=i%>
                   </td>
-                  <td>
-                    <img name="imgsrc" src="<%=getImagePath(oneItem.name)%>">
+                  <td data-id='<%=oneItem.id%>'>
+                    <img name="imgsrc" src="<%=getImagePath(oneItem.name)%>"width="64" height="64"/>
                   </td>
-                  <td>
+                  <td data-id='<%=oneItem.id%>'>
                     <%=oneItem.name%>
                   </td>
-                  <td>
+                  <td data-id='<%=oneItem.id%>'>
                     <%=oneItem.modifiedTime%>
                   </td>
-                  <td>
+                  <td data-id='<%=oneItem.id%>'>
                     <%=size%>
                   </td>
                 </tr>
@@ -196,23 +191,72 @@
 <!-- end of card -->
 
 <script language=javascript>
-  function Submit(index) {
-    if (index === 1) {
-      action_google.action = 'google/download';
-    }
-    if (index === 2) {
-      action_google.action = 'google/delete';
-      $('.replace').load("google/<%=FolderID%>");
-    }
-    if (index === 4) {
 
-      action_google.action = 'google/searchtype';
-      // $('.replace').load("google/searchtype",{post});
+  function dragStart(event) {
+    event.dataTransfer.setData("data", event.target.attributes[2].nodeValue);
+    console.log(event.target);
+  }
 
+  function allowDrop(event) {
+    event.preventDefault();
+  }
+
+  function dropFormove(event) {
+    event.preventDefault();
+    var fileId = event.dataTransfer.getData("data");
+    var folderId = event.target.dataset.id;
+    console.log(event);
+    var body = {
+      "fileId": fileId,
+      "folderId": folderId
     }
+    $.ajax({
+      type: "POST",
+      url: "google/mvdir/<%=FolderID%>",
+      async: true,
+      data: body,
+      dataType: "JSON",
+      success: function(json) {
+        console.log(json);
+        $('.replace').load("google/folder/<%=FolderID%>", function(){
+          $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+            console.log("load dropzone.js: " + textStatus);
+          });
+        });
+      },
+      beforeSend: function() {
+        // (이미지 보여주기 처리)
+        $('.wrap-loading').removeClass('display-none');
+      },
+      complete: function() {
+        // (이미지 감추기 처리)
+        $('.wrap-loading').addClass('display-none');
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  }
 
-    action_google.submit();
-  };
+
+
+  function Download() {
+  // 체크박스의 갯수를 변수에 담는다.
+  var chklen = action_google.name.length;
+  var fileId = '';
+  // 체크박스 갯수만큼 for 문을 돌려 체크된 놈의 value값을 가져온다.
+  for (i = 0; i < chklen; i++) {
+    if (action_google.id[i].checked == true) {
+      fileId = action_google.id[i].value;
+      break;
+    }
+  }
+  action_google.action = 'google/download';
+      $('.replace').load("google/folder/<%=FolderID%>");
+      action_google.submit();
+
+}
+
 
   function Rename() {
   // 체크박스의 갯수를 변수에 담는다.
@@ -243,7 +287,7 @@
       dataType: "JSON",
       success: function(json) {
         console.log(json);
-    
+
         $('.replace').load("google/folder/<%=FolderID%>");
       },
       beforeSend: function() {
@@ -287,7 +331,7 @@
       dataType: "JSON",
       success: function(json) {
         console.log(json);
-    
+
         $('.replace').load("google/folder/<%=FolderID%>");
       },
       beforeSend: function() {
@@ -375,7 +419,7 @@ String.prototype.hashCode = function() {
 
  $(function() {
 
-//if (action_dropbox.name != 'action_dropbox') {
+//if (action_google.name != 'action_google') {
   var imgsrc = document.getElementsByName('imgsrc');
 
   var filename = document.getElementsByName('id');
@@ -438,7 +482,7 @@ String.prototype.hashCode = function() {
   //     dataType: "JSON",
   //     success: function(json) {
   //       console.log(json);
-    
+
   //       $('.replace').load("google/folder/<%=FolderID%>");
   //     },
   //     beforeSend: function() {

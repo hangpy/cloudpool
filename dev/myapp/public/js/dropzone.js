@@ -5,16 +5,16 @@ $(function() {
  var area = obj.attr('name');
  var drive = (function(area) {
    switch (area) {
-     case 'google-area':
+     case 'google-dropzone':
        return 'google'
        break;
-     case 'dropbox-area':
+     case 'dropbox-dropzone':
        return 'dropbox'
        break;
-     case 'box-area':
+     case 'box-dropzone':
        return 'box'
        break;
-     case 'split-area':
+     case 'split-dropzone':
        return 'split'
        break;
    }
@@ -76,7 +76,10 @@ function F_FileMultiUpload(files, obj, drive, folderID) {
       contentType: false,
       success: function(response) {
         console.log("success");
-        Refresh();
+        if(drive=='google') $('.replace').load(drive + '/folder/'+ folderID);
+        else{
+          Refresh();
+        }
       },
       complete: function(response) {
         console.log("complete");

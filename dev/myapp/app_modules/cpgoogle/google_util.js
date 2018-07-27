@@ -178,6 +178,139 @@ var deleteFile =function(userId,fileId,callback){
     });
   }
 
+  var moveDir = function(userId, fileId, folderId, CurfolderId,callback) {
+    var data = { "userId" : userId , "fileId": fileId, "folderId" : folderId,"CurfolderId":CurfolderId};
+    request.post({
+      url: 'http://localhost:4000/api/google/mvdir/',
+      body : data,
+      json : true
+    },
+      function(error, response, body){
+        callback(body);
+      }
+    );
+    
+  }
+
+  var GetSize= function(oauth2Client,callback){
+    var drive = google.drive({ version: 'v3', auth: oauth2Client });
+    drive.about.get({
+      fields :'storageQuota'
+    },function(req, res){
+      console.log(res.data.storageQuota);
+      callback();
+    });
+    // "storageQuota": {
+    //   "limit": long,
+    //   "usage": long,
+    //   "usageInDrive": long,
+    //   "usageInDriveTrash": long
+    // },
+
+  }
+
+
+
+var downloadFile = function(res,userId,fileId,oauth2Client) {
+
+
+   var data = { "userId" : userId , "fileId": fileId};
+   request.post({
+     url: 'http://localhost:4000/api/google/download/',
+     body : data,
+     json : true
+   },
+     function(error, response, body){
+      console.log(body);
+
+      var drive = google.drive({
+        version: 'v3',
+        auth: oauth2Client
+      });
+      console.log(body.name);
+      console.log(body.mimeType);
+      var newFileName = encodeURIComponent(body.name);
+      res.setHeader('Content-disposition', 'attachment; filename*=UTF-8\'\'' + newFileName); //origFileNm으로 로컬PC에 파일 저장
+      res.setHeader('Content-type', body.mimeType);
+      runSample(fileId, drive, res);
+     }
+   );
+
+
+}
+async function runSample (fileId, drive,res) {
+  return new Promise(async (resolve, reject) => {
+    // const filePath = path.join(os.tmpdir(), uuid.v4());
+    console.log(`writing to` );
+    // const dest = fs.createWriteStream(filePath);
+    let progress = 0;
+    const test = await drive.files.get(
+      {fileId, alt: 'media'},
+      {responseType: 'stream'}
+    );
+    test.data
+      .on('end', () => {
+        console.log('Done downloading file.');
+        // resolve(filePath);
+      })
+      .on('error', err => {
+        console.error('Error downloading file.');
+        reject(err);
+      })
+      .on('data', d => {
+        progress += d.length;
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
+        process.stdout.write(`Downloaded ${progress} bytes`);
+      })
+      .pipe(res);
+  });
+ }
+
+
+//  var downloadFile = function(res, fileId,oauth2Client) {
+//   var drive = google.drive({
+//     version: ‘v3’,
+//     auth: oauth2Client
+//   });
+//   var newFileName = encodeURIComponent(‘KakaoTalk_Photo_2017-11-29-16-29-41.png’);
+//   var fileId= ‘1gSIyRK6PWRGGl0dzS1D4KjMeEVNWzAif’;
+//   res.setHeader(‘Content-disposition’, ‘attachment; filename*=UTF-8\‘\’' + newFileName); //origFileNm으로 로컬PC에 파일 저장
+//   res.setHeader(‘Content-type’, ‘image/png’);
+//   runSample(fileId, drive, res);
+
+
+// }
+
+// async function runSample (fileId, drive,res) {
+// return new Promise(async (resolve, reject) => {
+//   // const filePath = path.join(os.tmpdir(), uuid.v4());
+//   console.log(`writing to` );
+//   // const dest = fs.createWriteStream(filePath);
+//   let progress = 0;
+//   const test = await drive.files.get(
+//     {fileId, alt: ‘media’},
+//     {responseType: ‘stream’}
+//   );
+//   test.data
+//     .on(‘end’, () => {
+//       console.log(‘Done downloading file.’);
+//       // resolve(filePath);
+//     })
+//     .on(‘error’, err => {
+//       console.error(‘Error downloading file.’);
+//       reject(err);
+//     })
+//     .on(‘data’, d => {
+//       progress += d.length;
+//       process.stdout.clearLine();
+//       process.stdout.cursorTo(0);
+//       process.stdout.write(`Downloaded ${progress} bytes`);
+//     })
+//     .pipe(res);
+// });
+// }
+
 //   var deleteFile = function(fileId,oauth2Client) {
 //     var drive = google.drive({
 //       version: 'v3',
@@ -211,47 +344,6 @@ var deleteFile =function(userId,fileId,callback){
 //     console.log("name completely changed!");
 //     // res.redirect('google/rootroot);
 //   }
-
-
-//   var updateDir = function(fileId, folderId, oauth2Client) {
-//     var fileId;
-//     var folderId; // 이동시키려는 folder
-//     // var fileId = '1wi6vB5fWXer4T2ULA_0bNNGsl2Ff675g';
-//     // var folderId = '1gd2kkvnSjz95WUM9KWePmhDc_BrAdlqq';
-
-//     var drive = google.drive({
-//       version: 'v3',
-//       auth: oauth2Client
-//     });
-
-//     drive.files.get({
-//       fileId: fileId,
-//       fields: 'parents'
-//     }, function(err, file) {
-//       if (err) {
-//         // Handle error
-//         console.error(err);
-//       } else {
-//         // Move the file to the new folder
-//         var previousParents = file.data.parents.join(',');
-//         console.log('previous Parents : ', previousParents);
-//         drive.files.update({
-//           fileId: fileId,
-//           addParents: folderId,
-//           removeParents: previousParents,
-//           fields: 'id, parents'
-//         }, function(err, file) {
-//           if (err) {
-//             // Handle error
-//           } else {
-//             console.log(file.data);
-//             // File moved.
-//           }
-//         });
-//       }
-//     });
-//   }
-
 
 //   var searchName = function(Filename,oauth2Client) {
 //     var drive = google.drive({
@@ -382,13 +474,15 @@ var deleteFile =function(userId,fileId,callback){
     list: list,
     reName:reName,
     deleteFile:deleteFile,
-    // downloadFile: downloadFile,
+    downloadFile: downloadFile,
     uploadFile: uploadFile,
+    moveDir:moveDir,
     // deleteFile: deleteFile,
     // updateFile: updateFile,
     // updateDir: updateDir,
     // searchName: searchName,
     searchType: searchType,
+    GetSize:GetSize,
     // makeDir: makeDir,
     // copyFile: copyFile,
     getThumbnailLink: getThumbnailLink
