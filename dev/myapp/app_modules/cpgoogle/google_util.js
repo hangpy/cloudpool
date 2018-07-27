@@ -178,6 +178,21 @@ var deleteFile =function(userId,fileId,callback){
     });
   }
 
+  var moveDir = function(userId, fileId, folderId, CurfolderId,callback) {
+    var data = { "userId" : userId , "fileId": fileId, "folderId" : folderId,"CurfolderId":CurfolderId};
+    request.post({
+      url: 'http://localhost:4000/api/google/mvdir/',
+      body : data,
+      json : true
+    },
+      function(error, response, body){
+        callback(body);
+      }
+    );
+    
+  }
+
+
 //   var deleteFile = function(fileId,oauth2Client) {
 //     var drive = google.drive({
 //       version: 'v3',
@@ -211,47 +226,6 @@ var deleteFile =function(userId,fileId,callback){
 //     console.log("name completely changed!");
 //     // res.redirect('google/rootroot);
 //   }
-
-
-//   var updateDir = function(fileId, folderId, oauth2Client) {
-//     var fileId;
-//     var folderId; // 이동시키려는 folder
-//     // var fileId = '1wi6vB5fWXer4T2ULA_0bNNGsl2Ff675g';
-//     // var folderId = '1gd2kkvnSjz95WUM9KWePmhDc_BrAdlqq';
-
-//     var drive = google.drive({
-//       version: 'v3',
-//       auth: oauth2Client
-//     });
-
-//     drive.files.get({
-//       fileId: fileId,
-//       fields: 'parents'
-//     }, function(err, file) {
-//       if (err) {
-//         // Handle error
-//         console.error(err);
-//       } else {
-//         // Move the file to the new folder
-//         var previousParents = file.data.parents.join(',');
-//         console.log('previous Parents : ', previousParents);
-//         drive.files.update({
-//           fileId: fileId,
-//           addParents: folderId,
-//           removeParents: previousParents,
-//           fields: 'id, parents'
-//         }, function(err, file) {
-//           if (err) {
-//             // Handle error
-//           } else {
-//             console.log(file.data);
-//             // File moved.
-//           }
-//         });
-//       }
-//     });
-//   }
-
 
 //   var searchName = function(Filename,oauth2Client) {
 //     var drive = google.drive({
@@ -384,6 +358,7 @@ var deleteFile =function(userId,fileId,callback){
     deleteFile:deleteFile,
     // downloadFile: downloadFile,
     uploadFile: uploadFile,
+    moveDir:moveDir,
     // deleteFile: deleteFile,
     // updateFile: updateFile,
     // updateDir: updateDir,

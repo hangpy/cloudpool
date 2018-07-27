@@ -99,36 +99,41 @@
             <div class="scroll-sidebar">
                 <!-- Sidebar navigation-->
                 <nav class="sidebar-nav">
+
                     <ul id="sidebarnav">
                         <li class="nav-devider"></li>
                         <li class="nav-label">Cloud Pool</li>
-                        <li> <a class="has-arrow  " href="#" aria-expanded="false"><i class="fa fa-tachometer"></i><span class="hide-menu">대시보드</span></a>
-                            <ul aria-expanded="false" class="collapse">
-                                <!-- 연결한 드라이브들만 리스트에 보이게 해야함 -->
-                                <%
-                                  var google_state = drive_state.googleCount;
-                                  var dropbox_state = drive_state.dropboxCount;
-                                  var box_state = drive_state.boxCount
-                                %>
-                                <li><a href="#" id="drives-state">내 드라이브 현황 </a></li>
-                                <% if(google_state > 0) { %>
-                                <li><a href="#" id="google">Google </a></li>
-                                <% } %>
-                                <% if(dropbox_state > 0) { %>
-                                <li><a href="#" id="dropbox">Dropbox </a></li>
-                                <% } %>
-                                <% if(box_state > 0) { %>
-                                <li><a href="#" id="box">Box </a></li>
-                                <% } %>
-                                <li><a href="#" id="split">Split </a></li>
-                            </ul>
-                        </li>
-                        <li> <a class="has-arrow" href="#" aria-expanded="false"><i class="ti-settings"></i><span class="hide-menu">설정</span></a>
+                        <%
+                          var google_state = drive_state.googleCount;
+                          var dropbox_state = drive_state.dropboxCount;
+                          var box_state = drive_state.boxCount
+                        %>
+                        <li><a href="#" id="dashboard"><span class='dashboard-ico nav-ico'></span><span>Dashboard</span></a></li>
+                        <% if(google_state > 0) { %>
+                        <li><a href="#" id="google"><span class='google-ico nav-ico'></span><span>Google</span></a></li>
+                        <% } %>
+                        <% if(dropbox_state > 0) { %>
+                        <li><a href="#" id="dropbox"><span class='dropbox-ico nav-ico'></span><span>Dropbox</span></a></li>
+                        <% } %>
+                        <% if(box_state > 0) { %>
+                        <li><a href="#" id="box"><span class='box-ico nav-ico'></span><span>Box</span></a></li>
+                        <% } %>
+
+                        <li><a href="#" class="setting-drive"><span class='connect-ico nav-ico'></span><span>드라이브 연결</span></a></li>
+
+
+                        <!-- <li> <a class="has-arrow" href="#" aria-expanded="false"><i class="ti-settings"></i><span class="hide-menu">설정</span></a>
                           <ul aria-expanded="false" class="collapse">
-                              <li><a href="#" class="setting-drive">드라이브 연결 </a></li>
+
                           </ul>
-                        </li>
+                        </li> -->
                     </ul>
+                    <div style="margin: 10px"></div>
+
+                    <ul id="sidebarnav">
+                      <li><a href="#" id="split"><span class='split-ico nav-ico'></span><span>Split Merge</span></a></li>
+                    </ul>
+
                 </nav>
                 <!-- End Sidebar navigation -->
             </div>
