@@ -5,7 +5,7 @@ var path = require('path'),
   async = require('async'),
   fs = require('fs'),
   request = require('request');
-
+  const redis_client = require('../config/redis');
 
 module.exports = (function() {
 
@@ -73,6 +73,54 @@ var deleteFile =function(userId,fileId,callback){
       callback(body);
     }
   );
+}
+
+var refreshList= function(userId,callback){
+  redis_client.hset("USER" + userId, "isWaitGoogle", 1, function(err, reply){
+    if(err){
+      console.log("REDIS ERROR: " + err);
+      callback();
+    } else {
+      console.log("REDIS REPLY: " + reply);
+
+      var data = {"userId" : userId};
+
+      request.post({
+        url: 'http://localhost:4000/api/google/refresh/list/',
+        body : data,
+        json : true
+      },
+        function(error, response, body){
+          if(error){
+            console.log('rest api server request error!');
+            redis_client.hset("USER" + userId, "isWaitGoogle", 0, function(err, reply){
+              if(err){
+                console.log("REDIS ERROR: " + err);
+                callback();
+              } else {
+                console.log("REDIS REPLY: " + reply);
+                callback(body);
+              }
+            });
+            callback();
+          }
+          else{
+            console.log(body);
+            console.log("Complete to register rest API Server - Google ");
+            redis_client.hset("USER" + userId, "isWaitGoogle", 0, function(err, reply){
+              if(err){
+                console.log("REDIS ERROR: " + err);
+                callback();
+              } else {
+                console.log("REDIS REPLY: " + reply);
+                callback(body);
+              }
+            });
+          }
+        }
+      );
+    }
+  });
 }
 
 // var downloadFile = function(res, fileId,oauth2Client) {
@@ -489,6 +537,7 @@ async function runSample (fileId, drive,res) {
     downloadFile: downloadFile,
     uploadFile: uploadFile,
     moveDir:moveDir,
+    refreshList:refreshList,
     // deleteFile: deleteFile,
     // updateFile: updateFile,
     // updateDir: updateDir,

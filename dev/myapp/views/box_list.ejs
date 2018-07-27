@@ -6,7 +6,7 @@
   <div class="card-body">
   <button type="button" onClick='Refresh()'>파일 리스트 최신화</button>&nbsp;&nbsp;
   <button type="button" onClick='SpaceCheck()'>공간 체크</button>&nbsp;&nbsp;
-  <select name="selecttype">
+  <select id="selecttype">
     <option value="document">문서</option>
     <option value="PDF">PDF</option>
     <option value="video">video</option>
@@ -41,14 +41,64 @@
         <thead>
           <tr>
             <td> </td>
-            <td>파일이름</td>
             <td>파일형식</td>
+            <td>파일이름</td>
             <td>올린날짜</td>
             <td>파일용량</td>
           </tr>
         </thead>
         <tbody>
         <%
+                function getImagePath(name){
+                    var splitdata = name.split(".");
+                    var mimetype = splitdata[splitdata.length-1];
+                    var imagesrc='';
+                    if(mimetype=='jpg'||mimetype=='jpeg'||mimetype=='png'||mimetype=='tiff'||mimetype=='tif'||mimetype=='gif'||mimetype=='bmp'){
+                      imagesrc='icons/filetype-icon/jpg.png'
+                    }
+                    else if(mimetype==='avi'){
+                      imagesrc='icons/filetype-icon/avi.png';
+                    }
+                    else if(mimetype==='csv'){
+                      imagesrc='icons/filetype-icon/csv.png';
+                    }
+                    else if(mimetype==='doc'){
+                      imagesrc='icons/filetype-icon/doc.png';
+                    }
+                    else if(mimetype==='iso'){
+                      imagesrc='icons/filetype-icon/iso.png';
+                    }
+                    else if(mimetype==='mp3'){
+                      imagesrc='icons/filetype-icon/mp3.png';
+                    }
+                    else if(mimetype==='mp4'){
+                      imagesrc='icons/filetype-icon/mp4.png';
+                    }
+                    else if(mimetype==='pdf'){
+                      imagesrc='icons/filetype-icon/pdf.png';
+                    }
+                    else if(mimetype==='ppt'||mimetype=='pptx'){
+                      imagesrc='icons/filetype-icon/ppt.png';
+                    }
+                    else if(mimetype==='svg'){
+                      imagesrc='icons/filetype-icon/svg.png';
+                    }
+                    else if(mimetype==='txt'){
+                      imagesrc='icons/filetype-icon/txt.png';
+                    }
+                    else if(mimetype==='xls'){
+                      imagesrc='icons/filetype-icon/xls.png';
+                    }
+                    else if(mimetype==='zip'){
+                      imagesrc='icons/filetype-icon/zip.png';
+                    }
+                    else{
+                      imagesrc='icons/filetype-icon/file.png';
+                    }
+
+                    return imagesrc;
+                }
+
                 <!--byte to kb,mb,gb  -->
                 function formatBytes(bytes,decimals) {
                    if(bytes == 0) return '0 Bytes';
@@ -69,14 +119,15 @@
             <tr ondrop="dropFormove(event)" ondragover="allowDrop(event)" value="<%=oneItem.id%>" class="folder-row">
               <td><input type="checkbox" class="checkbox" name="name" value="<%=oneItem.id%>"></td>
               <!--폴더라면 폴더 ID를 넘겨서 다시 URL을 전송한다.-->
+              <td name="type" value='<%=oneItem.type%>'>
+                <img name="imgsrc" src="icons/filetype-icon/folder.png">
+              </td>
               <td>
                 <a href="#" onclick="moveFolder_box(this)" value='<%=oneItem.id%>'>
                   <%=oneItem.name%>
                 </a>
               </td>
-              <td name="type" value='<%=oneItem.type%>'>
-                <%=oneItem.type%>
-              </td>
+
               <td>
                 <%=oneItem.modifiedTime%>
               </td>
@@ -90,12 +141,13 @@
 
             <tr ondragstart="dragStart(event)" draggable="true" value="<%=oneItem.id%>" class="file-row">
               <td><input type="checkbox" class="checkbox" name="name" value="<%=oneItem.id%>"></td>
+              <td name="type" value='<%=oneItem.type%>'>
+                <img name="imgsrc" src="<%=getImagePath(oneItem.name)%>">
+              </td>
               <td>
                 <%=oneItem.name%>
               </td>
-              <td name="type" value='<%=oneItem.type%>'>
-                <%=oneItem.type%>
-              </td>
+
               <td>
                 <%=oneItem.modifiedTime%>
               </td>
@@ -181,7 +233,14 @@
     else {
       document.action_box.action = 'box/download';
       document.action_box.submit();
-      $('.replace').load("box/folder/<%=FolderID%>");
+      $('.replace').load("box/folder/<%=FolderID%>", function(){
+        $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+          console.log("load dropzone.js: " + textStatus);
+        });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
+        });
+      });
     }
 
   }
@@ -212,7 +271,14 @@
         dataType: "JSON",
         success: function(json) {
           console.log(json);
-          $('.replace').load("box/folder/<%=FolderID%>");
+          $('.replace').load("box/folder/<%=FolderID%>", function(){
+            $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+              console.log("load dropzone.js: " + textStatus);
+            });
+            $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+              console.log("load context_menu.js: " + textStatus);
+            });
+          });
         },
         error: function(error) {
           console.log(error);
@@ -228,7 +294,14 @@
       async: false,
       success: function(json) {
         console.log(json);
-        $('.replace').load("box/folder/<%=FolderID%>");
+        $('.replace').load("box/folder/<%=FolderID%>", function(){
+          $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+            console.log("load dropzone.js: " + textStatus);
+          });
+          $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+            console.log("load context_menu.js: " + textStatus);
+          });
+        });
       },
       error: function(error) {
         console.log(error);
@@ -255,7 +328,14 @@
           if(json!='success') {
             alert(json);
           }
-          $('.replace').load("box/folder/<%=FolderID%>");
+          $('.replace').load("box/folder/<%=FolderID%>", function(){
+            $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+              console.log("load dropzone.js: " + textStatus);
+            });
+            $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+              console.log("load context_menu.js: " + textStatus);
+            });
+          });
         },
         error: function(error) {
           console.log(error);
@@ -296,7 +376,14 @@
           if(json!='success'){
             alert(json);
           }
-          $('.replace').load("box/folder/<%=FolderID%>");
+          $('.replace').load("box/folder/<%=FolderID%>", function(){
+            $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+              console.log("load dropzone.js: " + textStatus);
+            });
+            $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+              console.log("load context_menu.js: " + textStatus);
+            });
+          });
         },
         error: function(error) {
           console.log(error);
@@ -337,7 +424,14 @@
         if(json!='success'){
           alert(json);
         }
-        $('.replace').load("box/folder/<%=FolderID%>");
+        $('.replace').load("box/folder/<%=FolderID%>", function(){
+          $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+            console.log("load dropzone.js: " + textStatus);
+          });
+          $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+            console.log("load context_menu.js: " + textStatus);
+          });
+        });
       },
       error: function(error) {
         console.log(error);
@@ -350,8 +444,27 @@
       alert('검색 내용을 입력해주세요');
     } else {
       var content = $('#content').val();
-      $('.replace').load("box/search/"+content);
+      $('.replace').load("box/search/"+content, function(){
+        $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+          console.log("load dropzone.js: " + textStatus);
+        });
+        $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+          console.log("load context_menu.js: " + textStatus);
+        });
+      });
     }
+  }
+
+  function Select() {
+    var selecttype = $('#selecttype').val();
+    $('.replace').load("box/select/"+selecttype, function(){
+      $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+        console.log("load dropzone.js: " + textStatus);
+      });
+      $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+        console.log("load context_menu.js: " + textStatus);
+      });
+    });
   }
 
   function SpaceCheck() {
@@ -362,7 +475,14 @@
       success: function(json) {
         console.log(json);
         alert('total: '+json.total+", used: "+json.used);
-        $('.replace').load("box/folder/<%=FolderID%>");
+        $('.replace').load("box/folder/<%=FolderID%>", function(){
+          $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+            console.log("load dropzone.js: " + textStatus);
+          });
+          $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+            console.log("load context_menu.js: " + textStatus);
+          });
+        });
       },
       error: function(error) {
         console.log(error);
