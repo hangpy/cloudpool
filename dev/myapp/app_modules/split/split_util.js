@@ -76,7 +76,7 @@ const UTIL = (function() {
         result = size;
         return result;
     }
-
+   // 최소사이즈 보다 작을시 에러 메세지
   };
 
 
@@ -436,6 +436,18 @@ var checkDrive = function(userID, callback){
   });
 }
 
+var move = function(FolderID, target, dest){
+    knex('SPLIT_FILE_TB').where('',target).update({
+      parents : dest,
+      thisKeyIsSkipped : undefined
+    }).then(function(rows){
+      console.log('rows : '+rows);
+    }).catch(function(err){
+      console.log("SQL Error");
+      console.log(err);
+    });
+}
+
 
   return {
     storage: storage,
@@ -449,7 +461,8 @@ var checkDrive = function(userID, callback){
     orgFile: orgFile,
     zipFileU : zipFileU,
     rename : rename,
-    directory : directory
+    directory : directory,
+    move : move
   }
 })();
 

@@ -47,7 +47,7 @@ module.exports = function(){
           console.log('folderList : '+folderList);
           console.log('depth : ' + depth);
         res.render('split_list',{
-          FoldreID : id,
+          FolderID : id,
           filelist : childList,
           folderlist: folderList,
           depth : depth
@@ -55,6 +55,14 @@ module.exports = function(){
       });
     });
   });
+
+  router.post('/move/', function(req, res){
+    var FolderID = req.body.FolderID;
+    var target =  req.body.filename;
+    var dest = req.body.dest;
+    splitUtil.move(FolderID, target, dest);
+
+  })
 //
   router.post('/upload/', upload.single('userfile'), function(req, res)
   {
