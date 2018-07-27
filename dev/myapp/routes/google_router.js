@@ -123,6 +123,31 @@ router.post('/download', function(req, res) {
   });
 });
 
+router.post('/getthumbnail/',function(req,res){
+  var fileId=req.body.path;
+  google_init(req.user, function(client) {
+    google_util.getThumbnailLink(fileId,client,function(thumbNail){
+      var result = [req.body.order, req.body.hashID, thumbNail]
+      res.json(result);
+    });
+  });
+});
+
+router.post('/mvdir/:id',function(req,res){
+  var fileId=req.body.fileId;
+  var folderId=req.body.folderId;
+  var CurfolderId = req.params.id;
+  console.log(req.body);
+  google_init(req.user, function(client) {
+    google_util.moveDir(req.user.userID,fileId,folderId,CurfolderId,function(result){
+      res.json(result);
+    });
+  });
+});
+
+
+
+
 router.post('/changedir/:id',function(req,res){
   google_init(req.user, function(client) {
     var fileId ;
@@ -137,16 +162,6 @@ router.post('/makedir/:id',function(req,res){
     var foldername;
     var FolderID;
     google_util.makeDir(foldername,FolderID,client);
-  });
-});
-
-router.post('/getthumbnail/',function(req,res){
-  var fileId=req.body.path;
-  google_init(req.user, function(client) {
-    google_util.getThumbnailLink(fileId,client,function(thumbNail){
-      var result = [req.body.order, req.body.hashID, thumbNail]
-      res.json(result);
-    });
   });
 });
 
