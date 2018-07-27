@@ -130,6 +130,16 @@ router.get('/search/:content', function(req, res) {
   });
 });
 
+router.get('/select/:selecttype', function(req, res) {
+  var selecttype = req.params.selecttype;
+  box_util.selectRest(req.user.userID, selecttype, function(filelist) {
+    res.render('box_list', {
+      FolderID: 0,
+      filelist: filelist
+    });
+  });
+});
+
 router.post('/space', function(req, res) {
   box_init(req.user, function(client) {
     box_util.spaceCheck(client, function(total, used){

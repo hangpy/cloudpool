@@ -55,7 +55,11 @@ $(function() {
    if (files.length < 1)
      return;
 
-   F_FileMultiUpload(files, obj, drive, folderID);
+   if(drive=='box') {
+     F_FileMultiUpload_b(files, folderID);
+   } else {
+     F_FileMultiUpload(files, obj, drive, folderID);
+   }
  });
 });
 
@@ -86,6 +90,38 @@ function F_FileMultiUpload(files, obj, drive, folderID) {
         Refresh();
       }
 
+    });
+  }
+}
+
+function F_FileMultiUpload_b(files, folderID) {
+  if (confirm(files.length + "개의 파일을 업로드 하시겠습니까?")) {
+    var data = new FormData();
+    for (var i = 0; i < files.length; i++) {
+      data.append('uploadfile', files[i]);
+    }
+    $.ajax({
+      type: "POST",
+      url: "box/upload/"+folderID,
+      async: true,
+      data: data,
+      processData: false,
+      contentType: false,
+      success: function(json) {
+        console.log(json);
+        alert(json);
+        $('.replace').load("box/folder/"+folderID, function(){
+          $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
+            console.log("load dropzone.js: " + textStatus);
+          });
+          $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
+            console.log("load context_menu.js: " + textStatus);
+          });
+        });
+      },
+      error: function(error) {
+        console.log(error);
+      }
     });
   }
 }

@@ -465,3 +465,59 @@ ul.contextMenu li:last-child:hover a:hover {
   display:none;
 }
 */
+
+
+
+
+/* function state */
+.board-body .mv-file-info-box,
+.board-body .del-file-info-box,
+.board-body .cg-file-info-box,
+.board-body .sh-file-info-box,
+.board-body .mk-folder-info-box {
+  visibility: hidden;
+  position: fixed;
+  height: 120px;
+  width: 300px;
+  right: 20px;
+  bottom: -120px;
+  padding: 0px
+}
+
+.popcard-title {
+  width: 100%;
+  height: 30px;
+  padding-left: 20px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: rgb(85, 85, 85);
+}
+
+.popcard-title span {
+  padding: 5px;
+  line-height: 30px;
+}
+
+.popcard-content {
+  height: 100%;
+  margin: 20px 10px 20px 10px;
+}
+
+.popcard-content span.popcard-content-text {
+  padding: 30px;
+  padding-left: 15px;
+  font-weight:bolder;
+  font-size: 14px;
+  color: rgb(75, 75, 75);
+  line-height: 50px;
+}
+
+.popcard-content span.loading-img {
+  width: 14px;
+  height: 14px;
+  padding: 20px;
+  padding-top: 12px;
+  background: url('../images/loading1.gif') no-repeat;
+  background-size: contain;
+}
