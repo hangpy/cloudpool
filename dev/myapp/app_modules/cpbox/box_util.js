@@ -77,13 +77,17 @@ module.exports = (function(){
   }
 
 
-  var downloadFile = function(client, fileId){
+  var downloadFile = function(client, fileId, res){
     client.files.getReadStream(fileId).then(stream => {
       client.files.get(fileId).then(file => {
         var fileName = file.name;
         console.log(fileName);
-        var output = fs.createWriteStream('../app_modules/cpbox/download/'+fileName);
-        stream.pipe(output);
+        var newFileName = encodeURIComponent(fileName);
+
+        res.setHeader('Content-disposition', 'attachment; filename*=UTF-8\'\'' + newFileName); //origFileNm으로 로컬PC에 파일 저장
+        // res.setHeader('Content-type', mimetype);
+        stream.pipe(res)
+        .on('finish', function () { console.log("finish"); });
       })
     })
   }
@@ -215,6 +219,17 @@ module.exports = (function(){
   	});
   }
 
+  var spaceCheck = function(client, callback) {
+    client.users.get(client.CURRENT_USER_ID, null, function(err, info){
+      if(err)console.log(err);
+      else{
+        console.log("used : "+ info.space_used);
+        console.log("Total : "+ info.space_amount);
+        callback(info.space_amount, info.space_used);
+      }
+    });
+  }
+
 
   return {
     listFileRest: listFileRest,
@@ -229,7 +244,8 @@ module.exports = (function(){
     renameFileRest: renameFileRest,
     movePathRest: movePathRest,
     thumbnail: thumbnail,
-    search: search
+    search: search,
+    spaceCheck: spaceCheck
   }
 
 })();

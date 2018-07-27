@@ -66,19 +66,9 @@ router.post('/upload/:id', function(req, res) {
 })
 
 router.post('/download', function(req, res) {
-  box_init(req.user, function(clinet) {
-    var backURL = req.header('Referer') || '/';
-    console.log(req.body);
+  box_init(req.user, function(client) {
     var FileID = req.body.name;
-    if (Array.isArray(FileID)) {
-      async.map(FileID, function(id, callback) {
-        box_util.downloadFile(id);
-        callback(null, 'finish');
-      });
-    } else {
-      box_util.downloadFile(clinet, FileID);
-    }
-    res.redirect(backURL);
+    box_util.downloadFile(client, FileID, res);
   });
 });
 
@@ -135,6 +125,18 @@ router.post('/search', function(req, res) {
         FolderID: 0,
         filelist: filelist
       });
+    });
+  });
+});
+
+router.post('/space', function(req, res) {
+  box_init(req.user, function(client) {
+    box_util.spaceCheck(client, function(total, used){
+      var space = {
+        'total':total,
+        'used':used
+      }
+      res.json(space);
     });
   });
 });
