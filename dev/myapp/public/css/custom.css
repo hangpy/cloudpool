@@ -254,6 +254,12 @@ body.register-body .container-fluid {
   visibility: hidden;
 }
 
+.board-body table .folder-row td img,
+.board-body table .file-row td img {
+  width: 36px;
+  height: 36px;
+}
+
 /* toast CSS */
 
 #toast {

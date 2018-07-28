@@ -81,14 +81,16 @@ function F_FileMultiUpload(files, obj, drive, folderID) {
       success: function(response) {
         console.log("success");
 
-        // if(drive=='google') {
-        //   $('.replace').load(drive + '/folder/'+ folderID);
-        // }else
+        if(drive=='google') {
+          $('.replace').load(drive + '/folder/'+ folderID, function(){
+            $.getScript('/js/loadjs.js', function(data, textStatus, jqxhr) {
+              console.log("load loadjs.js: " + textStatus);
+            });
+          });
+        }else
         if(drive!='split'){
           Refresh();
         }
-
-
       },
       complete: function(response) {
         console.log('response : '+ response);
@@ -119,11 +121,8 @@ function F_FileMultiUpload_b(files, folderID) {
         console.log(json);
         alert(json);
         $('.replace').load("box/folder/"+folderID, function(){
-          $.getScript('/js/dropzone.js', function(data, textStatus, jqxhr) {
-            console.log("load dropzone.js: " + textStatus);
-          });
-          $.getScript('/js/context_menu.js', function(data, textStatus, jqxhr) {
-            console.log("load context_menu.js: " + textStatus);
+          $.getScript('/js/loadjs.js', function(data, textStatus, jqxhr) {
+            console.log("load loadjs.js: " + textStatus);
           });
         });
       },
